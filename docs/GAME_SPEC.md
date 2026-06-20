@@ -1,4 +1,4 @@
-# Politics UK — Game Specification (Draft v0.3)
+# Politics UK — Game Specification (Draft v0.4)
 
 > **Status:** Living draft. Sections marked _(MVP)_ are the first build target; _(Later)_ items
 > are captured now so the architecture leaves room for them but are out of scope for the first
@@ -122,11 +122,23 @@ interface Party {
   leadership: PartyOfficer[];   // leader, deputy, etc. (date-stamped)
   founded?: number;
   mergedFrom?: string[];        // sister parties folded into this one (§4.3)
-  stances?: Record<string, {    // policy-axis positions for the sim engine (§10.5)
-    value: number;              //   −1.0 … +1.0
-    source: 'manifesto' | 'estimated';
-  }>;
+  compass?: CompassSummary;     // overall position; the shaded circle on cards/panel (§4.4)
+  stances?: Record<PolicyId, PolicyStance>;  // per-policy positions for the sim engine (§4.4, §10.5)
 }
+
+// Political-compass model (§4.4). Every stance is a 2D point, not a 1D slider.
+interface CompassPosition {
+  economic: number;             // −1 (left)        … +1 (right)
+  social: number;               // −1 (libertarian) … +1 (authoritarian)
+}
+type PolicyId = string;         // "immigration", "net_zero", …
+interface PolicyStance {
+  position: CompassPosition;
+  consistency: number;          // 0…1; the compass circle's radius grows as this falls
+  salience: number;             // 0…1; how much this issue currently matters (sim weight)
+  source: 'manifesto' | 'estimated';
+}
+interface CompassSummary { position: CompassPosition; consistency: number; }
 
 interface PartyOfficer {
   role: 'leader' | 'deputy_leader' | 'chair' | 'chief_whip' | string;
@@ -186,6 +198,41 @@ leader, and combined seat/representation totals. Confirmed merges:
 
 The `mergedFrom` field records what was combined so totals stay auditable and the merge is reversible
 if ever needed. Other sister-party cases discovered during data-gathering get added here.
+
+### 4.4 Policy axes — the political-compass model
+
+Party positions are **not** simple left/right sliders. Each stance is a point on a **2D political
+compass** with a circle around it for approximation:
+
+- **Economic axis** — left ↔ right (`economic: −1 … +1`).
+- **Social axis** — libertarian ↔ authoritarian (`social: −1 … +1`).
+- **Consistency circle** — each position carries a `consistency` value (`0…1`) rendered as a
+  **lightly shaded, bordered circle** whose **radius grows as consistency falls**. A small, tight
+  circle = a party that holds that position firmly and uniformly; a large circle = an internally
+  divided or fuzzy position. (This is the approximation the player sees and the sim reasons about.)
+
+Each party has an **overall `compass` summary** (the at-a-glance circle shown on selector cards and
+the party panel) plus **per-policy `stances`** used by the simulation.
+
+#### Two policy tiers
+
+Policy areas are grouped by impact:
+
+- **Major (~8–10)** — broad effect on daily life and public opinion; **weighted more** in the sim.
+- **Minor (~16–20)** — smaller aggregate effect, but can have **passionate supporters/opponents**;
+  **some are party-specific** (only certain parties hold a stance), flagged `partySpecific` in the
+  policy registry.
+
+Illustrative (not final — confirm the exact lists when scoring manifestos):
+
+| Tier | Policy areas (illustrative) |
+| --- | --- |
+| **Major** | immigration & borders · economy & taxation · public spending & services · health & social care (NHS) · environment & net zero · Europe / Brexit relationship · law & order · housing · defence & foreign affairs · constitution & devolution |
+| **Minor** | welfare & benefits · pensions / triple lock · education & schools · tuition fees · transport & infrastructure · energy mix (nuclear, North Sea) · farming & fishing · animal welfare · drugs policy · assisted dying · abortion · LGBTQ+ / gender recognition · monarchy / republic _(party-specific)_ · electoral reform / PR _(party-specific)_ · Lords reform · Scottish / Welsh independence _(party-specific)_ · foreign aid (0.7%) · trade unions & workers' rights · press regulation / free speech · gambling regulation |
+
+Stances are sourced from **party manifestos of the scenario period** (`source: 'manifesto'`) where
+available, otherwise `estimated` — the "hard, honest data" gathered alongside seats ([§5](#5-data-acquisition-plan)).
+The sim combines per-policy alignment weighted by **tier** (major > minor) and **salience** ([§10.5](#105-simulation-engine--policy-effects)).
 
 ---
 
@@ -392,18 +439,21 @@ modelling real parties.
 
 ### 10.5.1 Model
 
-1. **Policy axes.** A fixed set of issue axes — e.g. immigration, environment, tax, public spending,
-   EU/Brexit, social liberalism, law & order, devolution. Each scored e.g. `−1.0 … +1.0`.
-2. **Party stances.** Each party has a position on every axis, **derived from its manifesto of the
-   scenario period** (flagged `source: 'manifesto' | 'estimated'`). This is the "hard, honest data"
-   to be gathered alongside seat data ([§5](#5-data-acquisition-plan)).
-3. **Voter segments & party base.** Voter segments (and each party's **core base**) are scored on the
-   same axes, plus an **issue-salience** weight per axis (how much that issue currently matters).
-4. **Events / actions as deltas.** An **event** shifts axis *positions* and/or *salience* in the
+1. **Policy areas on a 2D compass.** A fixed set of policy areas ([§4.4](#44-policy-axes--the-political-compass-model)),
+   each a position on the **economic (left↔right)** and **social (libertarian↔authoritarian)** axes,
+   grouped into **major (~8–10, weighted more)** and **minor (~16–20, some party-specific)** tiers.
+2. **Party stances.** Each party has a compass position per policy area (with a `consistency` value),
+   **derived from its manifesto of the scenario period** (flagged `source: 'manifesto' | 'estimated'`).
+   This is the "hard, honest data" gathered alongside seat data ([§5](#5-data-acquisition-plan)).
+3. **Voter segments & party base.** Voter segments (and each party's **core base**) sit in the same
+   2D space, plus an **issue-salience** weight per area (how much that issue currently matters).
+4. **Events / actions as deltas.** An **event** shifts compass *positions* and/or *salience* in the
    world. A **player action** deliberately shifts the player party's own position.
-5. **Polling update** = a function of party↔segment **alignment** (weighted by salience), **plus a
-   base-betrayal penalty** when a party moves sharply away from its core identity — heavy lurches
-   annoy the core base and can backfire.
+5. **Polling update** = a function of party↔segment **alignment** (2D distance, weighted by policy
+   **tier** and **salience**), **plus a base-betrayal penalty** when a party moves sharply away from
+   its core identity — heavy lurches annoy the core base and can backfire. A party's per-policy
+   `consistency` (circle size) modulates how exposed it is: a fuzzy position pleases fewer voters
+   intensely but is less likely to trigger a betrayal penalty than abandoning a tightly-held one.
 
 ### 10.5.2 Worked examples (the player's hypotheticals)
 - **Migration falls to ~0 / illegal migration stops** → immigration **salience** collapses → Reform's
@@ -500,14 +550,17 @@ Grouped by impact. None block starting Phase 0, but answers shape Phase 1.
   engine, driven by events (acted-on or not) against manifesto-derived party stances.
 - ✅ **Effects engine** — deterministic spatial/saliency model, **not** an LLM ([§10.5](#105-simulation-engine--policy-effects)).
 - ✅ **Merged parties** — Labour+Co-op, Green E&W+Scottish Greens ([§4.3](#43-merging-associated-parties)).
+- ✅ **Policy axes** — **2D political compass** (economic left↔right × social libertarian↔authoritarian)
+  with a `consistency` circle, grouped into **major (~8–10)** and **minor (~16–20, some party-specific)**
+  tiers ([§4.4](#44-policy-axes--the-political-compass-model)). Exact area lists confirmed when scoring manifestos.
+- ✅ **Event format** — to be designed as part of the event-system build task (Phase 1).
+- ✅ **Party finance** — **estimates are fine**; no factual basis required. Use a real reference point
+  where one is handy, otherwise approximate from other party data (members, seats). Flag `estimated`.
+- ✅ **Working title** — "Politics UK" placeholder confirmed for now.
 
 **Still open — lower impact / later**
-1. **Policy axes** — confirm the axis list in [§10.5.1](#1051-model) (immigration, environment, tax,
-   spending, EU, social liberalism, law & order, devolution) or adjust before I score manifestos.
-2. **Event format** — happy for me to design the event schema, or do you have a structure in mind?
-3. **Party finance** — acceptable to show estimates with a footnote where real figures are absent?
-4. **Working title** — "Politics UK" is a placeholder; any preferred name?
+- _None outstanding._ New questions will be logged here as the build progresses.
 
 ---
 
-_End of draft v0.1._
+_End of draft v0.4._

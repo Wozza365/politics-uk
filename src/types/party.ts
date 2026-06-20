@@ -1,3 +1,5 @@
+import type { CompassSummary, PolicyId, PolicyStance } from './policy'
+
 export type PartyId = string // stable slug, e.g. "labour", "snp"
 export type ISODate = string // "2025-01-01"
 
@@ -6,11 +8,6 @@ export interface PartyOfficer {
   personName: string
   since?: ISODate
   portrait?: string // placeholder image with name for now
-}
-
-export interface PartyStance {
-  value: number // -1.0 ... +1.0
-  source: 'manifesto' | 'estimated'
 }
 
 export interface Party {
@@ -23,7 +20,8 @@ export interface Party {
   leadership: PartyOfficer[]
   founded?: number
   mergedFrom?: string[] // sister parties folded into this one (spec §4.3)
-  stances?: Record<string, PartyStance> // policy-axis positions for the sim engine (spec §10.5)
+  compass?: CompassSummary // overall position; the shaded circle on cards/panel (spec §4.4)
+  stances?: Record<PolicyId, PolicyStance> // per-policy positions for the sim engine (spec §10.5)
 }
 
 export interface PartyFinance {

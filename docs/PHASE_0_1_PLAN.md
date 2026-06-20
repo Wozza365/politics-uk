@@ -167,8 +167,10 @@ Vite + Vue 3 + TS + Pinia + Tailwind, `@/` alias, builds clean. No action.
 2. **Polling:** snapshot headline voting-intention % per party at ~2025-01-01 from a public
    aggregate (e.g. Wikipedia "Opinion polling for the next UK general election"). Record the
    source/as-of date in a comment or sibling `sources.json`.
-3. **Finance:** populate `PartyFinance` with `source: 'estimated'` where figures aren't
-   directly reported; never present an estimate as reported (spec §4.2 provenance note).
+3. **Finance:** **estimates are fine and expected — no factual basis required** (resolved, spec
+   §13). Use a real reported figure as a starting reference where one is handy, otherwise
+   approximate from other party data (membership, seat counts). Mark every value
+   `source: 'estimated'`; this is **not** a network-blocked step.
 4. **Membership:** latest published figures; flag estimates.
 5. Keep `boundaries.commons.json` separate from `scenario.json` (boundaries are large and
    change rarely; scenario state is small and per-date).
@@ -297,7 +299,8 @@ stops without a rewrite.
    the map/hemicycle).
 3. Card layout (spec §7.2): party name (top); **leader portrait placeholder** showing the
    leader's name (middle); details — leader, Commons seats, total council seats, plus
-   at-a-glance extras (devolved seats, headline polling %); difficulty badge (P1.2.3).
+   at-a-glance extras (devolved seats, headline polling %); difficulty badge (P1.2.3); and the
+   party's **compass summary** (P1.2.5) as a small at-a-glance circle.
 4. Style the card **in the party's colours** using `colours.primary` as background and
    `colours.onPrimary` as text (already WCAG-verified at data-build time, P0.3.3). Pull every
    number from the scenario store — **no hard-coded figures** (spec §7.3).
@@ -321,8 +324,29 @@ minor parties hard but capped); pure function, unit-testable.
 `game.startGame(partyId)` then `ui.goToLoading()`.
 **Acceptance:** Disabled with no selection; starts the game with the chosen party + scenario.
 
+#### P1.2.5 — Political-compass view (shared component)
+**Goal.** Spec §4.4: render party positions on the **2D political compass** — economic
+(left↔right) × social (libertarian↔authoritarian) — as **lightly shaded, bordered circles**
+whose **radius grows as `consistency` falls**. Reused by the party card (compact, overall
+`compass` summary) and the party panel (P1.7, fuller view). **Build it once, parameterised.**
+**Steps:**
+1. Create `src/components/CompassView.vue`. Props: an array of plotted items
+   `{ position: CompassPosition; consistency: number; colour: string; label?: string }` plus a
+   `size`/`compact` flag.
+2. Draw the 2D plane: quadrant gridlines and axis labels (economic x, social y), each item as a
+   circle centred at `(position.economic, position.social)` mapped to plane coords, radius a
+   function of `1 − consistency`, filled with the party colour at low opacity + a solid border.
+3. **Compact mode** (card): just the party's overall `compass` circle, minimal chrome.
+   **Full mode** (panel): can later overlay multiple parties and/or per-policy stances (Phase 2
+   detail — keep the prop shape ready, don't build the per-policy cloud yet).
+4. Use the existing `MapRenderer`-style discipline: this is a pure presentational component
+   driven by data; **no game logic inside**. Types come from `src/types/policy.ts`.
+**Acceptance:** Given a `CompassSummary` + colour, renders a correctly-placed, correctly-sized
+shaded circle with axis labels; compact and full modes both work; unit test covers the
+position→coords and consistency→radius mapping.
+
 **Files (P1.2):** `src/screens/StartScreen.vue`, `src/components/PartyCard.vue`,
-`src/components/DifficultyBadge.vue`, `src/sim/difficulty.ts`.
+`src/components/DifficultyBadge.vue`, `src/components/CompassView.vue`, `src/sim/difficulty.ts`.
 
 ### P1.3 — Loading screen `🔲`
 **Goal.** Spec §8: centred spinner while scenario data, boundaries, and derived state load.
@@ -396,7 +420,8 @@ reads cleanly; `seatsPerDot` parameter proven by a unit test even if Commons use
      (smaller); **Lords shown separately**, never in the combined total (spec §9.3);
    - party finance (estimated; flagged); membership;
    - confirmed extras: leader approval rating, vote-share **trend arrow** (momentum), councils
-     controlled, days since last election.
+     controlled, days since last election;
+   - the party's **compass summary** via `CompassView` (P1.2.5) — the player's overall position.
 2. All values from `game`/`scenario` stores. For MVP, tiers beyond Commons may be 0/"—" with a
    footnote until Phase 2 data exists — but the **layout** must already accommodate them.
 3. Add a non-functional "expand" affordance that, per spec §9.5, will later pause the clock when
@@ -457,26 +482,33 @@ day one. MVP = a working, balanced minimal version; depth comes later.
 
 **Depends on:** P1.1.
 
-#### P1.11.1 — Policy axes + types
-**Steps:** In `src/sim/axes.ts`, define the fixed axis list (spec §10.5.1: immigration,
-environment, tax, public spending, EU/Brexit, social liberalism, law & order, devolution — this
-is the still-open item in spec §13.1; **confirm the list with the product owner before scoring
-manifestos**, but the engine can be built against a provisional list). Types: `AxisId`,
-`Stance = { value: -1..1, source }` (already in `Party.stances`), `Salience = Record<AxisId,
-number>`.
-**Acceptance:** Axis list centralised; `Party.stances` keyed by these axes; types compile.
+#### P1.11.1 — Policy registry + compass types
+**Goal.** Spec §4.4 (resolved): the **2D political-compass** model. Stance/compass types
+already live in `src/types/policy.ts` (`CompassPosition`, `PolicyDef`, `PolicyStance`,
+`CompassSummary`) — **use them, don't redefine**.
+**Steps:**
+1. In `src/sim/policies.ts` (or `src/data/sim/policies.json`), define the **policy registry**: the
+   **major (~8–10)** and **minor (~16–20, some `partySpecific`)** areas from spec §4.4. Treat the
+   illustrative lists there as the provisional starting set; refine when scoring manifestos.
+2. Each policy is positioned on the **2D compass** (economic × social), not a 1D value. Major
+   policies carry a larger **tier weight** than minor ones in the sim.
+3. Provide a `salience: Record<PolicyId, number>` for the world's current issue salience.
+**Acceptance:** Registry centralised with major/minor tiers; `Party.stances` is keyed by these
+`PolicyId`s and typed as `PolicyStance`; types compile; no duplicate stance type definitions.
 
 #### P1.11.2 — Voter segments + party base
-**Steps:** In `src/sim/segments.ts`, define voter segments scored on the same axes, each with a
-size weight, plus per-party **core base** definitions. For MVP these can be a small hand-authored
-set in `src/data/sim/segments.json` (flagged as tunable/estimated). Structure for later
-data-driven refinement.
-**Acceptance:** Segments + bases load from data; sum of segment weights normalised.
+**Steps:** In `src/sim/segments.ts`, define voter segments positioned in the **same 2D compass
+space**, each with a size weight, plus per-party **core base** positions. For MVP these can be a
+small hand-authored set in `src/data/sim/segments.json` (flagged as tunable/estimated). Structure
+for later data-driven refinement.
+**Acceptance:** Segments + bases load from data with 2D positions; sum of segment weights normalised.
 
 #### P1.11.3 — Polling update function
 **Steps:** In `src/sim/poll.ts`, implement: `polling = f(alignment(party, segment) weighted by
-salience) − baseBetrayalPenalty(party movement vs core base)` (spec §10.5.1 step 5). Pure,
-deterministic, synchronous, client-side. Normalise outputs so the field sums sensibly.
+policy tier × salience) − baseBetrayalPenalty(party movement vs core base)` (spec §10.5.1 step 5).
+Alignment is **2D distance** on the compass; a stance's `consistency` modulates exposure (a fuzzy
+position pleases fewer voters intensely but is less betrayal-prone). Pure, deterministic,
+synchronous, client-side. Normalise outputs so the field sums sensibly.
 **Acceptance:** Pure function; given identical inputs returns identical outputs; no randomness in
 the core path (any procedural variety must be seeded/deterministic).
 
@@ -486,8 +518,9 @@ the core path (any procedural variety must be seeded/deterministic).
 base-betrayal collapse among their segment. Assert the **direction** of each move.
 **Acceptance:** All three qualitative outcomes reproduced by tests.
 
-**Files (P1.11):** `src/sim/{axes,segments,poll,difficulty}.ts`,
-`src/data/sim/segments.json`, plus tests.
+**Files (P1.11):** `src/sim/{policies,segments,poll,difficulty}.ts`,
+`src/data/sim/{policies,segments}.json`, plus tests. (Stance/compass **types** already exist in
+`src/types/policy.ts` — reuse them.)
 
 ### P1.12 — Event system (MVP) `🔲`
 **Goal.** Spec §10 + §9.5: a daily event roll from a weighted pool; some events require a player
@@ -595,13 +628,17 @@ network access for P0.3.1–4.
 
 ---
 
-## B. Decisions to confirm with the product owner
+## B. Decisions — all resolved (spec §13)
 
-These are flagged open in spec §13 and gate specific tasks (not the whole plan):
-1. **Policy-axis list** (gates P1.11.1 manifesto scoring) — confirm the eight-ish axes before
-   hand-scoring manifestos.
-2. **Event schema** (gates P1.12.1) — confirm the proposed format before authoring a library.
-3. **Party-finance estimates** — confirm "estimate-with-footnote" is acceptable for finance
-   figures that aren't publicly reported.
-4. **Working title** — "Politics UK" is the placeholder; confirm or change.
+The product owner has answered the previously-open questions; recorded here for the executing
+agent. **No decisions block this plan.**
+1. ✅ **Policy axes** — **2D political compass** (economic left↔right × social
+   libertarian↔authoritarian) with a `consistency` circle, split into **major (~8–10)** and
+   **minor (~16–20, some party-specific)** tiers (spec §4.4). Drives P1.2.5, P1.11.1. The exact
+   area lists are still refined *when scoring manifestos*, but the model and provisional lists are set.
+2. ✅ **Event schema** — design it as part of P1.12.1 (no pre-approval needed).
+3. ✅ **Party finance** — **pure estimates are fine**, no factual basis required; use a real
+   reference point where handy, else approximate from members/seats. Always flag `estimated`
+   (P0.3.4). This *removes* the earlier constraint — don't block on sourcing real finance figures.
+4. ✅ **Working title** — "Politics UK" placeholder confirmed.
 ```
