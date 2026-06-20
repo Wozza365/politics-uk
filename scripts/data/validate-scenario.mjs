@@ -1,0 +1,202 @@
+// Validates a scenario dataset against the invariants from spec §5.2 step 5
+// ("seat counts must reconcile to known totals... CI check") and §7.2 (WCAG
+// party-card contrast). Run with `npm run validate:data`.
+//
+// Validates the real dataset (scenario.json + boundaries.commons.json) by
+// default; pass --placeholder to validate the placeholder fixtures instead
+// (composition.placeholder.json + boundaries.placeholder.json) — both use
+// this same validator so a future CI check covers either.
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+// Known seat totals per tier (spec §4.1); only tiers actually present in the
+// dataset are checked, so this stays correct as later tiers (Phase 2+) land.
+const KNOWN_TIER_SEAT_TOTALS = {
+  commons: 650,
+  holyrood: 129,
+  senedd: 60,
+  ni_assembly: 90,
+  london_assembly: 25,
+}
+
+const MIN_CONTRAST = 4.5
+
+function readJson(relativePath) {
+  const path = fileURLToPath(new URL(relativePath, import.meta.url))
+  return JSON.parse(readFileSync(path, 'utf-8'))
+}
+
+function srgbToLinear(c) {
+  return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+}
+
+function relativeLuminance(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const [R, G, B] = [r, g, b].map(srgbToLinear)
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B
+}
+
+function contrastRatio(hexA, hexB) {
+  const lA = relativeLuminance(hexA)
+  const lB = relativeLuminance(hexB)
+  const [lighter, darker] = lA > lB ? [lA, lB] : [lB, lA]
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+
+function isValidIsoDate(value) {
+  if (typeof value !== 'string' || !ISO_DATE_RE.test(value)) return false
+  return !Number.isNaN(new Date(value).getTime())
+}
+
+class ValidationErrors extends Error {
+  constructor(errors) {
+    super(`${errors.length} validation error(s):\n` + errors.map((e) => `  - ${e}`).join('\n'))
+    this.errors = errors
+  }
+}
+
+function validate(scenario, boundariesByTier) {
+  const errors = []
+
+  if (!isValidIsoDate(scenario.date)) errors.push(`scenario.date is not a valid ISO date: ${scenario.date}`)
+
+  const partyIds = new Set(scenario.parties.map((p) => p.id))
+
+  // Party master list integrity: every party has the required fields and
+  // passes WCAG contrast.
+  for (const party of scenario.parties) {
+    if (!party.id || !party.name || !party.shortName) {
+      errors.push(`party "${party.id ?? '(missing id)'}" is missing a required field (id/name/shortName)`)
+    }
+    const { primary, onPrimary } = party.colours ?? {}
+    if (!primary || !onPrimary) {
+      errors.push(`party "${party.id}" is missing colours.primary/onPrimary`)
+      continue
+    }
+    const ratio = contrastRatio(primary, onPrimary)
+    if (ratio < MIN_CONTRAST) {
+      errors.push(
+        `party "${party.id}" colours.onPrimary (${onPrimary}) on primary (${primary}) only reaches ` +
+          `${ratio.toFixed(2)}:1 contrast, below the required ${MIN_CONTRAST}:1`,
+      )
+    }
+  }
+
+  // Per-tier seat/region/geometry reconciliation.
+  for (const [tierId, regions] of Object.entries(scenario.tiers)) {
+    const expectedTotal = KNOWN_TIER_SEAT_TOTALS[tierId]
+    if (expectedTotal !== undefined && regions.length !== expectedTotal) {
+      errors.push(`tier "${tierId}" has ${regions.length} regions, expected ${expectedTotal}`)
+    }
+
+    const boundaryRefs = boundariesByTier[tierId]
+    const seenRegionIds = new Set()
+
+    for (const region of regions) {
+      if (!region.id || !region.geometryRef || !region.name) {
+        errors.push(`tier "${tierId}": region is missing id/geometryRef/name (id: ${region.id})`)
+        continue
+      }
+      if (seenRegionIds.has(region.id)) errors.push(`tier "${tierId}": duplicate region id "${region.id}"`)
+      seenRegionIds.add(region.id)
+
+      if (boundaryRefs && !boundaryRefs.has(region.geometryRef)) {
+        errors.push(`tier "${tierId}": region "${region.id}" geometryRef "${region.geometryRef}" has no matching boundary`)
+      }
+
+      if (!region.seats || region.seats.length === 0) {
+        errors.push(`tier "${tierId}": region "${region.id}" has no seats`)
+        continue
+      }
+      for (const seat of region.seats) {
+        if (!partyIds.has(seat.party)) {
+          errors.push(`tier "${tierId}": region "${region.id}" seat references unknown party "${seat.party}"`)
+        }
+        if (seat.majority !== undefined && (typeof seat.majority !== 'number' || Number.isNaN(seat.majority))) {
+          errors.push(`tier "${tierId}": region "${region.id}" seat.majority is not a valid number`)
+        }
+        if (seat.voteShare !== undefined && (typeof seat.voteShare !== 'number' || Number.isNaN(seat.voteShare))) {
+          errors.push(`tier "${tierId}": region "${region.id}" seat.voteShare is not a valid number`)
+        }
+        if (seat.electedAt !== undefined && !isValidIsoDate(seat.electedAt)) {
+          errors.push(`tier "${tierId}": region "${region.id}" seat.electedAt is not a valid ISO date`)
+        }
+      }
+    }
+
+    // Boundaries -> regions: every boundary geometry should be claimed by a region.
+    if (boundaryRefs) {
+      const regionGeometryRefs = new Set(regions.map((r) => r.geometryRef))
+      for (const ref of boundaryRefs) {
+        if (!regionGeometryRefs.has(ref)) {
+          errors.push(`tier "${tierId}": boundary geometryRef "${ref}" has no matching region`)
+        }
+      }
+    }
+  }
+
+  // Polling: each entry is a finite number; total should be sensible (<=100).
+  let pollingTotal = 0
+  for (const [partyId, pct] of Object.entries(scenario.polling ?? {})) {
+    if (!partyIds.has(partyId)) errors.push(`polling references unknown party "${partyId}"`)
+    if (typeof pct !== 'number' || Number.isNaN(pct)) errors.push(`polling.${partyId} is not a valid number`)
+    else pollingTotal += pct
+  }
+  if (pollingTotal > 100) errors.push(`polling sums to ${pollingTotal}, expected <= 100`)
+
+  // Finance: every entry is provenance-flagged.
+  for (const [partyId, finance] of Object.entries(scenario.finances ?? {})) {
+    if (!partyIds.has(partyId)) errors.push(`finances references unknown party "${partyId}"`)
+    if (finance.source !== 'reported' && finance.source !== 'estimated') {
+      errors.push(`finances.${partyId}.source must be 'reported' or 'estimated', got "${finance.source}"`)
+    }
+  }
+
+  // Membership: each entry is a finite, non-negative number.
+  for (const [partyId, count] of Object.entries(scenario.membership ?? {})) {
+    if (!partyIds.has(partyId)) errors.push(`membership references unknown party "${partyId}"`)
+    if (typeof count !== 'number' || Number.isNaN(count) || count < 0) {
+      errors.push(`membership.${partyId} is not a valid non-negative number`)
+    }
+  }
+
+  return errors
+}
+
+function boundaryRefsFromTopology(topology, objectKey = 'regions') {
+  const object = topology.objects[objectKey]
+  if (!object) return null
+  return new Set(object.geometries.map((g) => g.properties.geometryRef))
+}
+
+function main() {
+  const usePlaceholder = process.argv.includes('--placeholder')
+
+  const scenario = usePlaceholder
+    ? readJson('../../src/data/scenarios/uk-2025-01-01/composition.placeholder.json')
+    : readJson('../../src/data/scenarios/uk-2025-01-01/scenario.json')
+
+  const boundariesTopology = usePlaceholder
+    ? readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.placeholder.json')
+    : readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.commons.json')
+
+  const boundariesByTier = { commons: boundaryRefsFromTopology(boundariesTopology, 'regions') }
+
+  const errors = validate(scenario, boundariesByTier)
+
+  if (errors.length > 0) {
+    console.error(new ValidationErrors(errors).message)
+    process.exit(1)
+  }
+
+  console.log(
+    `OK: ${usePlaceholder ? 'placeholder' : 'real'} dataset "${scenario.id}" passes all validation checks ` +
+      `(${Object.values(scenario.tiers).reduce((n, r) => n + r.length, 0)} regions, ${scenario.parties.length} parties).`,
+  )
+}
+
+main()

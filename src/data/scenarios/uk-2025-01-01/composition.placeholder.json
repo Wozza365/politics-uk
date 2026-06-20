@@ -62,7 +62,7 @@
       "id": "conservative",
       "name": "Conservative Party",
       "shortName": "Con",
-      "colours": { "primary": "#0087DC", "onPrimary": "#FFFFFF" },
+      "colours": { "primary": "#0087DC", "onPrimary": "#000000" },
       "scope": "national",
       "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }]
     },

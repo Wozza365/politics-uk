@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "data:fetch-boundaries": "node scripts/data/fetch-commons-boundaries.mjs",
+    "data:simplify-boundaries": "mapshaper src/data/scenarios/uk-2025-01-01/boundaries.commons.json -simplify 10% keep-shapes -o format=topojson force src/data/scenarios/uk-2025-01-01/boundaries.commons.json",
+    "data:fetch-composition": "node scripts/data/fetch-commons-composition.mjs",
+    "data:build-parties": "node scripts/data/build-parties.mjs",
+    "data:build-scenario": "node scripts/data/build-scenario.mjs",
+    "validate:data": "node scripts/data/validate-scenario.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
@@ -23,6 +29,7 @@
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
+    "mapshaper": "^0.7.29",
     "tailwindcss": "^4.3.1",
     "topojson-server": "^3.0.1",
     "typescript": "~6.0.2",

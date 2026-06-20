@@ -1,0 +1,275 @@
+[
+  {
+    "id": "labour",
+    "name": "Labour Party",
+    "shortName": "Lab",
+    "colours": {
+      "primary": "#E4003B",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "national",
+    "founded": 1900,
+    "mergedFrom": [
+      "labour_coop"
+    ],
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Keir Starmer",
+        "since": "2020-04-04"
+      }
+    ]
+  },
+  {
+    "id": "conservative",
+    "name": "Conservative Party",
+    "shortName": "Con",
+    "colours": {
+      "primary": "#0087DC",
+      "onPrimary": "#000000"
+    },
+    "scope": "national",
+    "founded": 1834,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Kemi Badenoch",
+        "since": "2024-11-02"
+      }
+    ]
+  },
+  {
+    "id": "liberal_democrat",
+    "name": "Liberal Democrats",
+    "shortName": "LD",
+    "colours": {
+      "primary": "#FAA61A",
+      "onPrimary": "#000000"
+    },
+    "scope": "national",
+    "founded": 1988,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Ed Davey",
+        "since": "2020-08-27"
+      }
+    ]
+  },
+  {
+    "id": "reform_uk",
+    "name": "Reform UK",
+    "shortName": "RUK",
+    "colours": {
+      "primary": "#12B6CF",
+      "onPrimary": "#000000"
+    },
+    "scope": "national",
+    "founded": 2018,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Nigel Farage",
+        "since": "2024-06-03"
+      }
+    ]
+  },
+  {
+    "id": "green",
+    "name": "Green Party of England and Wales",
+    "shortName": "Green",
+    "colours": {
+      "primary": "#6AB023",
+      "onPrimary": "#000000"
+    },
+    "scope": "national",
+    "founded": 1990,
+    "mergedFrom": [
+      "scottish_greens"
+    ],
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Adrian Ramsay",
+        "since": "2024-09-06"
+      },
+      {
+        "role": "leader",
+        "personName": "Carla Denyer",
+        "since": "2024-09-06"
+      }
+    ]
+  },
+  {
+    "id": "snp",
+    "name": "Scottish National Party",
+    "shortName": "SNP",
+    "colours": {
+      "primary": "#FFF09C",
+      "onPrimary": "#000000"
+    },
+    "scope": "regional",
+    "founded": 1934,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "John Swinney",
+        "since": "2024-05-05"
+      }
+    ]
+  },
+  {
+    "id": "plaid_cymru",
+    "name": "Plaid Cymru",
+    "shortName": "PC",
+    "colours": {
+      "primary": "#005B54",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "regional",
+    "founded": 1925,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Rhun ap Iorwerth",
+        "since": "2023-08-19"
+      }
+    ]
+  },
+  {
+    "id": "dup",
+    "name": "Democratic Unionist Party",
+    "shortName": "DUP",
+    "colours": {
+      "primary": "#D46A4C",
+      "onPrimary": "#000000"
+    },
+    "scope": "regional",
+    "founded": 1971,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Gavin Robinson",
+        "since": "2024-06-29"
+      }
+    ]
+  },
+  {
+    "id": "sinn_fein",
+    "name": "Sinn Féin",
+    "shortName": "SF",
+    "colours": {
+      "primary": "#326760",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "regional",
+    "founded": 1905,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Mary Lou McDonald",
+        "since": "2018-02-10"
+      }
+    ]
+  },
+  {
+    "id": "sdlp",
+    "name": "Social Democratic and Labour Party",
+    "shortName": "SDLP",
+    "colours": {
+      "primary": "#2AA82C",
+      "onPrimary": "#000000"
+    },
+    "scope": "regional",
+    "founded": 1970,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Claire Hanna",
+        "since": "2024-02-05"
+      }
+    ]
+  },
+  {
+    "id": "alliance",
+    "name": "Alliance Party of Northern Ireland",
+    "shortName": "APNI",
+    "colours": {
+      "primary": "#F6CB2F",
+      "onPrimary": "#000000"
+    },
+    "scope": "regional",
+    "founded": 1970,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Naomi Long",
+        "since": "2016-10-29"
+      }
+    ]
+  },
+  {
+    "id": "uup",
+    "name": "Ulster Unionist Party",
+    "shortName": "UUP",
+    "colours": {
+      "primary": "#48A5EE",
+      "onPrimary": "#000000"
+    },
+    "scope": "regional",
+    "founded": 1905,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Mike Nesbitt",
+        "since": "2024-04-08"
+      }
+    ]
+  },
+  {
+    "id": "tuv",
+    "name": "Traditional Unionist Voice",
+    "shortName": "TUV",
+    "colours": {
+      "primary": "#0C3A6A",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "regional",
+    "founded": 2007,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Jim Allister",
+        "since": "2007-12-07"
+      }
+    ]
+  },
+  {
+    "id": "speaker",
+    "name": "Speaker of the House of Commons",
+    "shortName": "Speaker",
+    "colours": {
+      "primary": "#4D4D4D",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "local",
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Sir Lindsay Hoyle",
+        "since": "2019-11-04"
+      }
+    ]
+  },
+  {
+    "id": "independent",
+    "name": "Independent",
+    "shortName": "Ind",
+    "colours": {
+      "primary": "#909090",
+      "onPrimary": "#000000"
+    },
+    "scope": "local",
+    "leadership": []
+  }
+]

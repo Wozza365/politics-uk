@@ -31,7 +31,7 @@ function buildRegionState(): RegionState {
 
 function draw() {
   const boundarySet: BoundarySet = {
-    id: 'commons-placeholder',
+    id: 'commons',
     topology: scenario.boundaries,
     objectKey: 'regions',
   }

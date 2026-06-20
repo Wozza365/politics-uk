@@ -1,0 +1,37 @@
+{
+  "boundaries": {
+    "description": "Westminster Parliamentary Constituencies (July 2024) Boundaries UK BGC",
+    "source": "ONS Open Geography Portal (geoportal.statistics.gov.uk)",
+    "arcgisItemId": "b49f0eeb2ce540f394831ba3a514d86e",
+    "retrieved": "2026-06-20",
+    "notes": "BGC (20m generalised, clipped) layer; simplified a further 10% with mapshaper for web payload size. 650 features, GSS-coded (PCON24CD)."
+  },
+  "composition": {
+    "description": "Commons seat holders as of 2025-01-01",
+    "source": "UK Parliament Members API (members-api.parliament.uk)",
+    "method": "Members/Search filtered by MembershipInDateRange covering 2025-01-01; party resolved from each member's partyAffiliations history (not latestParty, which reflects today) to correctly capture defections/independence between the 2024 GE and the as-of date; majority/election date from Location/Constituency/{id}/ElectionResults, picking the most recent result on or before 2025-01-01.",
+    "retrieved": "2026-06-20",
+    "notes": "voteShare omitted: only available via a further per-result API call, and is optional on Seat."
+  },
+  "parties": {
+    "description": "Party master list: names, official colours, leadership as of 2025-01-01",
+    "source": "Public party branding/leadership facts (well-documented, slow-changing); colours cross-checked where possible against colours returned by the Members API's election-result/candidate records",
+    "notes": "onPrimary is computed (not hand-authored) via WCAG 2.x relative-luminance contrast, asserted >= 4.5:1 in scripts/data/build-parties.mjs."
+  },
+  "polling": {
+    "description": "Headline GB-wide voting-intention %, averaged from polls fielded late Dec 2024 / early Jan 2025",
+    "source": "Wikipedia: \"Opinion polling for the next United Kingdom general election\", citing Deltapoll/The Mirror (19-23 Dec 2024), Opinium/The Observer (18-20 Dec 2024), Deltapoll/Mail on Sunday (30 Dec 2024-3 Jan 2025), Freshwater Strategy/CityAM (4-6 Jan 2025)",
+    "asOf": "2025-01-01",
+    "notes": "NI parties and Plaid Cymru aren't covered by GB-wide VI polls; left out of the map (along with 'don't know'/others) rather than guessed, so polling intentionally sums to < 100."
+  },
+  "finances": {
+    "description": "Party cash-on-hand and annual income",
+    "source": "estimated",
+    "notes": "Per spec §13 (resolved): pure estimates are fine, no factual basis required. Every value carries source: 'estimated'."
+  },
+  "membership": {
+    "description": "Party membership counts",
+    "source": "estimated",
+    "notes": "Best-effort figures informed by public reporting around 2025-01-01 (e.g. Reform UK's widely-reported overtaking of Conservative membership in late 2024); not independently verified from this environment, so treated as estimates throughout."
+  }
+}
