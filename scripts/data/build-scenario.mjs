@@ -20,6 +20,10 @@ import { fileURLToPath } from 'node:url'
 
 const SCENARIO_ID = 'uk-2025-01-01'
 const SCENARIO_DATE = '2025-01-01'
+// Placeholder for MVP (P1.1): not a researched figure for the real next UK
+// general election — just a reasonable ~5-years-out stand-in so the game
+// store's daysUntilElection getter has something to compute against.
+const NEXT_ELECTION_DATE_PLACEHOLDER = '2029-01-01'
 
 const POLLING = {
   labour: 28,
@@ -75,6 +79,7 @@ function main() {
     id: SCENARIO_ID,
     date: SCENARIO_DATE,
     label: `United Kingdom, ${SCENARIO_DATE}`,
+    nextElectionDate: NEXT_ELECTION_DATE_PLACEHOLDER,
     tiers: { commons: commonsRegions },
     parties,
     polling: POLLING,

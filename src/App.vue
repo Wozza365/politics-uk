@@ -1,9 +1,21 @@
 <script setup lang="ts">
-import MapView from './components/MapView.vue'
+import { computed } from 'vue'
+import { useUiStore } from '@/stores/ui'
+import StartScreen from '@/screens/StartScreen.vue'
+import LoadingScreen from '@/screens/LoadingScreen.vue'
+import GameScreen from '@/screens/GameScreen.vue'
+
+const ui = useUiStore()
+
+const screens = {
+  start: StartScreen,
+  loading: LoadingScreen,
+  game: GameScreen,
+} as const
+
+const currentScreen = computed(() => screens[ui.screen])
 </script>
 
 <template>
-  <main class="flex h-screen w-screen items-center justify-center bg-zinc-900 p-12">
-    <MapView />
-  </main>
+  <component :is="currentScreen" />
 </template>

@@ -2,6 +2,7 @@
   "id": "uk-2025-01-01",
   "date": "2025-01-01",
   "label": "United Kingdom, 2025-01-01",
+  "nextElectionDate": "2029-01-01",
   "tiers": {
     "commons": [
       {
