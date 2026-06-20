@@ -1,0 +1,115 @@
+{
+  "id": "uk-2025-01-01",
+  "date": "2025-01-01",
+  "label": "United Kingdom, 1 January 2025 (placeholder fixture)",
+  "tiers": {
+    "commons": [
+      {
+        "id": "placeholder-1",
+        "tier": "commons",
+        "name": "Sample Seat A",
+        "geometryRef": "placeholder-1",
+        "seats": [{ "regionId": "placeholder-1", "party": "labour", "memberName": "Placeholder MP A" }]
+      },
+      {
+        "id": "placeholder-2",
+        "tier": "commons",
+        "name": "Sample Seat B",
+        "geometryRef": "placeholder-2",
+        "seats": [{ "regionId": "placeholder-2", "party": "conservative", "memberName": "Placeholder MP B" }]
+      },
+      {
+        "id": "placeholder-3",
+        "tier": "commons",
+        "name": "Sample Seat C",
+        "geometryRef": "placeholder-3",
+        "seats": [{ "regionId": "placeholder-3", "party": "liberal_democrat", "memberName": "Placeholder MP C" }]
+      },
+      {
+        "id": "placeholder-4",
+        "tier": "commons",
+        "name": "Sample Seat D",
+        "geometryRef": "placeholder-4",
+        "seats": [{ "regionId": "placeholder-4", "party": "labour", "memberName": "Placeholder MP D" }]
+      },
+      {
+        "id": "placeholder-5",
+        "tier": "commons",
+        "name": "Sample Seat E",
+        "geometryRef": "placeholder-5",
+        "seats": [{ "regionId": "placeholder-5", "party": "reform_uk", "memberName": "Placeholder MP E" }]
+      },
+      {
+        "id": "placeholder-6",
+        "tier": "commons",
+        "name": "Sample Seat F",
+        "geometryRef": "placeholder-6",
+        "seats": [{ "regionId": "placeholder-6", "party": "snp", "memberName": "Placeholder MP F" }]
+      }
+    ]
+  },
+  "parties": [
+    {
+      "id": "labour",
+      "name": "Labour Party",
+      "shortName": "Lab",
+      "colours": { "primary": "#E4003B", "onPrimary": "#FFFFFF" },
+      "scope": "national",
+      "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }],
+      "mergedFrom": ["labour_coop"]
+    },
+    {
+      "id": "conservative",
+      "name": "Conservative Party",
+      "shortName": "Con",
+      "colours": { "primary": "#0087DC", "onPrimary": "#FFFFFF" },
+      "scope": "national",
+      "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }]
+    },
+    {
+      "id": "liberal_democrat",
+      "name": "Liberal Democrats",
+      "shortName": "LD",
+      "colours": { "primary": "#FAA61A", "onPrimary": "#000000" },
+      "scope": "national",
+      "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }]
+    },
+    {
+      "id": "reform_uk",
+      "name": "Reform UK",
+      "shortName": "RUK",
+      "colours": { "primary": "#12B6CF", "onPrimary": "#000000" },
+      "scope": "national",
+      "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }]
+    },
+    {
+      "id": "snp",
+      "name": "Scottish National Party",
+      "shortName": "SNP",
+      "colours": { "primary": "#FFF09C", "onPrimary": "#000000" },
+      "scope": "regional",
+      "leadership": [{ "role": "leader", "personName": "Placeholder Leader" }]
+    }
+  ],
+  "polling": {
+    "labour": 27,
+    "conservative": 24,
+    "liberal_democrat": 12,
+    "reform_uk": 25,
+    "snp": 3
+  },
+  "finances": {
+    "labour": { "source": "estimated" },
+    "conservative": { "source": "estimated" },
+    "liberal_democrat": { "source": "estimated" },
+    "reform_uk": { "source": "estimated" },
+    "snp": { "source": "estimated" }
+  },
+  "membership": {
+    "labour": 0,
+    "conservative": 0,
+    "liberal_democrat": 0,
+    "reform_uk": 0,
+    "snp": 0
+  }
+}
