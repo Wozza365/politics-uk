@@ -1,10 +1,16 @@
-# Politics UK — Phase 0 & 1 Work Breakdown
+# Politics UK — Phase 1 Work Breakdown
 
-> **Purpose.** A delegable, step-by-step plan for completing Phase 0 (Foundations) and
-> Phase 1 (MVP playable shell) of Politics UK. It is written to be handed to an AI
-> coding agent, which may execute tasks directly or fan them out to sub-agents.
-> The authoritative design is [`GAME_SPEC.md`](./GAME_SPEC.md); this document turns
-> spec §12 Phase 0/1 into concrete, ordered, verifiable work.
+> **Purpose.** A delegable, step-by-step plan for completing Phase 1 (MVP
+> playable shell) of Politics UK. It is written to be handed to an AI
+> coding agent, which may execute tasks directly or fan them out to
+> sub-agents. The authoritative design is
+> [`GAME_SPEC.md`](./GAME_SPEC.md); this document turns spec §12 Phase 1
+> into concrete, ordered, verifiable work.
+>
+> Phase 0 (Foundations) is **complete** — see
+> [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
+> how. It's kept in a separate file so this document only carries
+> still-relevant, forward-looking work.
 
 ---
 
@@ -17,8 +23,8 @@ dependency graph) — not necessarily numeric order.
 **Status legend.** Each task is tagged:
 - `✅ DONE` — already implemented and committed; listed for context only.
 - `🔲 TODO` — not started.
-- `🟡 BLOCKED` — cannot complete in the current environment (e.g. needs network egress
-  that the sandbox denies); do the parts you can and leave a clearly-labelled stub.
+- `🟡 BLOCKED` — cannot complete in the current environment; do the parts you can and leave a
+  clearly-labelled stub.
 
 **Per-task contract.** Each task gives: **Goal**, **Depends on**, **Steps**, **Files**,
 **Acceptance criteria**. A task is "done" only when every acceptance criterion passes.
@@ -28,8 +34,8 @@ dependency graph) — not necessarily numeric order.
    errors and a clean production build).
 2. No new `any` casts beyond those already present, unless justified in a comment.
 3. New behaviour is reachable from the running app (`npm run dev`) or covered by a test.
-4. Work is committed to branch `claude/tender-archimedes-rvajub` with a descriptive message.
-   Do **not** open a PR unless explicitly asked.
+4. Work is committed and pushed directly to `master` with a descriptive message. Do **not**
+   open a PR unless explicitly asked.
 
 **Conventions already established in the repo** (match them):
 - Vue 3 `<script setup lang="ts">` SFCs; Composition API.
@@ -46,178 +52,26 @@ dependency graph) — not necessarily numeric order.
 
 ---
 
-## 1. Current state snapshot (what already exists)
+## 1. Current state (what already exists)
 
-Phase 0 tasks **P0.1** and **P0.2** are complete and committed. Present in the repo:
+Phase 0 is fully complete (see [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md)). In short:
 
 | Area | Files | State |
 | --- | --- | --- |
 | Scaffold | `package.json`, `vite.config.ts`, `tsconfig*.json`, `index.html`, `src/main.ts`, `src/style.css` | ✅ Vite + Vue 3 + TS + Pinia + Tailwind v4, `@/` alias, builds clean |
-| Entity types | `src/types/{party,region,scenario,index}.ts` | ✅ Mirrors spec §4.2 |
+| Entity types | `src/types/{party,region,scenario,policy,index}.ts` | ✅ Mirrors spec §4.2 + the 2D political-compass model |
 | Renderer | `src/map/MapRenderer.ts` (interface), `src/map/SvgMapRenderer.ts` (impl) | ✅ d3-geo + topojson-client; hover/click events |
-| Map component | `src/components/MapView.vue` | ✅ CSS faux-3D wrapper + tooltip; renders Commons placeholder |
-| Store | `src/stores/scenario.ts` | ✅ Loads placeholder scenario + boundaries |
-| Data | `src/data/scenarios/uk-2025-01-01/{boundaries,composition}.placeholder.json`, `README.md` | 🟡 **Placeholder only** — real UK data blocked by sandbox network policy |
-| Data scripts | `scripts/data/{build-placeholder-boundaries,fetch-commons-boundaries}.mjs` | ✅ placeholder generator; 🟡 real fetcher unverified/unrun |
+| Map component | `src/components/MapView.vue` | ✅ CSS faux-3D wrapper + tooltip; renders real Commons data |
+| Store | `src/stores/scenario.ts` | ✅ Loads the real `uk-2025-01-01` scenario + boundaries |
+| Data | `src/data/scenarios/uk-2025-01-01/{boundaries.commons,composition.commons,parties,scenario,sources}.json` | ✅ Real: 650 Commons seats, 15 parties, polling/finance/membership snapshot |
+| Data scripts + validator | `scripts/data/*.mjs` | ✅ Reproducible fetch/build pipeline + `npm run validate:data` |
 
-The single outstanding Phase 0 item is **real data (P0.3)**; everything in Phase 1 is TODO.
-
----
-
-## 2. Phase 0 — Foundations (remaining)
-
-### P0.1 — Project scaffold `✅ DONE`
-Vite + Vue 3 + TS + Pinia + Tailwind, `@/` alias, builds clean. No action.
-
-### P0.2 — Renderer abstraction + `SvgMapRenderer` `✅ DONE`
-`MapRenderer` interface and SVG backend implemented and rendering. No action.
-
-### P0.3 — Real Commons dataset `🟡 BLOCKED (network)`
-
-> **Goal.** Replace the placeholder fixture with a real, versioned, date-stamped dataset
-> for `uk-2025-01-01`: current (post-2023 boundary review) Commons boundaries, the seat
-> holders as of 2025-01-01, the party master list, and scenario snapshots (polling,
-> finance, membership). Source-of-truth is committed JSON; scripts are reproducible (spec §5).
->
-> **Blocker.** ONS Open Geography Portal, mySociety MapIt, and the Parliament Members API
-> are outside this sandbox's network allowlist (all return 403). Run P0.3 from an
-> environment with outbound access to those hosts, **or** add them to the egress allowlist
-> first. `raw.githubusercontent.com` and the npm registry *are* reachable here.
-
-**Depends on:** P0.2.
-
-#### P0.3.1 — Fetch Commons boundaries `🟡`
-**Steps:**
-1. Confirm the correct ONS Open Geography Portal feature service for *Westminster
-   Parliamentary Constituencies (July 2024) UK BFC* (the boundaries used at the
-   4 July 2024 GE). The placeholder URL/service-ID in `scripts/data/fetch-commons-boundaries.mjs`
-   is **unverified** — look it up at <https://geoportal.statistics.gov.uk> and correct it.
-2. Prefer the **BFC** ("full resolution, clipped to coastline") or **BGC** ("generalised,
-   clipped") layer. BGC is smaller and better for web; BFC is more accurate. Default to BGC
-   unless detail is needed.
-3. Run `node scripts/data/fetch-commons-boundaries.mjs`. It requests GeoJSON (`f=geojson`,
-   `outSR=4326`), maps `PCON24CD`→`geometryRef` and `PCON24NM`→`name`, and writes TopoJSON
-   to `src/data/scenarios/uk-2025-01-01/boundaries.commons.json`.
-4. **Simplify for web.** If the output is large (> ~1–2 MB), simplify with `mapshaper`
-   (e.g. `mapshaper boundaries.commons.json -simplify 10% keep-shapes -o format=topojson`).
-   Add this as an npm script or a step in the fetch script. Target: a few hundred KB.
-5. Sanity-check geometry by reusing the projection smoke-test pattern (load topology →
-   `feature()` → `geoPath()` → assert non-empty `d` for every feature).
-
-**Files:** modify `scripts/data/fetch-commons-boundaries.mjs`; create
-`src/data/scenarios/uk-2025-01-01/boundaries.commons.json`.
-
-**Acceptance:**
-- TopoJSON has **650** geometries, each with a `geometryRef` matching a `PCON24CD` GSS code.
-- Every feature projects to a non-empty SVG path.
-- File committed and (if simplified) under ~1 MB.
-
-#### P0.3.2 — Build Commons composition (seat holders @ 2025-01-01) `🟡`
-**Steps:**
-1. Write `scripts/data/fetch-commons-composition.mjs`. Pull current MPs from the **UK
-   Parliament Members API** (`members-api.parliament.uk`) — endpoint
-   `GET /api/Members/Search` / the "current Commons members" query — capturing per member:
-   name, party, constituency name + GSS code, majority, and election date.
-2. **Respect the as-of date.** The dataset is 2025-01-01. Reflect any by-elections **up to
-   and including** that date and exclude later changes. The Members API exposes historical
-   membership; filter on the membership period covering 2025-01-01.
-3. **Apply party merges** (spec §4.3) during transform: map `Labour Co-operative` → `labour`,
-   `Scottish Greens` / `Green Party of England & Wales` → `green`. Keep the original party
-   in a sidecar field if useful for audit, but the `Seat.party` must be the merged `PartyId`.
-4. Emit `Region[]` for the `commons` tier in the exact shape of `src/types/region.ts`
-   (`id` = GSS code, `tier: "commons"`, `name`, `geometryRef` = GSS code, `seats: [{ regionId,
-   party, memberName, majority, voteShare?, electedAt }]`).
-
-**Files:** create `scripts/data/fetch-commons-composition.mjs`; output feeds P0.3.4.
-
-**Acceptance:**
-- Exactly **650** regions, each with exactly one seat.
-- Every `seats[].party` is a valid `PartyId` from the party master list (P0.3.3).
-- Every `geometryRef` matches a boundary `geometryRef` from P0.3.1 (no orphans either way).
-- Speaker and any independents are represented (use a sentinel party id, e.g. `speaker`,
-  `independent`).
-
-#### P0.3.3 — Party master list `🟡`
-**Steps:**
-1. Create `scripts/data/build-parties.mjs` (or hand-author + validate) producing `Party[]`
-   per `src/types/party.ts`.
-2. For each party set: `id` (stable slug), `name`, `shortName`, `colours.primary/secondary`,
-   `scope` (`national` for Lab/Con/LD/Reform/Green; `regional` for SNP/Plaid/NI parties),
-   `leadership` (leader at 2025-01-01, date-stamped), `mergedFrom` where applicable.
-3. **Compute `colours.onPrimary` for WCAG.** For each `primary`, pick black or white text to
-   hit **contrast ratio ≥ 4.5:1** (spec §7.2). Implement the WCAG relative-luminance formula
-   in the build script and **assert** the ratio; fail the build if a card colour can't meet
-   4.5:1 (then choose a `secondary` or adjusted shade).
-4. Leave `stances` empty for now — it's filled in P1.11.x (manifesto scoring), not Phase 0.
-
-**Files:** create `scripts/data/build-parties.mjs`; output feeds P0.3.4.
-
-**Acceptance:**
-- Every national party that holds ≥1 Commons seat is present; every `PartyId` referenced by
-  composition (P0.3.2) exists here.
-- Every `onPrimary` passes contrast ≥ 4.5:1 against its `primary` (assertion in the script).
-- Merges recorded via `mergedFrom`.
-
-#### P0.3.4 — Assemble the scenario snapshot `🟡`
-**Steps:**
-1. Create `scripts/data/build-scenario.mjs` that composes the outputs of P0.3.1–3 into one
-   `Scenario` object (`src/types/scenario.ts`) written to
-   `src/data/scenarios/uk-2025-01-01/scenario.json` (replacing `composition.placeholder.json`
-   as the runtime source).
-2. **Polling:** snapshot headline voting-intention % per party at ~2025-01-01 from a public
-   aggregate (e.g. Wikipedia "Opinion polling for the next UK general election"). Record the
-   source/as-of date in a comment or sibling `sources.json`.
-3. **Finance:** **estimates are fine and expected — no factual basis required** (resolved, spec
-   §13). Use a real reported figure as a starting reference where one is handy, otherwise
-   approximate from other party data (membership, seat counts). Mark every value
-   `source: 'estimated'`; this is **not** a network-blocked step.
-4. **Membership:** latest published figures; flag estimates.
-5. Keep `boundaries.commons.json` separate from `scenario.json` (boundaries are large and
-   change rarely; scenario state is small and per-date).
-
-**Files:** create `scripts/data/build-scenario.mjs`,
-`src/data/scenarios/uk-2025-01-01/scenario.json` (and optional `sources.json`).
-
-**Acceptance:**
-- `scenario.json` validates against the `Scenario` type (see P0.3.5).
-- `polling` sums to a sensible total (≤ 100; "Others" handled explicitly).
-- Every estimated value carries `source: 'estimated'`.
-
-#### P0.3.5 — Validation + CI guard `🟡 (validation 🔲 doable now)`
-**Steps:**
-1. Add a `scripts/data/validate-scenario.mjs` that loads the dataset and asserts:
-   - seat counts reconcile to known totals (Commons **650**; later tiers 129/60/90/…);
-   - every `Seat.party` resolves to a `Party`;
-   - every `Region.geometryRef` resolves to a boundary geometry and vice-versa;
-   - WCAG contrast holds for every party card colour;
-   - no `NaN`/missing required fields; dates are valid ISO.
-2. Wire it as `npm run validate:data` and (optionally) a CI workflow + a `pretest`/`prebuild`
-   hook so bad data can't ship.
-3. **This validator can and should be written now against the placeholder data** (it's not
-   network-blocked) so it's ready the moment real data lands. Mark it `🔲` not `🟡`.
-
-**Files:** create `scripts/data/validate-scenario.mjs`; add npm script; optional
-`.github/workflows/data.yml`.
-
-**Acceptance:** `npm run validate:data` exits 0 on good data and non-zero (with a clear
-message) when any invariant is violated; passes against placeholder data today.
-
-#### P0.3.6 — Point the store at real data `🟡`
-**Steps:**
-1. Update `src/stores/scenario.ts` to import `scenario.json` + `boundaries.commons.json`
-   instead of the `*.placeholder.json` files, **once they exist**.
-2. Keep the placeholder files in-repo (or move under a `__fixtures__` path) for tests.
-3. Update `MapView.vue`'s `objectKey` if the real topology uses a different object name than
-   `"regions"` (the fetch script controls this — keep it `"regions"` to avoid churn).
-
-**Files:** modify `src/stores/scenario.ts` (and possibly `MapView.vue`).
-
-**Acceptance:** `npm run dev` renders the **real** 650-seat Commons map, coloured by holding
-party, with correct hover stats; `npm run build` clean.
+Everything in Phase 1 below is TODO. The real Commons geometry already exists, so **P1.5 no
+longer depends on a blocked data step** — it can use the live store data directly.
 
 ---
 
-## 3. Phase 1 — MVP playable shell
+## 2. Phase 1 — MVP playable shell
 
 Phase 1 turns the foundations into a playable loop: **Start menu → Loading → Game screen**
 (spec §6), with the Westminster map, hemicycle, party stats, event feed, a ticking clock with
@@ -232,7 +86,7 @@ GE countdown, a view-switcher shell, and a minimal event/polling loop.
 ### P1.0 — App shell & screen routing `🔲`
 **Goal.** A single source of truth for "which screen are we on" and transitions between them.
 
-**Depends on:** P0.1.
+**Depends on:** P0.1 (done).
 
 **Steps:**
 1. Decide routing approach: a lightweight **`useUiStore`** with a `screen: 'start' | 'loading'
@@ -254,7 +108,7 @@ modify `src/App.vue`.
 **Goal.** The mutable game state the whole UI reads/writes: selected party, simulated date,
 clock run-state, live polling, finance, membership, feed entries.
 
-**Depends on:** P1.0, P0.2 (`scenario` store exists).
+**Depends on:** P1.0, scenario store (done, P0.2/P0.3).
 
 **Steps:**
 1. Create `src/stores/game.ts` (`useGameStore`). State:
@@ -282,7 +136,7 @@ dataset; build clean.
 ### P1.2 — Start menu `🔲`
 **Goal.** Spec §7: locked timeline selector + party cards + difficulty badges + Start.
 
-**Depends on:** P1.0, P1.1, P0.2.
+**Depends on:** P1.0, P1.1, scenario store.
 
 #### P1.2.1 — Timeline selector
 **Steps:** Render a slider (spec §7.1) with a **single selectable stop** (`2025-01-01`),
@@ -302,7 +156,7 @@ stops without a rewrite.
    at-a-glance extras (devolved seats, headline polling %); difficulty badge (P1.2.3); and the
    party's **compass summary** (P1.2.5) as a small at-a-glance circle.
 4. Style the card **in the party's colours** using `colours.primary` as background and
-   `colours.onPrimary` as text (already WCAG-verified at data-build time, P0.3.3). Pull every
+   `colours.onPrimary` as text (already WCAG-verified at data-build time). Pull every
    number from the scenario store — **no hard-coded figures** (spec §7.3).
 **Acceptance:** One card per national party, correctly coloured with readable text, all figures
 sourced from data; clicking selects the party.
@@ -377,22 +231,23 @@ common desktop sizes; build clean.
 **Goal.** Spec §9.1: the existing `MapView` integrated as the central map, zoom + pan + hover
 stats, coloured by holding party.
 
-**Depends on:** P1.4, P0.2 (and ideally P0.3 for real geometry).
+**Depends on:** P1.4. (Real Commons geometry already exists in the store — no longer blocked.)
 
 **Steps:**
 1. Reuse `MapView.vue`; mount it in the centre slot of `GameScreen`.
 2. Add **zoom + pan** (wheel-zoom + drag-pan). Implement at the component/CSS level (transform)
    or via a `d3-zoom` integration inside `SvgMapRenderer` — keep zoom state out of game logic.
-3. Hover tooltip already shows MP/party/majority; extend to vote share when present.
+3. Hover tooltip already shows MP/party/majority; extend to vote share when present (not
+   currently populated — see `PHASE_0_COMPLETED.md` P0.3.2 notes).
 4. Region fill comes from current holding party colour (already wired); ensure it reads live
-   composition from the store, not the placeholder constant, once P0.3 lands.
+   composition from the store, not a placeholder constant.
 **Acceptance:** Map fills centre, zoom/pan works, hover shows real stats, colours match holders;
 faux-3D treatment retained.
 
 ### P1.6 — Hemicycle (party-makeup dots) `🔲`
 **Goal.** Spec §9.2: dot diagram of seat composition for the current view's tier.
 
-**Depends on:** P1.4, P0.2.
+**Depends on:** P1.4.
 
 **Steps:**
 1. Create `src/components/HemicycleView.vue`. Compute seat totals per party from the store's
@@ -411,7 +266,7 @@ reads cleanly; `seatsPerDot` parameter proven by a unit test even if Commons use
 ### P1.7 — Top-centre party panel (collapsed) `🔲`
 **Goal.** Spec §9.3 collapsed view (expandable levers are Phase 2 — stub the expand affordance).
 
-**Depends on:** P1.1, P0.2.
+**Depends on:** P1.1.
 
 **Steps:**
 1. Create `src/components/PartyPanel.vue`. Show, for the **player's** party:
@@ -422,8 +277,9 @@ reads cleanly; `seatsPerDot` parameter proven by a unit test even if Commons use
    - confirmed extras: leader approval rating, vote-share **trend arrow** (momentum), councils
      controlled, days since last election;
    - the party's **compass summary** via `CompassView` (P1.2.5) — the player's overall position.
-2. All values from `game`/`scenario` stores. For MVP, tiers beyond Commons may be 0/"—" with a
-   footnote until Phase 2 data exists — but the **layout** must already accommodate them.
+2. All values from `game`/`scenario` stores. For MVP, tiers beyond Commons (and Lords — not yet
+   gathered, see `PHASE_0_COMPLETED.md`) may be 0/"—" with a footnote until that data exists —
+   but the **layout** must already accommodate them.
 3. Add a non-functional "expand" affordance that, per spec §9.5, will later pause the clock when
    opened — wire the pause hook now even if the expanded panel is empty.
 **Acceptance:** Collapsed panel shows all listed fields from data; estimates visibly flagged;
@@ -574,19 +430,21 @@ numbers and resolvable events, to a GE win/lose evaluation; `npm run build` clea
 
 ---
 
-## 4. Cross-cutting concerns (apply throughout)
+## 3. Cross-cutting concerns (apply throughout)
 
 - **Testing.** Add **Vitest** early (P1.1-ish). Unit-test pure logic: `sim/poll.ts`,
   `sim/difficulty.ts`, hemicycle layout, WCAG contrast, data validation. Component tests
   optional for MVP. Add `npm run test`.
-- **Accessibility.** Party-card contrast is enforced at data-build time (P0.3.3); also ensure
+- **Accessibility.** Party-card contrast is already enforced at data-build time; also ensure
   interactive controls are keyboard-reachable and the map has non-colour-only affordances where
   feasible.
 - **Determinism.** No `Math.random()` in the sim path — use a seeded PRNG so runs are
   reproducible and testable (spec §10.5 rationale).
-- **Performance.** Simplify boundaries for web (P0.3.1); keep the hemicycle and map re-renders
-  cheap (the clock ticks every 15s, but action handling shouldn't thrash). Profile if the map
-  redraws fully on every tick — diff/patch fills rather than rebuilding paths if needed.
+- **Performance.** Boundaries are already simplified for web (592KB); keep the hemicycle and map
+  re-renders cheap (the clock ticks every 15s, but action handling shouldn't thrash). Profile if
+  the map redraws fully on every tick — diff/patch fills rather than rebuilding paths if needed.
+  Note: bundling `scenario.json` + `boundaries.commons.json` directly pushes the main JS chunk to
+  ~830KB; consider a dynamic `import()` for scenario data if this becomes a problem.
 - **Data provenance.** Anything estimated carries `source: 'estimated'` and is footnoted in UI
   (spec §4.2). Never present a guess as reported fact.
 - **No scope creep into Phase 2.** Devolved/London/council views, hex-map renderer, full event
@@ -599,20 +457,18 @@ numbers and resolvable events, to a GE win/lose evaluation; `npm run build` clea
 ## A. Dependency graph & suggested execution order
 
 ```
-P0.1 ✅ ─┬─ P0.2 ✅ ─┬─ P0.3 (real data, BLOCKED) ─────────────┐
-         │           │                                         │
-         │           └─ P0.3.5 validator (doable now) ─────────┤
-         │                                                     │
-         └─ P1.0 app shell ─ P1.1 game stores ─┬─ P1.2 start menu ─ P1.2.3 difficulty
-                                               ├─ P1.3 loading
-                                               ├─ P1.4 game layout ─┬─ P1.5 map ◄── P0.3
-                                               │                    ├─ P1.6 hemicycle
-                                               │                    ├─ P1.7 party panel
-                                               │                    ├─ P1.8 feed
-                                               │                    ├─ P1.9 clock
-                                               │                    └─ P1.10 view switcher
-                                               ├─ P1.11 sim engine ─┐
-                                               └─ P1.12 events ◄─────┴─ P1.13 end-to-end
+Phase 0 ✅ (done — see PHASE_0_COMPLETED.md)
+   │
+   └─ P1.0 app shell ─ P1.1 game stores ─┬─ P1.2 start menu ─ P1.2.3 difficulty
+                                         ├─ P1.3 loading
+                                         ├─ P1.4 game layout ─┬─ P1.5 map
+                                         │                    ├─ P1.6 hemicycle
+                                         │                    ├─ P1.7 party panel
+                                         │                    ├─ P1.8 feed
+                                         │                    ├─ P1.9 clock
+                                         │                    └─ P1.10 view switcher
+                                         ├─ P1.11 sim engine ─┐
+                                         └─ P1.12 events ◄─────┴─ P1.13 end-to-end
 ```
 
 **Critical path:** P1.0 → P1.1 → P1.4 → (components) → P1.11/P1.12 → P1.13.
@@ -622,10 +478,6 @@ P1.5 (map), P1.6 (hemicycle), P1.7 (panel), P1.8 (feed), P1.9 (clock), P1.10 (sw
 and P1.11 (engine) can all proceed concurrently. P1.2/P1.3 (start/loading) are independent of
 the game-screen components and can also run in parallel.
 
-**Do-now-despite-the-blocker:** P0.3.5 (validator) and all of P1.0–P1.12 can be built against
-the **placeholder dataset**; only P1.5's *real* geometry and the final polish in P0.3.6 wait on
-network access for P0.3.1–4.
-
 ---
 
 ## B. Decisions — all resolved (spec §13)
@@ -633,12 +485,13 @@ network access for P0.3.1–4.
 The product owner has answered the previously-open questions; recorded here for the executing
 agent. **No decisions block this plan.**
 1. ✅ **Policy axes** — **2D political compass** (economic left↔right × social
-   libertarian↔authoritarian) with a `consistency` circle, split into **major (~8–10)** and
-   **minor (~16–20, some party-specific)** tiers (spec §4.4). Drives P1.2.5, P1.11.1. The exact
-   area lists are still refined *when scoring manifestos*, but the model and provisional lists are set.
+   libertarian↔authoritarian) with a `consistency` circle, split into **major (~8–10, weighted
+   more)** and **minor (~16–20, some party-specific)** tiers (spec §4.4). Drives P1.2.5, P1.11.1.
+   The exact area lists are still refined *when scoring manifestos*, but the model and
+   provisional lists are set.
 2. ✅ **Event schema** — design it as part of P1.12.1 (no pre-approval needed).
 3. ✅ **Party finance** — **pure estimates are fine**, no factual basis required; use a real
    reference point where handy, else approximate from members/seats. Always flag `estimated`
-   (P0.3.4). This *removes* the earlier constraint — don't block on sourcing real finance figures.
+   (already applied in Phase 0). This *removes* the earlier constraint — don't block on
+   sourcing real finance figures.
 4. ✅ **Working title** — "Politics UK" placeholder confirmed.
-```
