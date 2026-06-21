@@ -25,12 +25,19 @@ const SCENARIO_DATE = '2025-01-01'
 // store's daysUntilElection getter has something to compute against.
 const NEXT_ELECTION_DATE_PLACEHOLDER = '2029-01-01'
 
+// Workers Party of Britain and UKIP aren't broken out individually by most
+// GB-wide voting-intention pollsters (they fall inside "other"); these two
+// figures are rough indicative estimates rather than a sourced poll average,
+// included so they're selectable in the party picker (spec §7.2) with a
+// realistically punishing difficulty band rather than being omitted.
 const POLLING = {
   labour: 28,
   conservative: 24,
   reform_uk: 22,
   liberal_democrat: 12,
   green: 8,
+  workers_party: 1,
+  ukip: 0.3,
   snp: 3,
 }
 
@@ -40,6 +47,8 @@ const FINANCES = {
   liberal_democrat: { estimatedCashOnHand: 1_500_000, annualIncome: 6_000_000, source: 'estimated' },
   reform_uk: { estimatedCashOnHand: 2_000_000, annualIncome: 8_000_000, source: 'estimated' },
   green: { estimatedCashOnHand: 500_000, annualIncome: 2_000_000, source: 'estimated' },
+  workers_party: { estimatedCashOnHand: 20_000, annualIncome: 100_000, source: 'estimated' },
+  ukip: { estimatedCashOnHand: 5_000, annualIncome: 30_000, source: 'estimated' },
   snp: { estimatedCashOnHand: 400_000, annualIncome: 3_000_000, source: 'estimated' },
   plaid_cymru: { estimatedCashOnHand: 100_000, annualIncome: 500_000, source: 'estimated' },
   dup: { estimatedCashOnHand: 150_000, annualIncome: 600_000, source: 'estimated' },
@@ -56,6 +65,8 @@ const MEMBERSHIP = {
   liberal_democrat: 75_000,
   reform_uk: 220_000,
   green: 60_000,
+  workers_party: 4_000,
+  ukip: 3_000,
   snp: 50_000,
   plaid_cymru: 10_000,
   dup: 5_000,

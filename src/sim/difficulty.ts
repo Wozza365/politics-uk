@@ -1,6 +1,6 @@
 // Difficulty banding for the start-menu party picker (spec §11.1).
 //
-// Formula (documented, sanity-check-level for MVP — not exact figures):
+// Formula:
 //   1. "popularity proxy" = polling % (0-100) blended with weighted Commons
 //      seat share (0-100, expressed as % of total seats). Seat share is
 //      weighted more heavily than raw polling (0.6 vs 0.4) because holding
@@ -10,14 +10,21 @@
 //      via the optional `tiers` param without changing this shape: each tier
 //      contributes its own seat-share %, averaged together before blending
 //      with polling.
-//   2. That blended score (0-100) is inverted and bucketed into five bands:
-//      a dominant party (high score) lands in band 1 ("Easy"); a fringe party
-//      with near-zero polling and zero seats lands in band 5 ("Extreme").
-//   3. Small-party easing: bands are bucketed on a square-root curve rather
-//      than linearly, which compresses the bottom end of the scale so very
-//      small parties cluster into band 4 rather than uniformly maxing out at
-//      5 — i.e. hard-but-not-uniformly-impossible. Band 5 is still the
-//      ceiling: the result is clamped so nothing ever exceeds it.
+//   2. The band is **relative, not absolute**: `party`'s popularity proxy is
+//      ranked against every other selectable (`scope: 'national'`) party in
+//      the scenario, because "how hard is this party to play" is inherently
+//      a question of standing relative to the field, not a fixed threshold —
+//      e.g. a dominant governing party should land in band 1 ("Easy") even
+//      if its raw polling/seat-share numbers would look unremarkable in
+//      isolation. The party with the best proxy in the field is rank 0
+//      (easiest); the worst is rank `field.length - 1` (hardest).
+//   3. Small-party easing: rank percentile is bucketed on a square-root
+//      curve rather than linearly, which compresses the bottom end of the
+//      scale so very small/fringe parties cluster into band 4 ("Very Hard")
+//      rather than every party below the top few uniformly maxing out at 5
+//      — i.e. hard-but-not-uniformly-impossible. Band 5 ("Extreme") is
+//      reserved for the bottom of the field (e.g. a party with near-zero
+//      polling and zero seats).
 import type { Party, Scenario } from '@/types'
 
 export type DifficultyBand = 1 | 2 | 3 | 4 | 5
@@ -34,17 +41,7 @@ export interface DifficultyTierInput {
 const POLLING_WEIGHT = 0.4
 const SEAT_SHARE_WEIGHT = 0.6
 
-/**
- * Computes a 1-5 difficulty band for playing `party` in `scenario`.
- *
- * `extraTiers` lets later phases (devolved/council data) add more seat-share
- * inputs without restructuring this function; MVP only wires Commons.
- */
-export function computeDifficulty(
-  party: Party,
-  scenario: Scenario,
-  extraTiers: DifficultyTierInput[] = [],
-): DifficultyBand {
+function popularityProxy(party: Party, scenario: Scenario, extraTiers: DifficultyTierInput[] = []): number {
   const pollingPct = scenario.polling[party.id] ?? 0
 
   const commonsRegions = scenario.tiers.commons ?? []
@@ -64,14 +61,36 @@ export function computeDifficulty(
       : tiers.reduce((sum, tier) => sum + (tier.seatsHeld / tier.totalSeats) * 100 * (tier.weight ?? 1), 0) /
         tiers.reduce((sum, tier) => sum + (tier.weight ?? 1), 0)
 
-  const popularityProxy = pollingPct * POLLING_WEIGHT + seatShareScore * SEAT_SHARE_WEIGHT
+  return pollingPct * POLLING_WEIGHT + seatShareScore * SEAT_SHARE_WEIGHT
+}
 
-  // Invert: higher popularity/seat-share -> lower (easier) band.
-  const difficultyScore = Math.max(0, 100 - popularityProxy)
+/**
+ * Computes a 1-5 difficulty band for playing `party` in `scenario`, ranked
+ * against every other selectable (`scope: 'national'`) party in the field.
+ *
+ * `extraTiers` lets later phases (devolved/council data) add more seat-share
+ * inputs for `party` specifically, without restructuring this function; MVP
+ * only wires Commons, and other parties in the field are always scored on
+ * Commons alone (their devolved data isn't available to this call).
+ */
+export function computeDifficulty(
+  party: Party,
+  scenario: Scenario,
+  extraTiers: DifficultyTierInput[] = [],
+): DifficultyBand {
+  const nationalParties = scenario.parties.filter((p) => p.scope === 'national')
+  const field = nationalParties.some((p) => p.id === party.id) ? nationalParties : [...nationalParties, party]
 
-  // Small-party easing: a square-root curve compresses the high end of the
-  // difficulty scale so fringe parties don't all flatline at "impossible".
-  const eased = Math.sqrt(difficultyScore / 100) * 100
+  const ranked = field
+    .map((p) => ({ id: p.id, score: p.id === party.id ? popularityProxy(p, scenario, extraTiers) : popularityProxy(p, scenario) }))
+    .sort((a, b) => b.score - a.score)
+
+  const rank = ranked.findIndex((entry) => entry.id === party.id)
+  const percentile = ranked.length <= 1 ? 0 : rank / (ranked.length - 1)
+
+  // Small-party easing: a square-root curve compresses the top (harder) end
+  // of the ranking so fringe parties don't all flatline at "impossible".
+  const eased = Math.sqrt(percentile) * 100
 
   const band = 1 + Math.floor(eased / 25)
   return Math.min(5, Math.max(1, band)) as DifficultyBand

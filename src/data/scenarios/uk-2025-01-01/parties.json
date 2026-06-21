@@ -101,6 +101,42 @@
     ]
   },
   {
+    "id": "workers_party",
+    "name": "Workers Party of Britain",
+    "shortName": "WPB",
+    "colours": {
+      "primary": "#7A0000",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "national",
+    "founded": 2019,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "George Galloway",
+        "since": "2019-01-30"
+      }
+    ]
+  },
+  {
+    "id": "ukip",
+    "name": "UK Independence Party",
+    "shortName": "UKIP",
+    "colours": {
+      "primary": "#5B1A66",
+      "onPrimary": "#FFFFFF"
+    },
+    "scope": "national",
+    "founded": 1993,
+    "leadership": [
+      {
+        "role": "leader",
+        "personName": "Nick Tenconi",
+        "since": "2024-09-21"
+      }
+    ]
+  },
+  {
     "id": "snp",
     "name": "Scottish National Party",
     "shortName": "SNP",

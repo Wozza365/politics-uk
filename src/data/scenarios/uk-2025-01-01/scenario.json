@@ -9860,6 +9860,42 @@
       ]
     },
     {
+      "id": "workers_party",
+      "name": "Workers Party of Britain",
+      "shortName": "WPB",
+      "colours": {
+        "primary": "#7A0000",
+        "onPrimary": "#FFFFFF"
+      },
+      "scope": "national",
+      "founded": 2019,
+      "leadership": [
+        {
+          "role": "leader",
+          "personName": "George Galloway",
+          "since": "2019-01-30"
+        }
+      ]
+    },
+    {
+      "id": "ukip",
+      "name": "UK Independence Party",
+      "shortName": "UKIP",
+      "colours": {
+        "primary": "#5B1A66",
+        "onPrimary": "#FFFFFF"
+      },
+      "scope": "national",
+      "founded": 1993,
+      "leadership": [
+        {
+          "role": "leader",
+          "personName": "Nick Tenconi",
+          "since": "2024-09-21"
+        }
+      ]
+    },
+    {
       "id": "snp",
       "name": "Scottish National Party",
       "shortName": "SNP",
@@ -10038,6 +10074,8 @@
     "reform_uk": 22,
     "liberal_democrat": 12,
     "green": 8,
+    "workers_party": 1,
+    "ukip": 0.3,
     "snp": 3
   },
   "finances": {
@@ -10064,6 +10102,16 @@
     "green": {
       "estimatedCashOnHand": 500000,
       "annualIncome": 2000000,
+      "source": "estimated"
+    },
+    "workers_party": {
+      "estimatedCashOnHand": 20000,
+      "annualIncome": 100000,
+      "source": "estimated"
+    },
+    "ukip": {
+      "estimatedCashOnHand": 5000,
+      "annualIncome": 30000,
       "source": "estimated"
     },
     "snp": {
@@ -10113,6 +10161,8 @@
     "liberal_democrat": 75000,
     "reform_uk": 220000,
     "green": 60000,
+    "workers_party": 4000,
+    "ukip": 3000,
     "snp": 50000,
     "plaid_cymru": 10000,
     "dup": 5000,
