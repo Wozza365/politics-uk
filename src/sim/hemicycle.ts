@@ -37,41 +37,50 @@ export function computeHemicycleLayout(totalSeats: number, seatsPerDot: number =
   const maxRadius = 120 // outer radius to stay within UI bounds
   const radiusRange = maxRadius - minRadius
 
-  // Calculate number of rows to distribute dots
-  // Target ~18 dots per row at mid-radius for roughly consistent visual density
-  const targetDotsPerRow = 18
+  // Target ~18 dots on the innermost ring; every ring's dot count then scales
+  // with its arc length (radius), so dot spacing stays roughly constant from
+  // the centre outwards instead of every ring getting an even share.
+  const targetInnerRowDots = 18
+  const numRows = Math.max(2, Math.ceil(dotCount / (targetInnerRowDots * 2)))
 
-  const numRows = Math.max(2, Math.ceil(dotCount / targetDotsPerRow))
-
-  const rows: HemicycleRow[] = []
-  let dotsPlaced = 0
-
+  // First pass: each row's *ideal* (fractional) seat count, proportional to
+  // its radius (arc length at constant angular span).
+  const radii: number[] = []
   for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
-    // Radius increases linearly from inner to outer
     const t = numRows > 1 ? rowIndex / (numRows - 1) : 0
-    const radius = minRadius + t * radiusRange
-
-    // Calculate arc length at this radius
-    const arcLength = radius * arcAngle
-
-    // Distribute remaining dots across remaining rows
-    const dotsRemaining = dotCount - dotsPlaced
-    const rowsRemaining = numRows - rowIndex
-
-    // Scale dots per row by the arc length to maintain visual density
-    // Outer rows have larger circumference, so they fit more dots at the same density
-    const seatsInThisRow = Math.ceil(dotsRemaining / rowsRemaining)
-
-    rows.push({
-      radius,
-      seatsInRow: seatsInThisRow,
-      startAngle: 0,
-      endAngle: arcAngle,
-      arcLength,
-    })
-
-    dotsPlaced += seatsInThisRow
+    radii.push(minRadius + t * radiusRange)
   }
+  const radiusSum = radii.reduce((sum, r) => sum + r, 0)
+
+  // Second pass: round each row's share down (floor at 1, so even the
+  // smallest inner ring is drawable), then hand out the leftover dots (from
+  // rounding) to the outermost rows first, since they're the ones with the
+  // most room.
+  const baseCounts = radii.map((r) => Math.max(1, Math.floor((dotCount * r) / radiusSum)))
+  const assigned = baseCounts.reduce((sum, c) => sum + c, 0)
+  let remainder = dotCount - assigned
+  for (let rowIndex = numRows - 1; rowIndex >= 0 && remainder > 0; rowIndex--) {
+    baseCounts[rowIndex]++
+    remainder--
+  }
+  // If rounding up to the per-row minimum overshot the total (only possible
+  // with a very small dotCount spread across many rows), trim back from the
+  // innermost rows so the dot total still matches exactly.
+  let overshoot = assigned - dotCount
+  for (let rowIndex = 0; rowIndex < numRows && overshoot > 0; rowIndex++) {
+    if (baseCounts[rowIndex] > 1) {
+      baseCounts[rowIndex]--
+      overshoot--
+    }
+  }
+
+  const rows: HemicycleRow[] = radii.map((radius, rowIndex) => ({
+    radius,
+    seatsInRow: baseCounts[rowIndex],
+    startAngle: 0,
+    endAngle: arcAngle,
+    arcLength: radius * arcAngle,
+  }))
 
   return { rows, dotCount }
 }
