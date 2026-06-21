@@ -16,6 +16,8 @@ export interface RegionDisplayState {
   selected?: boolean
   label?: string
   tooltip?: Record<string, string | number | undefined>
+  opacity?: number // e.g. dim every region except the active one
+  liftPx?: number // raise this region above the rest of the (otherwise flat) map
 }
 
 /** Keyed by Region.geometryRef (spec §4.2) */
@@ -38,4 +40,6 @@ export interface MapRenderer {
   setEvents(events: MapRendererEvents): void
   resize(): void
   unmount(): void
+  /** Centre of a rendered region, in the same pixel space as the mount container's clientWidth/clientHeight (post-fit, pre-zoom). Null if not yet rendered. */
+  getRegionCenter(geometryRef: string): { x: number; y: number } | null
 }

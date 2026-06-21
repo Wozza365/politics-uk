@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useScenarioStore } from '@/stores/scenario'
-import { SvgMapRenderer } from '@/map/SvgMapRenderer'
+import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
 import type { BoundarySet, RegionState } from '@/map/MapRenderer'
 
 const scenario = useScenarioStore()
@@ -12,13 +12,21 @@ const container = ref<HTMLElement | null>(null)
 const hovered = ref<string | null>(null)
 const renderer = new SvgMapRenderer()
 
+// --- Active (clicked) constituency -------------------------------------
+const activeRegion = ref<string | null>(null)
+const isActive = computed(() => activeRegion.value !== null)
+const LIFT_PX = 3
+
 function buildRegionState(): RegionState {
   const state: RegionState = {}
   for (const region of scenario.commonsRegions) {
     const holder = region.seats[0]
+    const isActiveRegion = activeRegion.value === region.geometryRef
     state[region.geometryRef] = {
       fill: holder ? partyColour(holder.party) : '#9ca3af',
       selected: hovered.value === region.geometryRef,
+      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
+      liftPx: isActiveRegion ? LIFT_PX : undefined,
       tooltip: {
         name: region.name,
         party: holder ? scenario.party(holder.party)?.name : undefined,
@@ -45,6 +53,7 @@ function draw() {
 const MIN_ZOOM = 1
 const MAX_ZOOM = 6
 const BUTTON_ZOOM_STEP = 1.3
+const ACTIVE_ZOOM = 3.5
 
 const zoom = ref(1)
 const panX = ref(0)
@@ -70,20 +79,24 @@ function setZoom(next: number) {
 }
 
 function zoomIn() {
+  if (isActive.value) return
   setZoom(zoom.value * BUTTON_ZOOM_STEP)
 }
 
 function zoomOut() {
+  if (isActive.value) return
   setZoom(zoom.value / BUTTON_ZOOM_STEP)
 }
 
 function resetZoom() {
+  if (isActive.value) return
   zoom.value = 1
   panX.value = 0
   panY.value = 0
 }
 
 function onWheel(event: WheelEvent) {
+  if (isActive.value) return
   const factor = Math.exp(-event.deltaY * 0.001)
   setZoom(zoom.value * factor)
 }
@@ -92,7 +105,7 @@ function onWheel(event: WheelEvent) {
 let dragStart = { x: 0, y: 0 }
 
 function onMouseDown(event: MouseEvent) {
-  if (zoom.value <= MIN_ZOOM) return
+  if (isActive.value || zoom.value <= MIN_ZOOM) return
   dragging.value = true
   dragStart = { x: event.clientX, y: event.clientY }
 }
@@ -121,6 +134,7 @@ function touchDistance(a: Touch, b: Touch) {
 }
 
 function onTouchStart(event: TouchEvent) {
+  if (isActive.value) return
   if (event.touches.length === 2) {
     touchMode = 'pinch'
     pinchStartDist = touchDistance(event.touches[0], event.touches[1])
@@ -132,6 +146,7 @@ function onTouchStart(event: TouchEvent) {
 }
 
 function onTouchMove(event: TouchEvent) {
+  if (isActive.value) return
   if (touchMode === 'pinch' && event.touches.length === 2) {
     const dist = touchDistance(event.touches[0], event.touches[1])
     if (pinchStartDist > 0) setZoom(pinchStartZoom * (dist / pinchStartDist))
@@ -153,6 +168,72 @@ function onTouchEnd(event: TouchEvent) {
   }
 }
 
+// --- Click a constituency to activate it --------------------------------
+// Activating zooms to a fixed level centred on that constituency, steepens
+// the map's tilt (spec: default is near-flat; the active view is the more
+// dramatic angle the whole map used to sit at permanently), raises that one
+// region above the rest, and dims everything else. Manual zoom/pan is
+// disabled while active (gated above); clicking the active region again,
+// a different region, or empty space all resolve it below.
+function centerOnRegion(geometryRef: string) {
+  if (!container.value) return
+  const center = renderer.getRegionCenter(geometryRef)
+  if (!center) return
+  const width = container.value.clientWidth
+  const height = container.value.clientHeight
+  zoom.value = ACTIVE_ZOOM
+  panX.value = -(center.x - width / 2) * ACTIVE_ZOOM
+  panY.value = -(center.y - height / 2) * ACTIVE_ZOOM
+}
+
+// Only the activate/deactivate snap should animate the pan/zoom transform —
+// manual drag/wheel/pinch update the same transform far more often and need
+// to track the input with zero added delay, so the transition is toggled on
+// just for the duration of a snap rather than left on permanently.
+const snapping = ref(false)
+const SNAP_DURATION_MS = 500
+
+function snap(run: () => void) {
+  snapping.value = true
+  run()
+  setTimeout(() => {
+    snapping.value = false
+  }, SNAP_DURATION_MS)
+}
+
+function activate(geometryRef: string) {
+  snap(() => {
+    activeRegion.value = geometryRef
+    centerOnRegion(geometryRef)
+  })
+}
+
+function deactivate() {
+  snap(() => {
+    activeRegion.value = null
+    zoom.value = 1
+    panX.value = 0
+    panY.value = 0
+  })
+}
+
+function onRegionClick(geometryRef: string) {
+  if (activeRegion.value === geometryRef) {
+    deactivate()
+  } else {
+    activate(geometryRef)
+  }
+}
+
+function onWindowClick(event: MouseEvent) {
+  // A click on a constituency <path> is handled by onRegionClick (above) via
+  // the renderer's own event wiring — this only needs to catch "elsewhere":
+  // empty map background, or anywhere else on the page entirely.
+  const target = event.target as Element
+  if (target.tagName?.toLowerCase() === 'path') return
+  if (activeRegion.value) deactivate()
+}
+
 onMounted(() => {
   if (!container.value) return
   renderer.mount(container.value)
@@ -160,36 +241,62 @@ onMounted(() => {
     onRegionHover: (geometryRef) => {
       hovered.value = geometryRef
     },
+    onRegionClick,
   })
   draw()
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', onMouseUp)
+  window.addEventListener('click', onWindowClick)
 })
 
 watch(hovered, draw)
+watch(activeRegion, draw)
 onUnmounted(() => {
   renderer.unmount()
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', onMouseUp)
+  window.removeEventListener('click', onWindowClick)
 })
 
 const hoveredRegion = () =>
   scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
+
+// --- "Raised" 3D depth -------------------------------------------------
+// The renderer is flat SVG, so depth is faked with drop-shadow(), which
+// (unlike box-shadow) follows the rendered content's own alpha silhouette
+// rather than its rectangular box — a single small offset reads as a thin
+// raised edge around the coastline outline. Stacking many such layers for
+// a smoother gradient was tried and discarded: each drop-shadow is a full
+// extra rasterization pass over the whole (complex, many-path) SVG, and a
+// 16-layer stack made panning/zooming visibly laggy. One layer is cheap.
+const raisedMapFilter = `drop-shadow(0 ${RAISED_EDGE_DEPTH_PX}px 0 ${RAISED_EDGE_COLOR}) drop-shadow(0 8px 10px rgb(0 0 0 / 0.4))`
+
+// --- Tilt: flat by default, steeper while a region is active -----------
+const DEFAULT_TILT_DEG = 0
+const ACTIVE_TILT_DEG = 38
+const DEFAULT_TWIST_DEG = 0
+const ACTIVE_TWIST_DEG = -2
+const tiltDeg = computed(() => (isActive.value ? ACTIVE_TILT_DEG : DEFAULT_TILT_DEG))
+const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWIST_DEG))
 </script>
 
 <template>
   <div class="relative h-full w-full select-none">
     <div
-      class="h-full w-full origin-center [transform:perspective(1400px)_rotateX(38deg)_rotateZ(-2deg)] [filter:drop-shadow(0_24px_24px_rgb(0_0_0/0.35))]"
+      class="h-full w-full origin-center transition-[transform,filter] duration-500 ease-out"
+      :style="{
+        transform: `perspective(1400px) rotateX(${tiltDeg}deg) rotateZ(${twistDeg}deg)`,
+        filter: raisedMapFilter,
+      }"
     >
-      <div class="absolute inset-0 translate-y-2 rounded-lg bg-zinc-800/80" aria-hidden="true" />
       <div
         ref="container"
         class="relative h-full w-full overflow-hidden rounded-lg bg-transparent"
         :style="{
           transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
           transformOrigin: 'center',
-          cursor: zoom > 1 ? (dragging ? 'grabbing' : 'grab') : 'default',
+          transition: snapping ? `transform ${SNAP_DURATION_MS}ms ease-out` : 'none',
+          cursor: isActive ? 'default' : zoom > 1 ? (dragging ? 'grabbing' : 'grab') : 'default',
         }"
         @wheel.prevent="onWheel"
         @mousedown="onMouseDown"
@@ -215,7 +322,7 @@ const hoveredRegion = () =>
         type="button"
         aria-label="Zoom in"
         class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900/90 text-lg font-semibold text-white shadow-lg transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-        :disabled="zoom >= MAX_ZOOM"
+        :disabled="isActive || zoom >= MAX_ZOOM"
         @click="zoomIn"
       >
         +
@@ -224,7 +331,7 @@ const hoveredRegion = () =>
         type="button"
         aria-label="Zoom out"
         class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900/90 text-lg font-semibold text-white shadow-lg transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-        :disabled="zoom <= MIN_ZOOM"
+        :disabled="isActive || zoom <= MIN_ZOOM"
         @click="zoomOut"
       >
         −
@@ -233,7 +340,7 @@ const hoveredRegion = () =>
         type="button"
         aria-label="Reset zoom"
         class="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-900/90 text-xs font-semibold text-white shadow-lg transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
-        :disabled="zoom === 1 && panX === 0 && panY === 0"
+        :disabled="isActive || (zoom === 1 && panX === 0 && panY === 0)"
         @click="resetZoom"
       >
         ⟲
