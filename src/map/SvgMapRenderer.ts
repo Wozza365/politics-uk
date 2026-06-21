@@ -45,6 +45,15 @@ export class SvgMapRenderer implements MapRenderer {
   private overlayPath: SVGPathElement | null = null
   private liftedGeometryRef: string | null = null
   private liftedDepthPx = 0
+  // Pixel-space bounds per region from the projection itself (geoPath.bounds),
+  // not path.getBBox() — cheaper (no layout query) and unaffected by a path's
+  // own CSS transform (e.g. an active region's lift). sizeExtent is the
+  // min/max bounding-box diagonal across the whole dataset, computed in the
+  // same pass, so callers can rank one region's size relative to all the
+  // others (e.g. for size-proportional zoom).
+  private regionBounds: Map<string, { x: number; y: number; width: number; height: number }> =
+    new Map()
+  private sizeExtent: { min: number; max: number } | null = null
 
   mount(container: HTMLElement): void {
     this.container = container
@@ -52,6 +61,10 @@ export class SvgMapRenderer implements MapRenderer {
     svg.setAttribute('width', '100%')
     svg.setAttribute('height', '100%')
     svg.style.display = 'block'
+    // Only the background blur (setBackgroundBlur) transitions — letting it
+    // fade in/out is enough on its own to cover the snap's rendering
+    // artifacts without needing to be in lockstep with the snap's duration.
+    svg.style.transition = 'filter 300ms ease'
 
     const overlaySvg = document.createElementNS(NS, 'svg')
     overlaySvg.setAttribute('width', '100%')
@@ -196,6 +209,9 @@ export class SvgMapRenderer implements MapRenderer {
     // (now-stale) "nothing changed" check.
     this.liftedGeometryRef = null
     this.liftedDepthPx = 0
+    this.regionBounds.clear()
+    let minDiagonal = Infinity
+    let maxDiagonal = -Infinity
 
     for (const f of collection.features) {
       const geometryRef = f.properties.geometryRef
@@ -214,21 +230,35 @@ export class SvgMapRenderer implements MapRenderer {
 
       this.svg.appendChild(path)
       this.paths.set(geometryRef, path)
+
+      const [[x0, y0], [x1, y1]] = pathGenerator.bounds(f as GeoPermissibleObjects)
+      const boundsWidth = x1 - x0
+      const boundsHeight = y1 - y0
+      this.regionBounds.set(geometryRef, { x: x0, y: y0, width: boundsWidth, height: boundsHeight })
+      const diagonal = Math.hypot(boundsWidth, boundsHeight)
+      minDiagonal = Math.min(minDiagonal, diagonal)
+      maxDiagonal = Math.max(maxDiagonal, diagonal)
     }
+    this.sizeExtent = Number.isFinite(minDiagonal) ? { min: minDiagonal, max: maxDiagonal } : null
 
     this.syncLift(regionState)
   }
 
-  getRegionCenter(geometryRef: string): { x: number; y: number } | null {
-    const path = this.paths.get(geometryRef)
-    if (!path) return null
-    // getBBox() ignores this element's own CSS transform (e.g. an active
-    // region's lift), which is exactly what we want here: callers want the
-    // region's resting position in the SVG's own coordinate space, which —
-    // since the viewBox is fit 1:1 to the mount container's pixel size —
-    // doubles as container-local pixel coordinates pre-zoom.
-    const box = path.getBBox()
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 }
+  getRegionBounds(geometryRef: string): { x: number; y: number; width: number; height: number } | null {
+    return this.regionBounds.get(geometryRef) ?? null
+  }
+
+  /** Min/max bounding-box diagonal (pixels, pre-zoom) across all currently rendered regions. */
+  getRegionSizeExtent(): { min: number; max: number } | null {
+    return this.sizeExtent
+  }
+
+  setBackgroundBlur(blurPx: number | null): void {
+    if (!this.svg) return
+    // Deliberately on the main <svg> only, not the overlaySvg the lifted/
+    // active region renders on — that's the point: hide the background's
+    // artifacts while the active region stays sharp.
+    this.svg.style.filter = blurPx != null ? `blur(${blurPx}px)` : ''
   }
 
   resize(): void {
@@ -242,6 +272,8 @@ export class SvgMapRenderer implements MapRenderer {
   unmount(): void {
     this.svg?.replaceChildren()
     this.paths.clear()
+    this.regionBounds.clear()
+    this.sizeExtent = null
     this.container = null
     this.svg = null
     this.overlaySvg = null

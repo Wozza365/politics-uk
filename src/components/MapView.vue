@@ -53,7 +53,17 @@ function draw() {
 const MIN_ZOOM = 1
 const MAX_ZOOM = 6
 const BUTTON_ZOOM_STEP = 1.3
-const ACTIVE_ZOOM = 3.5
+// Activating a constituency picks a zoom level by ranking its bounding-box
+// diagonal against every other region's, then placing it along this range —
+// closest for the smallest region in the dataset, furthest for the largest.
+// Ranking against the dataset (rather than fitting each region to a fixed
+// on-screen target independently) is what guarantees two different-sized
+// constituencies actually land on two different zoom levels: a fixed-target
+// fit saturates at the min/max clamp for most regions, since UK constituency
+// size is heavily skewed (a few huge rural seats, hundreds of similarly
+// small urban ones).
+const ACTIVE_ZOOM_MIN = 2
+const ACTIVE_ZOOM_MAX = MAX_ZOOM
 
 const zoom = ref(1)
 const panX = ref(0)
@@ -169,21 +179,39 @@ function onTouchEnd(event: TouchEvent) {
 }
 
 // --- Click a constituency to activate it --------------------------------
-// Activating zooms to a fixed level centred on that constituency, steepens
-// the map's tilt (spec: default is near-flat; the active view is the more
-// dramatic angle the whole map used to sit at permanently), raises that one
-// region above the rest, and dims everything else. Manual zoom/pan is
-// disabled while active (gated above); clicking the active region again,
-// a different region, or empty space all resolve it below.
+// Activating zooms in, centred on that constituency, to a level proportional
+// to its size (see ACTIVE_ZOOM_MIN/MAX above), steepens the map's tilt (spec:
+// default is near-flat; the active view is the more dramatic angle the whole
+// map used to sit at permanently), raises that one region above the rest,
+// and dims everything else. Manual zoom/pan is disabled while active (gated
+// above); clicking the active region again, a different region, or empty
+// space all resolve it below.
 function centerOnRegion(geometryRef: string) {
   if (!container.value) return
-  const center = renderer.getRegionCenter(geometryRef)
-  if (!center) return
+  const bounds = renderer.getRegionBounds(geometryRef)
+  if (!bounds) return
   const width = container.value.clientWidth
   const height = container.value.clientHeight
-  zoom.value = ACTIVE_ZOOM
-  panX.value = -(center.x - width / 2) * ACTIVE_ZOOM
-  panY.value = -(center.y - height / 2) * ACTIVE_ZOOM
+
+  const diagonal = Math.max(Math.hypot(bounds.width, bounds.height), 1)
+  const extent = renderer.getRegionSizeExtent()
+  let activeZoom = (ACTIVE_ZOOM_MIN + ACTIVE_ZOOM_MAX) / 2
+  if (extent && extent.max > extent.min) {
+    // Logarithmic, not linear: a handful of very large rural seats would
+    // otherwise stretch the range so far that all the small/medium ones
+    // bunch up near one end and look identical.
+    const logDiagonal = Math.log(diagonal)
+    const logMin = Math.log(Math.max(extent.min, 1))
+    const logMax = Math.log(Math.max(extent.max, extent.min + 1))
+    const t = (logDiagonal - logMin) / (logMax - logMin)
+    activeZoom = ACTIVE_ZOOM_MAX - t * (ACTIVE_ZOOM_MAX - ACTIVE_ZOOM_MIN)
+  }
+
+  const centerX = bounds.x + bounds.width / 2
+  const centerY = bounds.y + bounds.height / 2
+  zoom.value = activeZoom
+  panX.value = -(centerX - width / 2) * activeZoom
+  panY.value = -(centerY - height / 2) * activeZoom
 }
 
 // Only the activate/deactivate snap should animate the pan/zoom transform —
@@ -191,11 +219,28 @@ function centerOnRegion(geometryRef: string) {
 // to track the input with zero added delay, so the transition is toggled on
 // just for the duration of a snap rather than left on permanently.
 const snapping = ref(false)
-const SNAP_DURATION_MS = 500
+// The transform (tilt + zoom) itself moves faster than the snap's overall
+// duration — the background blur (below) is deliberately held for the
+// extra 200ms after the move finishes, since that's where the pixelation
+// we can't fully eliminate is most visible (right as the transform settles).
+const SNAP_TRANSFORM_DURATION_MS = 800
+const SNAP_DURATION_MS = 1000
+// Cover-up, not a real fix: blurring the background masks the soft edges and
+// transient colour shifts the snap's combined tilt+zoom transform causes on
+// the ~650-path background while it's actively animating. Faded in/out
+// (via the svg's own `filter` transition) rather than toggled abruptly, so
+// it peaks partway into the snap and is gone again by the time it settles —
+// not a flat blur held for the full duration.
+const SNAP_BACKGROUND_BLUR_PX = 2
+const SNAP_BACKGROUND_BLUR_FADE_MS = 300
 
 function snap(run: () => void) {
   snapping.value = true
+  renderer.setBackgroundBlur(SNAP_BACKGROUND_BLUR_PX)
   run()
+  setTimeout(() => {
+    renderer.setBackgroundBlur(null)
+  }, SNAP_DURATION_MS - SNAP_BACKGROUND_BLUR_FADE_MS)
   setTimeout(() => {
     snapping.value = false
   }, SNAP_DURATION_MS)
@@ -283,10 +328,18 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
 <template>
   <div class="relative h-full w-full select-none">
     <div
-      class="h-full w-full origin-center transition-[transform,filter] duration-500 ease-out"
+      class="h-full w-full origin-center"
       :style="{
         transform: `perspective(1400px) rotateX(${tiltDeg}deg) rotateZ(${twistDeg}deg)`,
-        filter: raisedMapFilter,
+        transition: `transform ${SNAP_TRANSFORM_DURATION_MS}ms ease-in-out`,
+        // A `filter` on an ancestor of an animating `transform` forces the
+        // browser to rasterize this subtree and scale that bitmap for the
+        // duration of the transition rather than re-rendering the SVG's
+        // vector paths each frame, which is what made the map look blurry
+        // while snapping to/from a constituency. Dropping the filter only
+        // for the transition window (it's purely decorative) keeps the snap
+        // crisp; it reappears once the transform has settled.
+        filter: snapping ? 'none' : raisedMapFilter,
       }"
     >
       <div
@@ -295,7 +348,7 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
         :style="{
           transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
           transformOrigin: 'center',
-          transition: snapping ? `transform ${SNAP_DURATION_MS}ms ease-out` : 'none',
+          transition: snapping ? `transform ${SNAP_TRANSFORM_DURATION_MS}ms ease-in-out` : 'none',
           cursor: isActive ? 'default' : zoom > 1 ? (dragging ? 'grabbing' : 'grab') : 'default',
         }"
         @wheel.prevent="onWheel"

@@ -40,6 +40,15 @@ export interface MapRenderer {
   setEvents(events: MapRendererEvents): void
   resize(): void
   unmount(): void
-  /** Centre of a rendered region, in the same pixel space as the mount container's clientWidth/clientHeight (post-fit, pre-zoom). Null if not yet rendered. */
-  getRegionCenter(geometryRef: string): { x: number; y: number } | null
+  /** Bounding box of a rendered region, in the same pixel space as the mount container's clientWidth/clientHeight (post-fit, pre-zoom). Null if not yet rendered. */
+  getRegionBounds(geometryRef: string): { x: number; y: number; width: number; height: number } | null
+  /** Min/max bounding-box diagonal (pixels, pre-zoom) across all currently rendered regions. Null if not yet rendered. */
+  getRegionSizeExtent(): { min: number; max: number } | null
+  /**
+   * Blur every region except whichever one is currently lifted/active. Used
+   * to mask GPU-compositing artifacts (soft edges, transient colour shifts)
+   * that show up on the ~650-path background during the zoom/tilt snap
+   * transition; pass `null` to remove it once the transition has settled.
+   */
+  setBackgroundBlur(blurPx: number | null): void
 }
