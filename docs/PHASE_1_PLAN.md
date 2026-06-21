@@ -166,7 +166,7 @@ else positioned around it per spec §9; faux-3D treatment retained (already true
 **Acceptance:** Dot count equals total seats (650), party groupings and colours correct, arc
 reads cleanly; `seatsPerDot` parameter proven by a unit test even if Commons uses 1.
 
-### P1.7 — Top-centre party panel (collapsed) `🔲`
+### P1.7 — Top-centre party panel (collapsed) `✅ DONE`
 **Goal.** Spec §9.3 collapsed view (expandable levers are Phase 2 — stub the expand affordance).
 
 **Depends on:** P1.1.
