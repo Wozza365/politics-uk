@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MapView from '@/components/MapView.vue'
 import PartyPanel from '@/components/PartyPanel.vue'
+import HemicycleView from '@/components/HemicycleView.vue'
 </script>
 
 <template>
@@ -56,9 +57,7 @@ import PartyPanel from '@/components/PartyPanel.vue'
       aria-label="Party makeup"
     >
       <slot name="hemicycle">
-        <div class="flex min-h-12 items-center justify-center px-4 py-3 text-zinc-400">
-          Hemicycle placeholder
-        </div>
+        <HemicycleView />
       </slot>
     </section>
 
