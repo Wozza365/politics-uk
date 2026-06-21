@@ -10,6 +10,15 @@ export interface PartyOfficer {
   portrait?: string // placeholder image with name for now
 }
 
+export interface PartyHistoryEntry {
+  date: ISODate
+  polling: number
+  finance: PartyFinance
+  membership: number
+  commonsSeats: number
+  otherSeats: number
+}
+
 export interface Party {
   id: PartyId
   name: string
@@ -22,6 +31,7 @@ export interface Party {
   mergedFrom?: string[] // sister parties folded into this one (spec §4.3)
   compass?: CompassSummary // overall position; the shaded circle on cards/panel (spec §4.4)
   stances?: Record<PolicyId, PolicyStance> // per-policy positions for the sim engine (spec §10.5)
+  history: PartyHistoryEntry[]
 }
 
 export interface PartyFinance {

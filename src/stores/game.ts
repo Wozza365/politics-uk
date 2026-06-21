@@ -23,6 +23,7 @@ export const useGameStore = defineStore('game', {
     date: '' as ISODate,
     clock: { running: false, msPerDay: 15000 },
     polling: {} as Record<PartyId, number>,
+    pollingHistory: [] as Array<{ date: ISODate; polling: Record<PartyId, number> }>,
     feed: [] as FeedEntry[],
     // No GameEvent type yet (that's P1.12's job) — typed loosely for now.
     pendingEvent: null as unknown | null,
@@ -68,6 +69,10 @@ export const useGameStore = defineStore('game', {
       this.selectedPartyId = partyId
       this.date = scenario.scenario.date
       this.polling = { ...scenario.scenario.polling }
+      this.pollingHistory = scenario.scenario.pollingHistory.map((snapshot) => ({
+        date: snapshot.date,
+        polling: { ...snapshot.polling },
+      }))
       this.clock.running = false
     },
     tickDay() {

@@ -10,6 +10,7 @@ function makeParty(id: string, scope: Party['scope'] = 'national'): Party {
     colours: { primary: '#000000', onPrimary: '#FFFFFF' },
     scope,
     leadership: [],
+    history: [],
   }
 }
 
@@ -21,6 +22,7 @@ function makeScenario(overrides: Partial<Scenario> = {}): Scenario {
     tiers: { commons: [] },
     parties: [],
     polling: {},
+    pollingHistory: [],
     finances: {},
     membership: {},
     ...overrides,

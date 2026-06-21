@@ -9777,6 +9777,20 @@
           "personName": "Keir Starmer",
           "since": "2020-04-04"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 27.72,
+          "finance": {
+            "estimatedCashOnHand": 7920000,
+            "annualIncome": 35525000,
+            "source": "estimated"
+          },
+          "membership": 366300,
+          "commonsSeats": 402,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9794,6 +9808,20 @@
           "role": "leader",
           "personName": "Kemi Badenoch",
           "since": "2024-11-02"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 24.36,
+          "finance": {
+            "estimatedCashOnHand": 6090000,
+            "annualIncome": 24500000,
+            "source": "estimated"
+          },
+          "membership": 131950,
+          "commonsSeats": 121,
+          "otherSeats": 0
         }
       ]
     },
@@ -9813,6 +9841,20 @@
           "personName": "Ed Davey",
           "since": "2020-08-27"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 11.76,
+          "finance": {
+            "estimatedCashOnHand": 1470000,
+            "annualIncome": 6075000,
+            "source": "estimated"
+          },
+          "membership": 73500,
+          "commonsSeats": 72,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9830,6 +9872,20 @@
           "role": "leader",
           "personName": "Nigel Farage",
           "since": "2024-06-03"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 22.28,
+          "finance": {
+            "estimatedCashOnHand": 2025000,
+            "annualIncome": 7920000,
+            "source": "estimated"
+          },
+          "membership": 222750,
+          "commonsSeats": 5,
+          "otherSeats": 0
         }
       ]
     },
@@ -9857,6 +9913,20 @@
           "personName": "Carla Denyer",
           "since": "2024-09-06"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 7.92,
+          "finance": {
+            "estimatedCashOnHand": 495000,
+            "annualIncome": 2030000,
+            "source": "estimated"
+          },
+          "membership": 59400,
+          "commonsSeats": 4,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9874,6 +9944,20 @@
           "role": "leader",
           "personName": "George Galloway",
           "since": "2019-01-30"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 1.01,
+          "finance": {
+            "estimatedCashOnHand": 20300,
+            "annualIncome": 98000,
+            "source": "estimated"
+          },
+          "membership": 4060,
+          "commonsSeats": 0,
+          "otherSeats": 0
         }
       ]
     },
@@ -9893,6 +9977,20 @@
           "personName": "Nick Tenconi",
           "since": "2024-09-21"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0.29,
+          "finance": {
+            "estimatedCashOnHand": 4900,
+            "annualIncome": 30375,
+            "source": "estimated"
+          },
+          "membership": 2940,
+          "commonsSeats": 0,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9910,6 +10008,20 @@
           "role": "leader",
           "personName": "John Swinney",
           "since": "2024-05-05"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 3.04,
+          "finance": {
+            "estimatedCashOnHand": 405000,
+            "annualIncome": 2970000,
+            "source": "estimated"
+          },
+          "membership": 50625,
+          "commonsSeats": 9,
+          "otherSeats": 0
         }
       ]
     },
@@ -9929,6 +10041,20 @@
           "personName": "Rhun ap Iorwerth",
           "since": "2023-08-19"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 99000,
+            "annualIncome": 507500,
+            "source": "estimated"
+          },
+          "membership": 9900,
+          "commonsSeats": 4,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9946,6 +10072,20 @@
           "role": "leader",
           "personName": "Gavin Robinson",
           "since": "2024-06-29"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 152250,
+            "annualIncome": 588000,
+            "source": "estimated"
+          },
+          "membership": 5075,
+          "commonsSeats": 5,
+          "otherSeats": 0
         }
       ]
     },
@@ -9965,6 +10105,20 @@
           "personName": "Mary Lou McDonald",
           "since": "2018-02-10"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 196000,
+            "annualIncome": 810000,
+            "source": "estimated"
+          },
+          "membership": 7840,
+          "commonsSeats": 7,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -9982,6 +10136,20 @@
           "role": "leader",
           "personName": "Claire Hanna",
           "since": "2024-02-05"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 50625,
+            "annualIncome": 198000,
+            "source": "estimated"
+          },
+          "membership": 2025,
+          "commonsSeats": 2,
+          "otherSeats": 0
         }
       ]
     },
@@ -10001,6 +10169,20 @@
           "personName": "Naomi Long",
           "since": "2016-10-29"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 79200,
+            "annualIncome": 304500,
+            "source": "estimated"
+          },
+          "membership": 2970,
+          "commonsSeats": 1,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -10018,6 +10200,20 @@
           "role": "leader",
           "personName": "Mike Nesbitt",
           "since": "2024-04-08"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 40600,
+            "annualIncome": 147000,
+            "source": "estimated"
+          },
+          "membership": 2030,
+          "commonsSeats": 1,
+          "otherSeats": 0
         }
       ]
     },
@@ -10037,6 +10233,20 @@
           "personName": "Jim Allister",
           "since": "2007-12-07"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 19600,
+            "annualIncome": 81000,
+            "source": "estimated"
+          },
+          "membership": 1470,
+          "commonsSeats": 1,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -10054,6 +10264,20 @@
           "personName": "Sir Lindsay Hoyle",
           "since": "2019-11-04"
         }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 0,
+            "annualIncome": 0,
+            "source": "estimated"
+          },
+          "membership": 0,
+          "commonsSeats": 1,
+          "otherSeats": 0
+        }
       ]
     },
     {
@@ -10065,7 +10289,21 @@
         "onPrimary": "#000000"
       },
       "scope": "local",
-      "leadership": []
+      "leadership": [],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 0,
+            "annualIncome": 0,
+            "source": "estimated"
+          },
+          "membership": 0,
+          "commonsSeats": 15,
+          "otherSeats": 0
+        }
+      ]
     }
   ],
   "polling": {
@@ -10078,6 +10316,30 @@
     "ukip": 0.3,
     "snp": 3
   },
+  "pollingHistory": [
+    {
+      "date": "2024-12-01",
+      "polling": {
+        "labour": 27.72,
+        "conservative": 24.36,
+        "liberal_democrat": 11.76,
+        "reform_uk": 22.28,
+        "green": 7.92,
+        "workers_party": 1.01,
+        "ukip": 0.29,
+        "snp": 3.04,
+        "plaid_cymru": 0,
+        "dup": 0,
+        "sinn_fein": 0,
+        "sdlp": 0,
+        "alliance": 0,
+        "uup": 0,
+        "tuv": 0,
+        "speaker": 0,
+        "independent": 0
+      }
+    }
+  ],
   "finances": {
     "labour": {
       "estimatedCashOnHand": 8000000,

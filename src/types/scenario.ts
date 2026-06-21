@@ -1,6 +1,11 @@
 import type { ISODate, Party, PartyFinance, PartyId } from './party'
 import type { Region, TierId } from './region'
 
+export interface PollingSnapshot {
+  date: ISODate
+  polling: Record<PartyId, number>
+}
+
 export interface Scenario {
   id: string // "uk-2025-01-01"
   date: ISODate
@@ -12,6 +17,7 @@ export interface Scenario {
   tiers: Record<TierId, Region[]>
   parties: Party[]
   polling: Record<PartyId, number> // headline VI %, scenario-start snapshot
+  pollingHistory: PollingSnapshot[]
   finances: Record<PartyId, PartyFinance>
   membership: Record<PartyId, number>
 }
