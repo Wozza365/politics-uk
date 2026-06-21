@@ -109,3 +109,26 @@ Still open (carried forward in `PHASE_1_PLAN.md`'s P1.5): formal
 integration into the P1.4 game-screen layout once that exists — today the
 map is mounted standalone in `GameScreen.vue`'s placeholder, not yet
 alongside the hemicycle/panel/feed/clock.
+
+## P1.6 — Hemicycle (party-makeup dots) ✅
+
+Commit `3b022f0`.
+
+- `src/components/HemicycleView.vue`: displays seat composition as a dot diagram in a hemicycle (parliament arc).
+- `src/sim/hemicycle.ts`: layout utilities `computeHemicycleLayout()` (distributes dots across concentric rows of the arc) and `getHemicycleDotPosition()` (polar-to-Cartesian coordinate mapping).
+- Dot count = total Commons seats (650); 1 dot = 1 seat. Layout structure accepts `seatsPerDot` parameter (e.g., `1 dot = 10 seats` for thousand-seat tiers), proven ready for Phase 2 large tiers even though MVP uses 1.
+- Parties ordered left→right by economic compass position when available, else by seat count descending. Each dot coloured by party `colours.primary`.
+- Dots are **hover-ready** with tooltips showing party name and seat number. Clickable drill-down is stubbed for Phase 2.
+- Legend below the hemicycle shows each party's `shortName` and seat count.
+- Integrated into `GameScreen.vue`'s hemicycle slot (bottom-centre panel, per spec §9.2).
+
+## P1.7 — Top-centre party panel (collapsed) ✅
+
+Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
+
+- `src/components/PartyPanel.vue`: renders the **player's** party's stats in a collapsed (at-a-glance) panel.
+- Fields: party name, current polling % (0 dp), **two seat figures** (Commons prominent, combined "everything else" smaller), party finance (flagged estimated), membership, leader approval rating, vote-share trend arrow (momentum), councils controlled, days-since-last-election.
+- All values sourced from `game`/`scenario` stores. Devolved seats and Lords (not in Phase 0 data) show "—" with a footnote; layout accommodates them.
+- Compass summary (via `CompassView`, P1.2.5) shows the player's overall position.
+- Non-functional "expand" affordance (expand handler wired to pause the clock per spec §9.5 even though expanded panel is empty — Phase 2 work).
+- Status badge shows the player's difficulty relative to peers (updated daily from the store).

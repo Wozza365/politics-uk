@@ -147,46 +147,11 @@ zoom level, hover tooltip (MP/party/majority), and fill from live holding-party 
 **Acceptance (remaining):** Once P1.4 lands, the map sits in its centre slot with everything
 else positioned around it per spec §9; faux-3D treatment retained (already true today).
 
-### P1.6 — Hemicycle (party-makeup dots) `🔲`
-**Goal.** Spec §9.2: dot diagram of seat composition for the current view's tier.
-
-**Depends on:** P1.4.
-
-**Steps:**
-1. Create `src/components/HemicycleView.vue`. Compute seat totals per party from the store's
-   composition for the active tier (Commons at MVP).
-2. Lay out dots in a **hemicycle** (parliament arc). For Commons (650), **1 dot = 1 seat**;
-   design the layout fn to accept a `seatsPerDot` scale so thousand-seat tiers later use
-   `1 dot = 10/100` with a footnote (spec §9.2). A standard approach: distribute seats across
-   concentric rows of the arc proportional to radius.
-3. Colour each dot by party (`colours.primary`). Order parties left→right by political lean if
-   available, else by seat count.
-4. Mark dots up as **hover-ready now, clickable later** (add the markup/handlers but leave the
-   drill-down as a Phase 2 stub).
-**Acceptance:** Dot count equals total seats (650), party groupings and colours correct, arc
-reads cleanly; `seatsPerDot` parameter proven by a unit test even if Commons uses 1.
+### P1.6 — Hemicycle (party-makeup dots) `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p16--hemicycle-party-makeup-dots-).
 
 ### P1.7 — Top-centre party panel (collapsed) `✅ DONE`
-**Goal.** Spec §9.3 collapsed view (expandable levers are Phase 2 — stub the expand affordance).
-
-**Depends on:** P1.1.
-
-**Steps:**
-1. Create `src/components/PartyPanel.vue`. Show, for the **player's** party:
-   - party name; current polling % (0 dp);
-   - **two seat figures** — Commons (prominent) and a combined "everything else" elected total
-     (smaller); **Lords shown separately**, never in the combined total (spec §9.3);
-   - party finance (estimated; flagged); membership;
-   - confirmed extras: leader approval rating, vote-share **trend arrow** (momentum), councils
-     controlled, days since last election;
-   - the party's **compass summary** via `CompassView` (P1.2.5) — the player's overall position.
-2. All values from `game`/`scenario` stores. For MVP, tiers beyond Commons (and Lords — not yet
-   gathered, see `PHASE_0_COMPLETED.md`) may be 0/"—" with a footnote until that data exists —
-   but the **layout** must already accommodate them.
-3. Add a non-functional "expand" affordance that, per spec §9.5, will later pause the clock when
-   opened — wire the pause hook now even if the expanded panel is empty.
-**Acceptance:** Collapsed panel shows all listed fields from data; estimates visibly flagged;
-trend arrow reflects polling momentum; build clean.
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p17--top-centre-party-panel-collapsed-).
 
 ### P1.8 — Event feed `🔲`
 **Goal.** Spec §9.4: a text-style feed (no panel/background), newest at the **bottom**
