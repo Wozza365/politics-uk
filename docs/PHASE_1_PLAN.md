@@ -9,8 +9,7 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. Phase 1 is **in progress**; P1.0–P1.3 are done and P1.5's core map
-> interaction work is done ahead of schedule — see
+> how. Phase 1 is **in progress**; P1.0–P1.7 are done — see
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
 > how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
@@ -75,15 +74,14 @@ Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) fo
 
 | Area | Files | State |
 | --- | --- | --- |
-| App shell + routing (P1.0) | `src/stores/ui.ts`, `src/App.vue`, `src/screens/*.vue` | ✅ Screen state + routing; `GameScreen.vue` is still a placeholder (P1.4) |
+| App shell + routing (P1.0) | `src/stores/ui.ts`, `src/App.vue`, `src/screens/*.vue` | ✅ Screen state + routing; `GameScreen.vue` is the full six-region layout (P1.4) |
 | Game state store (P1.1) | `src/stores/game.ts`, `src/types/event.ts` | ✅ Selected party, date, clock state, polling, feed, pending-event hook |
 | Start menu (P1.2) | `src/screens/StartScreen.vue`, `src/components/{PartyCard,DifficultyBadge,CompassView}.vue`, `src/sim/difficulty.ts` | ✅ Timeline stub, party cards, difficulty banding, compass view, Start button |
 | Loading screen (P1.3) | `src/screens/LoadingScreen.vue` | ✅ |
-| Map zoom/pan/focus (part of P1.5) | `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Done ahead of schedule; formal integration into the P1.4 layout still open |
+| Westminster map (P1.4, P1.5) | `src/screens/GameScreen.vue`, `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Game-screen layout built; map zoom/pan/focus integrated into its centre slot |
 | Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
 
-Everything else in Phase 1 below is TODO. The real Commons geometry already exists, so **P1.5
-no longer depends on a blocked data step** — it can use the live store data directly.
+Everything else in Phase 1 below is TODO.
 
 ---
 
@@ -113,39 +111,11 @@ are done.
 ### P1.3 — Loading screen `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p13--loading-screen-).
 
-### P1.4 — Game screen layout `🔲`
-**Goal.** Spec §9 layout: map centre; event feed top-left (no panel behind it); party stats
-top-centre; clock + GE countdown top-right; hemicycle under the map; view-switcher
-bottom-centre. Everything overlaid on a neutral backdrop.
+### P1.4 — Game screen layout `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p14--game-screen-layout-).
 
-**Depends on:** P1.0.
-
-**Steps:** Build `GameScreen.vue` as a full-viewport layout (CSS grid / absolute regions per
-the ASCII layout in spec §9). Drop in placeholder slots for each sub-component so they can be
-filled independently (good delegation seams). The map sits centrally and behind the overlaid
-text UI.
-**Acceptance:** All six regions positioned per spec §9; responsive enough not to overlap at
-common desktop sizes; build clean.
-
-### P1.5 — Westminster map in the game screen `🟠 PARTIAL`
-**Goal.** Spec §9.1: the existing `MapView` integrated as the central map, zoom + pan + hover
-stats, coloured by holding party.
-
-**Depends on:** P1.4. (Real Commons geometry already exists in the store — no longer blocked.)
-
-**Done already** (ahead of schedule — see
-[`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p15--westminster-map-zoom-pan-and-focus-partial-)):
-manual wheel-zoom/drag-pan/pinch-zoom, click-to-focus a constituency with a size-proportional
-zoom level, hover tooltip (MP/party/majority), and fill from live holding-party colour.
-
-**Still open:**
-1. Vote share in the hover tooltip — not currently populated in the dataset (see
-   `PHASE_0_COMPLETED.md` P0.3.2 notes); needs a data step, not a `MapView` change.
-2. Formal integration into the **P1.4 game-screen layout** — today `MapView` is mounted
-   standalone in `GameScreen.vue`'s placeholder (see P1.4 below), not yet positioned alongside
-   the hemicycle/panel/feed/clock per spec §9's six-region layout.
-**Acceptance (remaining):** Once P1.4 lands, the map sits in its centre slot with everything
-else positioned around it per spec §9; faux-3D treatment retained (already true today).
+### P1.5 — Westminster map in the game screen `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p15--westminster-map-zoom-pan-and-focus-).
 
 ### P1.6 — Hemicycle (party-makeup dots) `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p16--hemicycle-party-makeup-dots-).

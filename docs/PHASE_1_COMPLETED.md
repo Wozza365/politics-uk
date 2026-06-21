@@ -77,7 +77,30 @@ Commit `342e34c`.
   swapping in genuinely-async loading later is a one-line change.
   Auto-advances to `ui.goToGame()`.
 
-## P1.5 — Westminster map zoom, pan, and focus (partial) 🟠
+## P1.4 — Game screen layout ✅
+
+- `src/screens/GameScreen.vue`: full-viewport (`h-screen w-screen`) absolute-
+  positioned layout implementing the spec §9 six-region ASCII layout on a
+  neutral `bg-zinc-900` backdrop:
+  - Event feed: top-left panel (`absolute left-4 top-4 bottom-4`), no
+    background behind the entries themselves (chrome is just the panel
+    container).
+  - Party panel (`PartyPanel`): top-centre.
+  - Game clock + GE countdown: top-right panel (`absolute right-4 top-4`).
+  - Map: centred, behind/between the overlaid UI (`absolute inset-x-0
+    bottom-32 top-20`), capped at `max-w-6xl`.
+  - Hemicycle (`HemicycleView`): bottom-centre, above the view-switcher
+    (`absolute bottom-20 left-1/2 -translate-x-1/2`).
+  - View-switcher: bottom-centre nav bar (`absolute bottom-4 left-1/2
+    -translate-x-1/2`).
+- Each region exposes a named `<slot>` (`event-feed`, `clock`, `map`,
+  `hemicycle`, `view-switcher`) with a sensible placeholder/default so
+  sub-components could be (and were) filled in independently — the
+  delegation seam the plan called for.
+- Builds clean; regions stay non-overlapping at common desktop sizes via
+  fixed offsets + `max-w`/`translate` centring rather than flex/grid reflow.
+
+## P1.5 — Westminster map zoom, pan, and focus ✅
 
 Commits `e5b6476` (manual zoom/pan), `65a403a` (click-to-activate
 constituency focus + tilt), `3daf1f1` (size-proportional focus zoom +
@@ -105,10 +128,13 @@ Done, ahead of the original P1.5 ask:
 - Hover tooltip already shows MP/party/majority (not vote share — not yet
   populated in the dataset, see `PHASE_0_COMPLETED.md` P0.3.2).
 
-Still open (carried forward in `PHASE_1_PLAN.md`'s P1.5): formal
-integration into the P1.4 game-screen layout once that exists — today the
-map is mounted standalone in `GameScreen.vue`'s placeholder, not yet
-alongside the hemicycle/panel/feed/clock.
+Formally integrated into the P1.4 game-screen layout: `MapView` is mounted
+in `GameScreen.vue`'s central map slot, positioned alongside the
+hemicycle/panel/feed/clock per spec §9's six-region layout.
+
+Vote share in the hover tooltip remains unpopulated (needs a data step, not
+a `MapView` change — see `PHASE_0_COMPLETED.md` P0.3.2 notes); carried
+forward as a data follow-up, not a blocker for P1.5 completion.
 
 ## P1.6 — Hemicycle (party-makeup dots) ✅
 
