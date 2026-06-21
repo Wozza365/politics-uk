@@ -31,10 +31,11 @@ export interface HemicycleRow {
 export function computeHemicycleLayout(totalSeats: number, seatsPerDot: number = 1) {
   const dotCount = Math.ceil(totalSeats / seatsPerDot)
 
-  // Hemicycle spans π radians (180°), centered horizontally at the bottom
+  // A full semicircle (180°), symmetric about the upward vertical (straight
+  // up = the centre of the fan).
   const arcAngle = Math.PI
-  const minRadius = 30 // inner radius
-  const maxRadius = 120 // outer radius to stay within UI bounds
+  const minRadius = 42.3046875 // inner radius (another 5% closer in)
+  const maxRadius = 169.21875 // outer radius (another 5% closer in)
   const radiusRange = maxRadius - minRadius
 
   // Target ~18 dots on the innermost ring; every ring's dot count then scales
@@ -77,56 +78,61 @@ export function computeHemicycleLayout(totalSeats: number, seatsPerDot: number =
   const rows: HemicycleRow[] = radii.map((radius, rowIndex) => ({
     radius,
     seatsInRow: baseCounts[rowIndex],
-    startAngle: 0,
-    endAngle: arcAngle,
+    startAngle: -arcAngle / 2,
+    endAngle: arcAngle / 2,
     arcLength: radius * arcAngle,
   }))
 
   return { rows, dotCount }
 }
 
+/** One drawable dot position before a party is assigned to it. */
+export interface HemicycleSlot {
+  radius: number
+  angle: number
+}
+
 /**
- * Generate hemicycle dot positions (x, y) for a given seat index.
- * Arc spans from 0° to 180° (left to right across the bottom of a circle).
+ * Flatten every row into individual dot slots, sorted by angle ascending
+ * (left → right, i.e. clockwise across the fan), then by radius ascending
+ * as a tiebreak for slots that land at the same angle in different rows.
  *
- * @param seatIndex - seat number (0-indexed)
- * @param rows - row layout data from computeHemicycleLayout
+ * This ordering is what lets callers fill the hemicycle by sweeping
+ * clockwise across the whole fan (assigning contiguous wedges to parties)
+ * rather than filling one ring fully before moving to the next.
+ */
+export function buildHemicycleSlots(rows: HemicycleRow[]): HemicycleSlot[] {
+  const slots: HemicycleSlot[] = []
+
+  for (const row of rows) {
+    const angleRange = row.endAngle - row.startAngle
+    const angleStep = angleRange / Math.max(row.seatsInRow - 1, 1)
+    for (let i = 0; i < row.seatsInRow; i++) {
+      slots.push({ radius: row.radius, angle: row.startAngle + angleStep * i })
+    }
+  }
+
+  slots.sort((a, b) => a.angle - b.angle || a.radius - b.radius)
+  return slots
+}
+
+/**
+ * Convert a hemicycle slot (radius, angle) to SVG (x, y).
+ * Angle 0 = straight up; positive angle = right, negative = left.
+ *
  * @param viewportWidth - width of the SVG viewport
  * @param viewportHeight - height of the SVG viewport
- * @returns { x, y } coordinates for the dot
  */
-export function getHemicycleDotPosition(
-  seatIndex: number,
-  rows: HemicycleRow[],
+export function slotToPosition(
+  slot: HemicycleSlot,
   viewportWidth: number,
   viewportHeight: number,
 ): { x: number; y: number } {
-  let rowIndex = 0
-  let seatInRow = seatIndex
-
-  // Find which row this seat belongs to
-  for (let i = 0; i < rows.length; i++) {
-    if (seatInRow < rows[i].seatsInRow) {
-      rowIndex = i
-      break
-    }
-    seatInRow -= rows[i].seatsInRow
-  }
-
-  const row = rows[rowIndex]
-  // Angle: from 0° (left) to π (right), centered at bottom
-  const angleRange = row.endAngle - row.startAngle
-  const angleStep = angleRange / Math.max(row.seatsInRow - 1, 1)
-  const angle = row.startAngle + angleStep * seatInRow
-
-  // Convert polar (radius, angle) to Cartesian coordinates
-  // Center the hemicycle horizontally and at the bottom of viewport
   const centerX = viewportWidth / 2
-  const centerY = viewportHeight
+  const centerY = viewportHeight - 5 // nudged up 5px
 
-  // angle 0 = left, π = right; we want angle π/2 = top
-  const x = centerX + row.radius * Math.sin(angle)
-  const y = centerY - row.radius * Math.cos(angle)
+  const x = centerX + slot.radius * Math.sin(slot.angle)
+  const y = centerY - slot.radius * Math.cos(slot.angle)
 
   return { x, y }
 }

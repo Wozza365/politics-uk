@@ -362,6 +362,10 @@ zero changes to game logic. This is the single non-negotiable design decision.
     with a footnote stating the scale. Scale chosen per-view to keep dot counts legible.
 - Dots are **semi-interactive now** (hover-ready markup) and **clickable later** (drill into that
   party's seats / breakdown).
+- A small **view-mode toggle** in the top-left of the widget (⌒ / = icon) is stubbed in for a
+  future switch between the **hemicycle dot fan** (⌒) and a **"house" view** (=) — a literal
+  rows-of-benches layout some players may prefer. Non-functional at MVP; only the affordance and
+  icon-swap exist.
 
 ### 9.3 Top-centre — party panel _(MVP collapsed; expandable later)_
 
