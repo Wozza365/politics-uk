@@ -42,7 +42,7 @@ function startGame() {
 </script>
 
 <template>
-  <main class="flex h-screen w-screen flex-col items-center gap-8 overflow-y-auto bg-zinc-900 p-8 mb-[50px]">
+  <main class="flex h-screen w-screen flex-col items-center gap-8 overflow-y-auto bg-zinc-900 p-8 pb-[50px]">
     <h1 class="text-3xl font-semibold text-zinc-100">Politics UK</h1>
 
     <div class="flex w-full max-w-md flex-col items-center gap-2">
