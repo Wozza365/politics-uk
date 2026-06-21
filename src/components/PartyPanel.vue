@@ -136,13 +136,18 @@ function formatPolling(value: number) {
 function formatScaled(value: number | null | undefined) {
   if (value === null || value === undefined) return '-'
   const abs = Math.abs(value)
-  const formatted = abs >= 1_000_000 ? `${(value / 1_000_000).toFixed(3)}m` : `${(value / 1_000).toFixed(3)}k`
+  const formatted =
+    abs >= 1_000_000
+      ? `${(value / 1_000_000).toFixed(3)}m`
+      : new Intl.NumberFormat('en-GB', {
+          maximumFractionDigits: 0,
+        }).format(value)
   return value < 0 ? `-${formatted}` : formatted
 }
 
 function formatMoney(value: PartyFinance | undefined) {
   if (value?.estimatedCashOnHand === undefined || value?.estimatedCashOnHand === null) return '-'
-  return formatScaled(value.estimatedCashOnHand)
+  return `£${formatScaled(value.estimatedCashOnHand)}`
 }
 </script>
 
