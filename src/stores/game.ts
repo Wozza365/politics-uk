@@ -87,6 +87,18 @@ export const useGameStore = defineStore('game', {
     recordFeedEntry(entry: FeedEntry) {
       this.feed.push(entry)
     },
+    /** The feed's per-entry action buttons are the player's main lever on the game loop:
+     * resolving one records the choice + a placeholder effect directly on the entry. */
+    resolveFeedAction(entryId: string, actionId: string) {
+      const entry = this.feed.find((candidate) => candidate.id === entryId)
+      if (!entry || entry.status !== 'unactioned') return
+      const action = entry.actions?.find((candidate) => candidate.id === actionId)
+      if (!action) return
+      entry.status = 'actioned'
+      entry.actionTaken = action.label
+      entry.effect = 'Effect pending — wired up once the simulation engine (P1.11) and event system (P1.12) land.'
+      entry.actions = undefined
+    },
     resolvePendingEvent(_choiceId: string) {
       // MVP scope: full effect-application (modifying polling/finances/etc. based on
       // the chosen option) arrives with P1.12's GameEvent system. For now we just

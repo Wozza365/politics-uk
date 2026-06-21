@@ -123,20 +123,8 @@ See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p16--hemicycle-party-makeup-
 ### P1.7 — Top-centre party panel (collapsed) `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p17--top-centre-party-panel-collapsed-).
 
-### P1.8 — Event feed `🔲`
-**Goal.** Spec §9.4: a text-style feed (no panel/background), newest at the **bottom**
-(spec §13 resolved: chronological == newest-at-bottom).
-
-**Depends on:** P1.1.
-
-**Steps:**
-1. Define `FeedEntry` in `src/types/` (or `src/types/event.ts`): `{ id, date: ISODate,
-   headline: string, actionTaken?: string }`.
-2. Create `src/components/EventFeed.vue`. Render `game.feed` directly on the backdrop (no
-   container chrome): **bold headline**, the action taken below it (if any), and a simple date.
-3. Order chronological, **newest at the bottom**; auto-scroll to the latest entry as it appears.
-**Acceptance:** Entries render headline/action/date with correct styling and ordering;
-auto-scrolls; reads live from the store.
+### P1.8 — Event feed `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p18--event-feed-).
 
 ### P1.9 — Game clock + GE countdown `🔲`
 **Goal.** Spec §9.5: visible simulated date, auto-advances **one day per ~15s**, GE countdown,

@@ -158,3 +158,26 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
 - Compass summary (via `CompassView`, P1.2.5) shows the player's overall position.
 - Non-functional "expand" affordance (expand handler wired to pause the clock per spec §9.5 even though expanded panel is empty — Phase 2 work).
 - Status badge shows the player's difficulty relative to peers (updated daily from the store).
+
+## P1.8 — Event feed ✅
+
+- `src/types/event.ts`: `FeedEntry` now carries a `status: 'actioned' | 'unactioned'`. An
+  `unactioned` entry carries `actions: FeedEntryAction[]` (the choices to render as buttons); an
+  `actioned` entry carries `actionTaken` (what was done) and `effect` (placeholder text — real
+  simulation effects are P1.11/P1.12's job).
+- `src/stores/game.ts`: `feed: FeedEntry[]` was already global state on `useGameStore` (P1.1) —
+  pushed to and read from anywhere via the store, no new plumbing needed. Added
+  `resolveFeedAction(entryId, actionId)`: flips the entry to `actioned`, records the chosen
+  action's label as `actionTaken` plus a placeholder `effect`, and clears `actions`. This is the
+  **player's main lever on the game loop** — resolving an unactioned event is how a decision gets
+  made; covered by `src/stores/game.spec.ts`.
+- `src/components/EventFeed.vue`: renders `game.feed` directly on the backdrop, no container
+  chrome (spec §9.4) — bold headline, then either the action-taken + effect text (`actioned`) or a
+  row of small buttons per `entry.actions` (`unactioned`) that call `resolveFeedAction` on click,
+  then the date. Newest entry appended at the bottom; auto-scrolls to it as it appears.
+- `GameScreen.vue`'s event-feed region dropped its panel chrome (border/background/header) to
+  match — `EventFeed` owns its own (lack of) styling per spec.
+- Verified manually in a running dev server (Playwright-driven Chromium): seeded one actioned and
+  one unactioned entry into the store, confirmed the unactioned entry's buttons render, clicking
+  one flips it to actioned with the recorded label and placeholder effect text, and the feed has
+  no panel background.
