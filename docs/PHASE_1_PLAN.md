@@ -9,7 +9,10 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. It's kept in a separate file so this document only carries
+> how. Phase 1 is **in progress**; P1.0–P1.3 are done and P1.5's core map
+> interaction work is done ahead of schedule — see
+> [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
+> how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
 
 ---
@@ -23,6 +26,8 @@ dependency graph) — not necessarily numeric order.
 **Status legend.** Each task is tagged:
 - `✅ DONE` — already implemented and committed; listed for context only.
 - `🔲 TODO` — not started.
+- `🟠 PARTIAL` — some of the task is already done (see `PHASE_1_COMPLETED.md`); the remaining
+  steps are still listed below.
 - `🟡 BLOCKED` — cannot complete in the current environment; do the parts you can and leave a
   clearly-labelled stub.
 
@@ -60,14 +65,25 @@ Phase 0 is fully complete (see [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md))
 | --- | --- | --- |
 | Scaffold | `package.json`, `vite.config.ts`, `tsconfig*.json`, `index.html`, `src/main.ts`, `src/style.css` | ✅ Vite + Vue 3 + TS + Pinia + Tailwind v4, `@/` alias, builds clean |
 | Entity types | `src/types/{party,region,scenario,policy,index}.ts` | ✅ Mirrors spec §4.2 + the 2D political-compass model |
-| Renderer | `src/map/MapRenderer.ts` (interface), `src/map/SvgMapRenderer.ts` (impl) | ✅ d3-geo + topojson-client; hover/click events |
-| Map component | `src/components/MapView.vue` | ✅ CSS faux-3D wrapper + tooltip; renders real Commons data |
+| Renderer | `src/map/MapRenderer.ts` (interface), `src/map/SvgMapRenderer.ts` (impl) | ✅ d3-geo + topojson-client; hover/click events; size-proportional region focus zoom |
+| Map component | `src/components/MapView.vue` | ✅ CSS faux-3D wrapper + tooltip; renders real Commons data; zoom/pan + click-to-focus |
 | Store | `src/stores/scenario.ts` | ✅ Loads the real `uk-2025-01-01` scenario + boundaries |
 | Data | `src/data/scenarios/uk-2025-01-01/{boundaries.commons,composition.commons,parties,scenario,sources}.json` | ✅ Real: 650 Commons seats, 15 parties, polling/finance/membership snapshot |
 | Data scripts + validator | `scripts/data/*.mjs` | ✅ Reproducible fetch/build pipeline + `npm run validate:data` |
 
-Everything in Phase 1 below is TODO. The real Commons geometry already exists, so **P1.5 no
-longer depends on a blocked data step** — it can use the live store data directly.
+Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for detail):
+
+| Area | Files | State |
+| --- | --- | --- |
+| App shell + routing (P1.0) | `src/stores/ui.ts`, `src/App.vue`, `src/screens/*.vue` | ✅ Screen state + routing; `GameScreen.vue` is still a placeholder (P1.4) |
+| Game state store (P1.1) | `src/stores/game.ts`, `src/types/event.ts` | ✅ Selected party, date, clock state, polling, feed, pending-event hook |
+| Start menu (P1.2) | `src/screens/StartScreen.vue`, `src/components/{PartyCard,DifficultyBadge,CompassView}.vue`, `src/sim/difficulty.ts` | ✅ Timeline stub, party cards, difficulty banding, compass view, Start button |
+| Loading screen (P1.3) | `src/screens/LoadingScreen.vue` | ✅ |
+| Map zoom/pan/focus (part of P1.5) | `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Done ahead of schedule; formal integration into the P1.4 layout still open |
+| Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
+
+Everything else in Phase 1 below is TODO. The real Commons geometry already exists, so **P1.5
+no longer depends on a blocked data step** — it can use the live store data directly.
 
 ---
 
@@ -83,135 +99,19 @@ GE countdown, a view-switcher shell, and a minimal event/polling loop.
 > the loop end-to-end. The map, hemicycle, party panel, feed, and clock are independent
 > components and are the natural delegation boundaries.
 
-### P1.0 — App shell & screen routing `🔲`
-**Goal.** A single source of truth for "which screen are we on" and transitions between them.
+### P1.0 — App shell & screen routing `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p10--app-shell--screen-routing-).
 
-**Depends on:** P0.1 (done).
+### P1.1 — Game state stores `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p11--game-state-stores-).
 
-**Steps:**
-1. Decide routing approach: a lightweight **`useUiStore`** with a `screen: 'start' | 'loading'
-   | 'game'` state is sufficient for 3 screens and avoids a router dependency. (Use `vue-router`
-   only if deep-linking/back-button is wanted — not needed for MVP.) **Recommend the store.**
-2. Create `src/stores/ui.ts` with `screen` state and actions `goToStart()`, `goToLoading()`,
-   `goToGame()`.
-3. In `src/App.vue`, render the current screen component via `<component :is>` or `v-if`
-   on `ui.screen`. Remove the temporary direct-`MapView` mount.
-4. Create placeholder screen components: `src/screens/StartScreen.vue`,
-   `LoadingScreen.vue`, `GameScreen.vue` (empty shells for now).
+### P1.2 — Start menu `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p12--start-menu-). All five sub-tasks
+(P1.2.1–P1.2.5: timeline selector, party cards, difficulty badge, Start button, compass view)
+are done.
 
-**Files:** `src/stores/ui.ts`; `src/screens/{StartScreen,LoadingScreen,GameScreen}.vue`;
-modify `src/App.vue`.
-
-**Acceptance:** App boots to Start; manually flipping `ui.screen` swaps screens; build clean.
-
-### P1.1 — Game state stores `🔲`
-**Goal.** The mutable game state the whole UI reads/writes: selected party, simulated date,
-clock run-state, live polling, finance, membership, feed entries.
-
-**Depends on:** P1.0, scenario store (done, P0.2/P0.3).
-
-**Steps:**
-1. Create `src/stores/game.ts` (`useGameStore`). State:
-   - `selectedPartyId: PartyId | null`
-   - `date: ISODate` (starts at `scenario.date`)
-   - `clock: { running: boolean; msPerDay: number }` (default `msPerDay = 15000`, spec §9.5)
-   - `polling: Record<PartyId, number>` (initialised from `scenario.polling`)
-   - `feed: FeedEntry[]` (see P1.8 for the type)
-   - `pendingEvent: GameEvent | null` (an action-required event currently blocking, P1.12)
-2. Actions: `startGame(partyId)`, `tickDay()`, `pauseClock()`, `resumeClock()`,
-   `recordFeedEntry(entry)`, `resolvePendingEvent(choiceId)`.
-3. Derived getters: `selectedParty`, `commonsSeatsByParty`, `playerSeatCount`,
-   `playerPollingPct`, `daysUntilElection` (needs `nextElectionDate` — add to scenario or a
-   constant for MVP), `winThresholdSeats` = `Math.floor(totalSeats / 2) + 1` (spec §11.2 —
-   **never hard-code 326**; derive from the scenario's seat total).
-4. Keep the **clock mechanism** (the `setInterval`/`requestAnimationFrame` driver) out of the
-   store; the store exposes `tickDay()` and run-state, and a composable drives it (P1.9).
-
-**Files:** `src/stores/game.ts`.
-
-**Acceptance:** `startGame('labour')` sets selected party, seeds `polling` from scenario, and
-leaves the clock paused until the game screen mounts; getters compute correctly against the
-dataset; build clean.
-
-### P1.2 — Start menu `🔲`
-**Goal.** Spec §7: locked timeline selector + party cards + difficulty badges + Start.
-
-**Depends on:** P1.0, P1.1, scenario store.
-
-#### P1.2.1 — Timeline selector
-**Steps:** Render a slider (spec §7.1) with a **single selectable stop** (`2025-01-01`),
-architected for more stops later (drive options from an array even though it has one entry).
-Show the chosen date label. Selecting it sets the active scenario id.
-**Acceptance:** Slider present, one stop, displays `1 January 2025`; structure supports adding
-stops without a rewrite.
-
-#### P1.2.2 — Party cards
-**Steps:**
-1. Create `src/components/PartyCard.vue`. Props: a `Party` + its scenario figures.
-2. Render only **selectable** parties: `scope === 'national'` (spec §7.2). Regional/local
-   parties are excluded from the picker but **remain in the data model** (they still appear on
-   the map/hemicycle).
-3. Card layout (spec §7.2): party name (top); **leader portrait placeholder** showing the
-   leader's name (middle); details — leader, Commons seats, total council seats, plus
-   at-a-glance extras (devolved seats, headline polling %); difficulty badge (P1.2.3); and the
-   party's **compass summary** (P1.2.5) as a small at-a-glance circle.
-4. Style the card **in the party's colours** using `colours.primary` as background and
-   `colours.onPrimary` as text (already WCAG-verified at data-build time). Pull every
-   number from the scenario store — **no hard-coded figures** (spec §7.3).
-**Acceptance:** One card per national party, correctly coloured with readable text, all figures
-sourced from data; clicking selects the party.
-
-#### P1.2.3 — Difficulty badge
-**Steps:**
-1. Create `src/sim/difficulty.ts` implementing spec §11.1: a 1–5 band from a **popularity
-   proxy** (current polling % + weighted seat share across tiers) and a **realistic-path-to-
-   power** term, with a **small-party weighting** that eases very small parties so they're
-   hard-but-not-impossible (capped below "impossible").
-2. For MVP, seat-share weighting may use Commons seats only (other tiers arrive in Phase 2);
-   structure the function to accept additional tiers later.
-3. Render the band as a badge on `PartyCard`.
-**Acceptance:** Indicative banding sanity-checks against spec §11.1 (governing party easier,
-minor parties hard but capped); pure function, unit-testable.
-
-#### P1.2.4 — Start button
-**Steps:** A `Start` button, disabled until a party is selected; on click calls
-`game.startGame(partyId)` then `ui.goToLoading()`.
-**Acceptance:** Disabled with no selection; starts the game with the chosen party + scenario.
-
-#### P1.2.5 — Political-compass view (shared component)
-**Goal.** Spec §4.4: render party positions on the **2D political compass** — economic
-(left↔right) × social (libertarian↔authoritarian) — as **lightly shaded, bordered circles**
-whose **radius grows as `consistency` falls**. Reused by the party card (compact, overall
-`compass` summary) and the party panel (P1.7, fuller view). **Build it once, parameterised.**
-**Steps:**
-1. Create `src/components/CompassView.vue`. Props: an array of plotted items
-   `{ position: CompassPosition; consistency: number; colour: string; label?: string }` plus a
-   `size`/`compact` flag.
-2. Draw the 2D plane: quadrant gridlines and axis labels (economic x, social y), each item as a
-   circle centred at `(position.economic, position.social)` mapped to plane coords, radius a
-   function of `1 − consistency`, filled with the party colour at low opacity + a solid border.
-3. **Compact mode** (card): just the party's overall `compass` circle, minimal chrome.
-   **Full mode** (panel): can later overlay multiple parties and/or per-policy stances (Phase 2
-   detail — keep the prop shape ready, don't build the per-policy cloud yet).
-4. Use the existing `MapRenderer`-style discipline: this is a pure presentational component
-   driven by data; **no game logic inside**. Types come from `src/types/policy.ts`.
-**Acceptance:** Given a `CompassSummary` + colour, renders a correctly-placed, correctly-sized
-shaded circle with axis labels; compact and full modes both work; unit test covers the
-position→coords and consistency→radius mapping.
-
-**Files (P1.2):** `src/screens/StartScreen.vue`, `src/components/PartyCard.vue`,
-`src/components/DifficultyBadge.vue`, `src/components/CompassView.vue`, `src/sim/difficulty.ts`.
-
-### P1.3 — Loading screen `🔲`
-**Goal.** Spec §8: centred spinner while scenario data, boundaries, and derived state load.
-
-**Depends on:** P1.0.
-
-**Steps:** Centred spinner + placeholder copy; theme the accent with the selected party's
-colour. Since data is bundled (imported JSON), simulate a short load (e.g. await
-microtask/`requestIdleCallback` + a minimum visible duration) then `ui.goToGame()`. Keep a real
-async hook so swapping to fetched data later needs no structural change.
-**Acceptance:** Spinner shows, accent matches selected party, auto-advances to game.
+### P1.3 — Loading screen `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p13--loading-screen-).
 
 ### P1.4 — Game screen layout `🔲`
 **Goal.** Spec §9 layout: map centre; event feed top-left (no panel behind it); party stats
@@ -227,22 +127,25 @@ text UI.
 **Acceptance:** All six regions positioned per spec §9; responsive enough not to overlap at
 common desktop sizes; build clean.
 
-### P1.5 — Westminster map in the game screen `🔲`
+### P1.5 — Westminster map in the game screen `🟠 PARTIAL`
 **Goal.** Spec §9.1: the existing `MapView` integrated as the central map, zoom + pan + hover
 stats, coloured by holding party.
 
 **Depends on:** P1.4. (Real Commons geometry already exists in the store — no longer blocked.)
 
-**Steps:**
-1. Reuse `MapView.vue`; mount it in the centre slot of `GameScreen`.
-2. Add **zoom + pan** (wheel-zoom + drag-pan). Implement at the component/CSS level (transform)
-   or via a `d3-zoom` integration inside `SvgMapRenderer` — keep zoom state out of game logic.
-3. Hover tooltip already shows MP/party/majority; extend to vote share when present (not
-   currently populated — see `PHASE_0_COMPLETED.md` P0.3.2 notes).
-4. Region fill comes from current holding party colour (already wired); ensure it reads live
-   composition from the store, not a placeholder constant.
-**Acceptance:** Map fills centre, zoom/pan works, hover shows real stats, colours match holders;
-faux-3D treatment retained.
+**Done already** (ahead of schedule — see
+[`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p15--westminster-map-zoom-pan-and-focus-partial-)):
+manual wheel-zoom/drag-pan/pinch-zoom, click-to-focus a constituency with a size-proportional
+zoom level, hover tooltip (MP/party/majority), and fill from live holding-party colour.
+
+**Still open:**
+1. Vote share in the hover tooltip — not currently populated in the dataset (see
+   `PHASE_0_COMPLETED.md` P0.3.2 notes); needs a data step, not a `MapView` change.
+2. Formal integration into the **P1.4 game-screen layout** — today `MapView` is mounted
+   standalone in `GameScreen.vue`'s placeholder (see P1.4 below), not yet positioned alongside
+   the hemicycle/panel/feed/clock per spec §9's six-region layout.
+**Acceptance (remaining):** Once P1.4 lands, the map sits in its centre slot with everything
+else positioned around it per spec §9; faux-3D treatment retained (already true today).
 
 ### P1.6 — Hemicycle (party-makeup dots) `🔲`
 **Goal.** Spec §9.2: dot diagram of seat composition for the current view's tier.
