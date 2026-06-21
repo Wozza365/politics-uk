@@ -7,9 +7,9 @@ import { computeHemicycleLayout, getHemicycleDotPosition } from '@/sim/hemicycle
 const gameStore = useGameStore()
 const scenarioStore = useScenarioStore()
 
-const VIEWPORT_WIDTH = 700
-const VIEWPORT_HEIGHT = 280
-const DOT_RADIUS = 8
+const VIEWPORT_WIDTH = 500
+const VIEWPORT_HEIGHT = 200
+const DOT_RADIUS = 5
 const SEATS_PER_DOT = 1
 
 interface PartyWithSeats {
@@ -60,7 +60,8 @@ const partiesWithSeats = computed(() => {
 
 // Build the SVG dots for the hemicycle
 const dots = computed(() => {
-  const layout = computeHemicycleLayout(gameStore.playerSeatCount + 1, SEATS_PER_DOT)
+  const totalSeats = totalSeatCount.value
+  const layout = computeHemicycleLayout(totalSeats, SEATS_PER_DOT)
   const result: Array<{
     id: string
     partyId: string
@@ -110,7 +111,7 @@ const totalSeatCount = computed(() =>
     <svg
       :width="VIEWPORT_WIDTH"
       :height="VIEWPORT_HEIGHT"
-      viewBox="0 0 700 280"
+      viewBox="0 0 500 200"
       class="drop-shadow-lg"
     >
       <!-- Render dots -->
