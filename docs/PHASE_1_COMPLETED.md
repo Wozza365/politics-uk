@@ -132,9 +132,9 @@ Formally integrated into the P1.4 game-screen layout: `MapView` is mounted
 in `GameScreen.vue`'s central map slot, positioned alongside the
 hemicycle/panel/feed/clock per spec §9's six-region layout.
 
-Vote share in the hover tooltip remains unpopulated (needs a data step, not
-a `MapView` change — see `PHASE_0_COMPLETED.md` P0.3.2 notes); carried
-forward as a data follow-up, not a blocker for P1.5 completion.
+Richer tooltip content (full previous-election vote share, demographics) is
+carried forward as its own task — see `PHASE_1_PLAN.md` P1.14 — not a
+blocker for P1.5 completion.
 
 ## P1.6 — Hemicycle (party-makeup dots) ✅
 

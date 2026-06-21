@@ -266,6 +266,33 @@ drifts → numbers update across map/hemicycle/panel/feed → GE countdown runs 
 **Acceptance:** A user can play from the start menu through ticking days with live, drifting
 numbers and resolvable events, to a GE win/lose evaluation; `npm run build` clean.
 
+### P1.14 — Constituency tooltip data enrichment `🔲`
+**Goal.** Spec §9.1's hover tooltip currently shows MP/party/majority only. Extend it with the
+**full previous-election result** (not just the winner) and other constituency-level reference
+data, so the tooltip becomes a useful at-a-glance dossier and a future cross-reference point
+against census data.
+
+**Depends on:** P1.5 (tooltip exists); a data step, not a `MapView` change (see
+`PHASE_0_COMPLETED.md` P0.3.2 notes on why vote share isn't in the dataset yet).
+
+**Steps:**
+1. Extend the constituency data (`src/data/scenarios/uk-2025-01-01/composition.commons.json` or a
+   new per-constituency dataset) with the **full previous-election breakdown**: vote share for
+   every candidate/party (not just the winner), turnout, and electorate size.
+2. Add constituency-level reference data useful for later cross-referencing against ONS census
+   data — candidates to include: median age, average/median household income, population
+   density, urban/rural classification, employment rate, and highest-qualification mix. Source
+   from ONS where feasible; flag anything estimated/approximated per spec §4.2 (`source:
+   'estimated'`).
+3. Update the `MapRenderer` tooltip data contract and `MapView.vue`'s tooltip rendering to
+   surface the new fields (vote-share breakdown as a mini bar/list, demographics as a compact
+   stat block).
+4. Extend `scripts/data/*.mjs` + `npm run validate:data` to fetch/validate the new fields,
+   following the existing reproducible-pipeline convention.
+**Acceptance:** Hovering a constituency shows full previous-election vote shares + turnout
+alongside the existing MP/party/majority, plus the added demographic stats; every non-official
+figure is flagged with its source; `npm run validate:data` and `npm run build` pass.
+
 ---
 
 ## 3. Cross-cutting concerns (apply throughout)
@@ -307,6 +334,8 @@ Phase 0 ✅ (done — see PHASE_0_COMPLETED.md)
                                          │                    └─ P1.10 view switcher
                                          ├─ P1.11 sim engine ─┐
                                          └─ P1.12 events ◄─────┴─ P1.13 end-to-end
+
+P1.5 map ─ P1.14 tooltip data enrichment (independent follow-up, no downstream dependents)
 ```
 
 **Critical path:** P1.0 → P1.1 → P1.4 → (components) → P1.11/P1.12 → P1.13.
