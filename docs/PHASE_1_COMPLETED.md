@@ -302,3 +302,62 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
 - **Acceptance:** ticking generates feed entries; most days have no event; polling only moves on a
   published-poll event, with believable, capped swings; action events pause the clock until
   resolved via the feed's choice buttons, including on a repeatable event's second occurrence.
+
+## P1.14 — Constituency tooltip data enrichment ✅
+
+- `src/types/region.ts` — added `CandidateResult` (`party`, `candidateName?`, `votes`,
+  `voteShare`) and extended `Seat` with `turnout?`/`electorate?`/`results?` (the full ranked
+  breakdown, winner first); added a new `RegionDemographics` type, scoped to the fields actually
+  sourced this pass rather than the full wishlist in the original plan.
+- `scripts/data/party-slugs.mjs` + `scripts/data/constituency-name.mjs` (new) — `PARTY_SLUGS` and
+  `normaliseConstituencyName()` factored out of `fetch-commons-composition.mjs` so both new fetch
+  scripts below can reuse them without duplicating the table.
+- `scripts/data/fetch-commons-results-breakdown.mjs` (new) — fetches the full candidate-level
+  vote-share breakdown for every Commons constituency from the Members API's per-result endpoint
+  (`Location/Constituency/{id}/ElectionResult/{electionId}`), at concurrency 2 with the existing
+  exponential 429 backoff, and merges `turnout`/`electorate`/`results`/`voteShare` onto each seat
+  in `composition.commons.json` in place. `P0.3.2` had deliberately skipped this because this
+  endpoint rate-limited earlier dev runs; it completed cleanly (650/650, 0 failures) this time,
+  though a second consecutive run hit a 429 on the very first call — there's a real per-session
+  rate limit on this API, budget for it on any future re-run. The Commons Library's CBP-10009
+  candidate CSV (a single no-rate-limit download) was evaluated as an alternative but
+  `researchbriefings.files.parliament.uk` sits behind a Cloudflare managed JS challenge that
+  blocks plain HTTP fetches.
+- `scripts/data/fetch-commons-demographics.mjs` (new) — pulls two ONS ad-hoc releases keyed
+  directly on PCON24 codes (no boundary-crosswalk modelling needed): population/area/density
+  (England & Wales, mid-2024) and LI02 employment/unemployment/economic-inactivity rates (Great
+  Britain, Oct 2023–Sep 2024), writing `src/data/scenarios/uk-2025-01-01/demographics.commons.json`.
+  Includes a remap for 4 Scottish constituencies where ONS's LI02 release still carries a
+  pre-2024-boundary-review GSS code for a seat whose boundary didn't actually change in the
+  review.
+- **Deliberately left unpopulated rather than guessed:** median age (the only PCON-keyed ONS
+  series found is on the old pre-2024 boundaries and six years stale), qualifications/NS-SeC mix
+  (Census 2021 is published on OA/LSOA/MSOA/LA/ward geographies via Nomis, not PCON24 — ONS's
+  "create a custom dataset" tool can re-aggregate but is an interactive SPA without a confirmed
+  stable API from this environment), urban/rural classification (no PCON24-keyed dataset found),
+  and household income (spec §4.2 expects this modelled/estimated from regional income × IMD
+  decile — a methodology decision, not a fetch). All gaps are documented per-field in
+  `sources.json` rather than estimated, per spec §4.2's "never present a guess as reported fact".
+- `sources.json` — new `results` and `demographics` entries documenting exact API/dataset URLs,
+  method, retrieval date, and nation-coverage gaps (Scotland/NI absent from density; NI absent
+  from employment indicators).
+- `scripts/data/validate-scenario.mjs` — asserts each seat's `results` (when present) sum to
+  ~100% vote share, and that every `demographics.commons.json` entry's `regionId` resolves to a
+  real commons region with a valid `source`. Deliberately does *not* cross-check
+  `results[0].party` against `seat.party` — they can legitimately diverge for MPs who've since
+  defected or lost the whip, since `seat.party` is resolved as-of the scenario date while
+  `results[0].party` is the party they won the seat as.
+- `src/stores/scenario.ts` — loads `demographics.commons.json` and exposes a
+  `demographicsByRegion` lookup map alongside `commonsRegions`.
+- `src/components/MapView.vue` — the constituency tooltip now renders a vote-share mini bar-list
+  (one row per candidate, party-coloured, sized by share) with turnout/electorate underneath, and
+  a compact demographics stat block (density, employment/unemployment/economic-inactivity rate),
+  with a footnote marker reserved for `source: 'estimated'` once any field needs it.
+- **Side fix:** `scripts/data/build-scenario.mjs` now writes `pollingHistory: []` —
+  `Scenario.pollingHistory` was required by the type and read by `stores/game.ts` on game start,
+  but was never actually populated, which would have thrown at runtime the first time a game
+  started.
+- **Acceptance:** hovering a constituency shows the full previous-election vote-share breakdown
+  plus turnout/electorate alongside the existing MP/party/majority, plus density/employment
+  demographics wherever the source data covers that nation; `npm run validate:data`,
+  `npm run build`, and `npm run test` all pass.
