@@ -3,30 +3,35 @@ import MapView from '@/components/MapView.vue'
 import PartyPanel from '@/components/PartyPanel.vue'
 import HemicycleView from '@/components/HemicycleView.vue'
 import EventFeed from '@/components/EventFeed.vue'
+import GameClock from '@/components/GameClock.vue'
 </script>
 
 <template>
   <main class="relative h-screen w-screen overflow-hidden bg-zinc-900 text-zinc-100">
     <section
-      class="absolute left-4 top-4 bottom-4 z-20 w-80 max-w-[calc(100vw-2rem)]"
+      class="absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
       aria-label="Event feed"
     >
-      <slot name="event-feed">
-        <EventFeed />
-      </slot>
+      <header class="border-b border-zinc-800/80 px-4 py-3">
+        <p class="text-sm font-semibold tracking-wide text-zinc-100">Event feed</p>
+        <p class="text-xs text-zinc-400">Chronological log</p>
+      </header>
+
+      <div class="min-h-0 flex-1 px-4 py-4 text-sm">
+        <slot name="event-feed">
+          <EventFeed />
+        </slot>
+      </div>
     </section>
 
     <PartyPanel />
 
     <section
-      class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-right text-sm shadow-2xl backdrop-blur-sm"
+      class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
       aria-label="Game clock and election countdown"
     >
       <slot name="clock">
-        <div class="px-4 py-3">
-          <p class="font-semibold text-zinc-100">1 January 2025</p>
-          <p class="text-zinc-400">General Election countdown</p>
-        </div>
+        <GameClock />
       </slot>
     </section>
 

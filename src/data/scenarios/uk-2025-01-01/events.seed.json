@@ -1,0 +1,108 @@
+[
+  {
+    "id": "minister-gaffe-tweet",
+    "headline": "A junior minister's late-night tweet sparks a minor row",
+    "body": "A backbench-turned-minister's reply to a critic gets screenshotted and goes round Westminster Twitter before breakfast.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 6,
+    "actions": [
+      {
+        "id": "distance",
+        "label": "Distance the party from the remark",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.04 }],
+          "summary": "A swift, mild rebuke draws a line under it within a day."
+        }
+      },
+      {
+        "id": "defend",
+        "label": "Defend the minister and move on",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": -0.06 }],
+          "summary": "Critics accuse the leadership of tin ears; the story runs a day longer than it should."
+        }
+      },
+      {
+        "id": "ignore",
+        "label": "Say nothing and let it blow over",
+        "effects": {
+          "summary": "It blows over by the next news cycle, as these usually do."
+        }
+      }
+    ]
+  },
+  {
+    "id": "local-flooding-response",
+    "headline": "Flooding hits a market town overnight",
+    "body": "Heavy rain overwhelms drainage in a small town; the council and emergency services pull an all-nighter on sandbags and rescues.",
+    "scope": "local",
+    "severity": "minor",
+    "weight": 5,
+    "effects": {
+      "summary": "Local services are praised for a quick response; no national ripple."
+    }
+  },
+  {
+    "id": "monthly-economic-data",
+    "headline": "Monthly economic figures land — mixed picture",
+    "body": "Growth, inflation and unemployment numbers are released; commentators find a story in them either way.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 5,
+    "effects": {
+      "polling": [{ "partyId": "incumbent", "magnitude": -0.05 }],
+      "salienceShift": { "economy_tax": 0.02 },
+      "summary": "The numbers keep the economy in the headlines for another news cycle."
+    }
+  },
+  {
+    "id": "viral-mp-clip",
+    "headline": "A clip of an MP goes viral for the wrong reasons",
+    "body": "Ten seconds of an awkward committee-room answer gets clipped, captioned, and shared a few hundred thousand times.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 4,
+    "actions": [
+      {
+        "id": "self-deprecate",
+        "label": "Have the MP laugh it off online",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.05 }],
+          "summary": "A good-natured response turns mockery into mild affection."
+        }
+      },
+      {
+        "id": "no-comment",
+        "label": "No comment from the party",
+        "effects": {
+          "summary": "The clip fades within a couple of days, as most do."
+        }
+      }
+    ]
+  },
+  {
+    "id": "polling-update",
+    "headline": "A new opinion poll is published",
+    "body": "The latest voting-intention poll lands, folding in everything that's happened since the last one.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 8,
+    "once": false,
+    "publishesPoll": true,
+    "effects": {
+      "summary": "The pollsters have their say."
+    }
+  },
+  {
+    "id": "council-by-election-gain",
+    "headline": "A ward by-election result lands quietly",
+    "body": "A routine council by-election, caused by a resignation, returns a result nobody outside the ward much notices.",
+    "scope": "regional",
+    "severity": "minor",
+    "weight": 4,
+    "effects": {
+      "summary": "Barely registers beyond the local paper."
+    }
+  }
+]

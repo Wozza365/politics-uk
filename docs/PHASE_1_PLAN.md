@@ -9,7 +9,7 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. Phase 1 is **in progress**; P1.0–P1.7 are done — see
+> how. Phase 1 is **in progress**; P1.0–P1.9 are done — see
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
 > how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
@@ -80,6 +80,7 @@ Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) fo
 | Loading screen (P1.3) | `src/screens/LoadingScreen.vue` | ✅ |
 | Westminster map (P1.4, P1.5) | `src/screens/GameScreen.vue`, `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Game-screen layout built; map zoom/pan/focus integrated into its centre slot |
 | Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
+| Simulation engine (P1.11) | `src/sim/{policies,segments,poll,rng}.ts`, `src/data/sim/{policies,segments}.json` | ✅ Deterministic spatial/issue-salience polling model + generic `-1..+1` impact contract wired into `game.tickDay()` |
 
 Everything else in Phase 1 below is TODO.
 
@@ -126,24 +127,8 @@ See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p17--top-centre-party-panel-
 ### P1.8 — Event feed `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p18--event-feed-).
 
-### P1.9 — Game clock + GE countdown `🔲`
-**Goal.** Spec §9.5: visible simulated date, auto-advances **one day per ~15s**, GE countdown,
-pauses on action-events (and later on open menus).
-
-**Depends on:** P1.1.
-
-**Steps:**
-1. Create `src/composables/useGameClock.ts`: drives `game.tickDay()` on an interval of
-   `game.clock.msPerDay` while `game.clock.running`. Use a single timer; clean up on unmount.
-   Prefer a drift-correcting timer (compare timestamps) over naïve `setInterval`.
-2. Create `src/components/GameClock.vue`: show the current simulated date and a **countdown to
-   the next General Election** (`daysUntilElection` getter). The clock UI is an interactive
-   element later (by-elections list) — leave a stub affordance.
-3. **Pause/resume rules** (spec §9.5): pause when an action-required event is pending
-   (`game.pendingEvent != null`); resume on resolution. (Menu-open pause is Phase 2 but wire the
-   same pause path so it's trivial to extend.)
-**Acceptance:** Date advances ~1 day/15s, pauses when an action event fires and resumes when
-resolved, GE countdown decrements; timer cleaned up on unmount (no leaks/double-timers).
+### P1.9 — Game clock + GE countdown `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p19--game-clock--ge-countdown-).
 
 ### P1.10 — View-switcher shell `🔲`
 **Goal.** Spec §9.6: bottom-centre nav bar to switch map/hemicycle views; **only Westminster
@@ -158,84 +143,11 @@ UI store); MVP only reacts to Westminster.
 **Acceptance:** Bar shows all views with only Westminster selectable; selection state stored;
 disabled items are visibly inactive and non-interactive.
 
-### P1.11 — Simulation engine (MVP) `🔲`
-**Goal.** Spec §10.5: a **deterministic** spatial/issue-salience model that moves polling from
-day one. MVP = a working, balanced minimal version; depth comes later.
+### P1.11 — Simulation engine (MVP) `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p111--simulation-engine-mvp-).
 
-**Depends on:** P1.1.
-
-#### P1.11.1 — Policy registry + compass types
-**Goal.** Spec §4.4 (resolved): the **2D political-compass** model. Stance/compass types
-already live in `src/types/policy.ts` (`CompassPosition`, `PolicyDef`, `PolicyStance`,
-`CompassSummary`) — **use them, don't redefine**.
-**Steps:**
-1. In `src/sim/policies.ts` (or `src/data/sim/policies.json`), define the **policy registry**: the
-   **major (~8–10)** and **minor (~16–20, some `partySpecific`)** areas from spec §4.4. Treat the
-   illustrative lists there as the provisional starting set; refine when scoring manifestos.
-2. Each policy is positioned on the **2D compass** (economic × social), not a 1D value. Major
-   policies carry a larger **tier weight** than minor ones in the sim.
-3. Provide a `salience: Record<PolicyId, number>` for the world's current issue salience.
-**Acceptance:** Registry centralised with major/minor tiers; `Party.stances` is keyed by these
-`PolicyId`s and typed as `PolicyStance`; types compile; no duplicate stance type definitions.
-
-#### P1.11.2 — Voter segments + party base
-**Steps:** In `src/sim/segments.ts`, define voter segments positioned in the **same 2D compass
-space**, each with a size weight, plus per-party **core base** positions. For MVP these can be a
-small hand-authored set in `src/data/sim/segments.json` (flagged as tunable/estimated). Structure
-for later data-driven refinement.
-**Acceptance:** Segments + bases load from data with 2D positions; sum of segment weights normalised.
-
-#### P1.11.3 — Polling update function
-**Steps:** In `src/sim/poll.ts`, implement: `polling = f(alignment(party, segment) weighted by
-policy tier × salience) − baseBetrayalPenalty(party movement vs core base)` (spec §10.5.1 step 5).
-Alignment is **2D distance** on the compass; a stance's `consistency` modulates exposure (a fuzzy
-position pleases fewer voters intensely but is less betrayal-prone). Pure, deterministic,
-synchronous, client-side. Normalise outputs so the field sums sensibly.
-**Acceptance:** Pure function; given identical inputs returns identical outputs; no randomness in
-the core path (any procedural variety must be seeded/deterministic).
-
-#### P1.11.4 — Validate against the spec's worked examples
-**Steps:** Add unit tests reproducing spec §10.5.2: (a) immigration salience → ~0 ⇒ Reform dips;
-(b) governing party occupies green space ⇒ Greens squeezed; (c) Greens adopt anti-environment ⇒
-base-betrayal collapse among their segment. Assert the **direction** of each move.
-**Acceptance:** All three qualitative outcomes reproduced by tests.
-
-**Files (P1.11):** `src/sim/{policies,segments,poll,difficulty}.ts`,
-`src/data/sim/{policies,segments}.json`, plus tests. (Stance/compass **types** already exist in
-`src/types/policy.ts` — reuse them.)
-
-### P1.12 — Event system (MVP) `🔲`
-**Goal.** Spec §10 + §9.5: a daily event roll from a weighted pool; some events require a player
-decision (which pauses the clock and is recorded to the feed). MVP = a handful of seeded events,
-with and without actions.
-
-**Depends on:** P1.1, P1.11 (effects feed the engine), P1.8 (feed), P1.9 (clock pause).
-
-#### P1.12.1 — Event data format
-**Steps:** Design and document a data-driven event schema (this is spec §13's open "event
-schema" item — propose, then confirm). Minimum fields: `id`, `headline`, `body?`, `scope`
-(`local|regional|national|international`), `weight`, optional `triggers`/`conditions`, `effects`
-(deltas to axis positions/salience/finance/membership/seats), and optional `actions: [{ id,
-label, effects }]` for player-decision events. Put the schema in `src/types/event.ts` and a short
-note in `GAME_SPEC.md` §10 (replace "Format TBD").
-**Acceptance:** `GameEvent` type compiles; schema documented; a couple of seeded events authored
-in `src/data/scenarios/uk-2025-01-01/events.seed.json`.
-
-#### P1.12.2 — Event roll + dispatch
-**Steps:** In `src/sim/events.ts`: on `tickDay()`, roll from the weighted pool (deterministic
-seeded RNG so runs are reproducible). Mix **real/historical** seeds (so early play tracks
-reality) with **fictional/procedural** ones (spec §10). Apply non-action event effects
-immediately via the engine; for action events, set `game.pendingEvent`, **pause the clock**, and
-highlight the relevant UI area (spec §10 / §9.5).
-**Acceptance:** Ticking generates feed entries; most events have little/no effect, some move
-numbers; action events pause the clock until resolved.
-
-#### P1.12.3 — Action resolution
-**Steps:** A modal/inline prompt renders `pendingEvent.actions`; choosing one applies its
-effects through the engine, records the choice under the event in the feed (spec §9.4), clears
-`pendingEvent`, and resumes the clock.
-**Acceptance:** Player choice applies effects, appears in the feed beneath the headline, and the
-clock resumes.
+### P1.12 — Event system (MVP) `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p112--event-system-mvp-).
 
 ### P1.13 — End-to-end loop wire-up `🔲`
 **Goal.** A coherent playable slice: pick a party → load → play days → events fire → polling

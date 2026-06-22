@@ -1,0 +1,10 @@
+[
+  { "id": "traditional_left", "name": "Traditional left / public-sector workers", "position": { "economic": -0.45, "social": -0.1 }, "weight": 22, "coreBaseFor": "labour" },
+  { "id": "shire_conservative", "name": "Shire conservatives", "position": { "economic": 0.5, "social": 0.4 }, "weight": 18, "coreBaseFor": "conservative" },
+  { "id": "populist_right", "name": "Populist right / nationalist", "position": { "economic": 0.3, "social": 0.8 }, "weight": 16, "coreBaseFor": "reform_uk" },
+  { "id": "urban_liberal", "name": "Urban liberal / green-leaning", "position": { "economic": -0.6, "social": -0.6 }, "weight": 14, "coreBaseFor": "green" },
+  { "id": "centrist_liberal", "name": "Centrist liberal", "position": { "economic": -0.1, "social": -0.5 }, "weight": 12, "coreBaseFor": "liberal_democrat" },
+  { "id": "hard_eurosceptic", "name": "Hard eurosceptic nationalist", "position": { "economic": 0.25, "social": 0.9 }, "weight": 5, "coreBaseFor": "ukip" },
+  { "id": "socialist_anti_war", "name": "Socialist / anti-war coalition", "position": { "economic": -0.7, "social": 0.2 }, "weight": 6, "coreBaseFor": "workers_party" },
+  { "id": "floating_centre", "name": "Floating centrist swing voters", "position": { "economic": 0, "social": 0 }, "weight": 20 }
+]

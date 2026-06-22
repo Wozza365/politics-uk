@@ -4120,7 +4120,7 @@
           {
             "regionId": "E14001130",
             "party": "green",
-            "memberName": "Siân Berry",
+            "memberName": "Si\u00e2n Berry",
             "majority": 14290,
             "electedAt": "2024-07-04",
             "turnout": 52363,
@@ -11978,7 +11978,7 @@
           {
             "regionId": "E14001258",
             "party": "liberal_democrat",
-            "memberName": "Zöe Franklin",
+            "memberName": "Z\u00f6e Franklin",
             "majority": 8429,
             "electedAt": "2024-07-04",
             "turnout": 48294,
@@ -33838,7 +33838,7 @@
           {
             "regionId": "N05000011",
             "party": "sinn_fein",
-            "memberName": "Dáire Hughes",
+            "memberName": "D\u00e1ire Hughes",
             "majority": 15493,
             "electedAt": "2024-07-04",
             "turnout": 45942,
@@ -34302,7 +34302,7 @@
           {
             "regionId": "N05000018",
             "party": "sinn_fein",
-            "memberName": "Órfhlaith Begley",
+            "memberName": "\u00d3rfhlaith Begley",
             "majority": 15917,
             "electedAt": "2024-07-04",
             "turnout": 43695,
@@ -39398,7 +39398,7 @@
       {
         "id": "W07000102",
         "tier": "commons",
-        "name": "Montgomeryshire and Glyndŵr",
+        "name": "Montgomeryshire and Glynd\u0175r",
         "geometryRef": "W07000102",
         "seats": [
           {
@@ -40030,7 +40030,7 @@
       {
         "id": "W07000112",
         "tier": "commons",
-        "name": "Ynys Môn",
+        "name": "Ynys M\u00f4n",
         "geometryRef": "W07000112",
         "seats": [
           {
@@ -40107,10 +40107,6 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
-      "founded": 1900,
-      "mergedFrom": [
-        "labour_coop"
-      ],
       "leadership": [
         {
           "role": "leader",
@@ -40118,6 +40114,109 @@
           "since": "2020-04-04"
         }
       ],
+      "founded": 1900,
+      "mergedFrom": [
+        "labour_coop"
+      ],
+      "compass": {
+        "position": {
+          "economic": -0.25,
+          "social": -0.05
+        },
+        "consistency": 0.55
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": 0.05,
+            "social": 0.25
+          },
+          "consistency": 0.5,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": -0.15,
+            "social": 0.0
+          },
+          "consistency": 0.55,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": -0.3,
+            "social": 0.0
+          },
+          "consistency": 0.6,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": -0.35,
+            "social": -0.05
+          },
+          "consistency": 0.75,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": -0.2,
+            "social": -0.3
+          },
+          "consistency": 0.6,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": -0.05,
+            "social": -0.15
+          },
+          "consistency": 0.45,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": 0.05,
+            "social": 0.3
+          },
+          "consistency": 0.55,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": -0.25,
+            "social": -0.2
+          },
+          "consistency": 0.65,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": 0.05,
+            "social": 0.3
+          },
+          "consistency": 0.7,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": -0.1,
+            "social": -0.2
+          },
+          "consistency": 0.55,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40142,7 +40241,6 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
-      "founded": 1834,
       "leadership": [
         {
           "role": "leader",
@@ -40150,6 +40248,106 @@
           "since": "2024-11-02"
         }
       ],
+      "founded": 1834,
+      "compass": {
+        "position": {
+          "economic": 0.4,
+          "social": 0.35
+        },
+        "consistency": 0.5
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.7
+          },
+          "consistency": 0.6,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": 0.55,
+            "social": 0.05
+          },
+          "consistency": 0.6,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": 0.45,
+            "social": 0.0
+          },
+          "consistency": 0.55,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.1
+          },
+          "consistency": 0.4,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": 0.3,
+            "social": 0.35
+          },
+          "consistency": 0.45,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": 0.3,
+            "social": 0.4
+          },
+          "consistency": 0.6,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": 0.15,
+            "social": 0.65
+          },
+          "consistency": 0.7,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": 0.25,
+            "social": 0.3
+          },
+          "consistency": 0.45,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.55
+          },
+          "consistency": 0.7,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.4
+          },
+          "consistency": 0.55,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40174,7 +40372,6 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
-      "founded": 1988,
       "leadership": [
         {
           "role": "leader",
@@ -40182,6 +40379,106 @@
           "since": "2020-08-27"
         }
       ],
+      "founded": 1988,
+      "compass": {
+        "position": {
+          "economic": -0.1,
+          "social": -0.55
+        },
+        "consistency": 0.7
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": -0.1,
+            "social": -0.5
+          },
+          "consistency": 0.65,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": -0.05,
+            "social": -0.1
+          },
+          "consistency": 0.55,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": -0.2,
+            "social": -0.1
+          },
+          "consistency": 0.55,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": -0.3,
+            "social": -0.2
+          },
+          "consistency": 0.7,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": -0.35,
+            "social": -0.45
+          },
+          "consistency": 0.7,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": -0.3,
+            "social": -0.55
+          },
+          "consistency": 0.85,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": -0.1,
+            "social": -0.3
+          },
+          "consistency": 0.55,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": -0.15,
+            "social": -0.3
+          },
+          "consistency": 0.55,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": -0.05,
+            "social": -0.1
+          },
+          "consistency": 0.5,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": -0.2,
+            "social": -0.55
+          },
+          "consistency": 0.75,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40206,7 +40503,6 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
-      "founded": 2018,
       "leadership": [
         {
           "role": "leader",
@@ -40214,6 +40510,106 @@
           "since": "2024-06-03"
         }
       ],
+      "founded": 2018,
+      "compass": {
+        "position": {
+          "economic": 0.35,
+          "social": 0.75
+        },
+        "consistency": 0.55
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": 0.3,
+            "social": 0.9
+          },
+          "consistency": 0.85,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": 0.5,
+            "social": 0.2
+          },
+          "consistency": 0.5,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": 0.25,
+            "social": 0.1
+          },
+          "consistency": 0.4,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": 0.15,
+            "social": 0.2
+          },
+          "consistency": 0.35,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": 0.4,
+            "social": 0.5
+          },
+          "consistency": 0.8,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": 0.35,
+            "social": 0.6
+          },
+          "consistency": 0.85,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.75
+          },
+          "consistency": 0.75,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.35
+          },
+          "consistency": 0.4,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": 0.15,
+            "social": 0.55
+          },
+          "consistency": 0.55,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": 0.15,
+            "social": 0.5
+          },
+          "consistency": 0.5,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40238,10 +40634,6 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
-      "founded": 1990,
-      "mergedFrom": [
-        "scottish_greens"
-      ],
       "leadership": [
         {
           "role": "leader",
@@ -40254,6 +40646,109 @@
           "since": "2024-09-06"
         }
       ],
+      "founded": 1990,
+      "mergedFrom": [
+        "scottish_greens"
+      ],
+      "compass": {
+        "position": {
+          "economic": -0.7,
+          "social": -0.6
+        },
+        "consistency": 0.75
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": -0.4,
+            "social": -0.6
+          },
+          "consistency": 0.65,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": -0.7,
+            "social": -0.2
+          },
+          "consistency": 0.7,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": -0.75,
+            "social": -0.1
+          },
+          "consistency": 0.75,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": -0.65,
+            "social": -0.2
+          },
+          "consistency": 0.7,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": -0.7,
+            "social": -0.55
+          },
+          "consistency": 0.9,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": -0.5,
+            "social": -0.6
+          },
+          "consistency": 0.75,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": -0.4,
+            "social": -0.55
+          },
+          "consistency": 0.6,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": -0.55,
+            "social": -0.3
+          },
+          "consistency": 0.6,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": -0.45,
+            "social": -0.5
+          },
+          "consistency": 0.55,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": -0.5,
+            "social": -0.6
+          },
+          "consistency": 0.65,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40278,7 +40773,6 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
-      "founded": 2019,
       "leadership": [
         {
           "role": "leader",
@@ -40286,6 +40780,106 @@
           "since": "2019-01-30"
         }
       ],
+      "founded": 2019,
+      "compass": {
+        "position": {
+          "economic": -0.6,
+          "social": 0.3
+        },
+        "consistency": 0.45
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": -0.1,
+            "social": 0.35
+          },
+          "consistency": 0.4,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": -0.8,
+            "social": 0.1
+          },
+          "consistency": 0.7,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": -0.8,
+            "social": 0.1
+          },
+          "consistency": 0.7,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": -0.75,
+            "social": 0.05
+          },
+          "consistency": 0.7,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": -0.3,
+            "social": 0.1
+          },
+          "consistency": 0.3,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": -0.4,
+            "social": 0.4
+          },
+          "consistency": 0.55,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": -0.2,
+            "social": 0.3
+          },
+          "consistency": 0.45,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": -0.6,
+            "social": 0.05
+          },
+          "consistency": 0.55,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": -0.3,
+            "social": -0.2
+          },
+          "consistency": 0.6,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": -0.4,
+            "social": 0.15
+          },
+          "consistency": 0.4,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40310,7 +40904,6 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
-      "founded": 1993,
       "leadership": [
         {
           "role": "leader",
@@ -40318,6 +40911,106 @@
           "since": "2024-09-21"
         }
       ],
+      "founded": 1993,
+      "compass": {
+        "position": {
+          "economic": 0.3,
+          "social": 0.85
+        },
+        "consistency": 0.6
+      },
+      "stances": {
+        "immigration": {
+          "position": {
+            "economic": 0.25,
+            "social": 0.95
+          },
+          "consistency": 0.85,
+          "salience": 0.9,
+          "source": "estimated"
+        },
+        "economy_tax": {
+          "position": {
+            "economic": 0.45,
+            "social": 0.3
+          },
+          "consistency": 0.5,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "public_spending": {
+          "position": {
+            "economic": 0.3,
+            "social": 0.2
+          },
+          "consistency": 0.4,
+          "salience": 0.7,
+          "source": "estimated"
+        },
+        "health_nhs": {
+          "position": {
+            "economic": 0.1,
+            "social": 0.25
+          },
+          "consistency": 0.35,
+          "salience": 0.85,
+          "source": "estimated"
+        },
+        "environment_net_zero": {
+          "position": {
+            "economic": 0.35,
+            "social": 0.55
+          },
+          "consistency": 0.75,
+          "salience": 0.5,
+          "source": "estimated"
+        },
+        "europe_brexit": {
+          "position": {
+            "economic": 0.4,
+            "social": 0.7
+          },
+          "consistency": 0.85,
+          "salience": 0.4,
+          "source": "estimated"
+        },
+        "law_order": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.85
+          },
+          "consistency": 0.75,
+          "salience": 0.55,
+          "source": "estimated"
+        },
+        "housing": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.4
+          },
+          "consistency": 0.4,
+          "salience": 0.6,
+          "source": "estimated"
+        },
+        "defence_foreign": {
+          "position": {
+            "economic": 0.15,
+            "social": 0.6
+          },
+          "consistency": 0.55,
+          "salience": 0.45,
+          "source": "estimated"
+        },
+        "constitution_devolution": {
+          "position": {
+            "economic": 0.2,
+            "social": 0.55
+          },
+          "consistency": 0.5,
+          "salience": 0.25,
+          "source": "estimated"
+        }
+      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40342,7 +41035,6 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
-      "founded": 1934,
       "leadership": [
         {
           "role": "leader",
@@ -40350,6 +41042,7 @@
           "since": "2024-05-05"
         }
       ],
+      "founded": 1934,
       "history": [
         {
           "date": "2024-12-01",
@@ -40374,7 +41067,6 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
-      "founded": 1925,
       "leadership": [
         {
           "role": "leader",
@@ -40382,6 +41074,7 @@
           "since": "2023-08-19"
         }
       ],
+      "founded": 1925,
       "history": [
         {
           "date": "2024-12-01",
@@ -40406,7 +41099,6 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
-      "founded": 1971,
       "leadership": [
         {
           "role": "leader",
@@ -40414,6 +41106,7 @@
           "since": "2024-06-29"
         }
       ],
+      "founded": 1971,
       "history": [
         {
           "date": "2024-12-01",
@@ -40431,14 +41124,13 @@
     },
     {
       "id": "sinn_fein",
-      "name": "Sinn Féin",
+      "name": "Sinn F\u00e9in",
       "shortName": "SF",
       "colours": {
         "primary": "#326760",
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
-      "founded": 1905,
       "leadership": [
         {
           "role": "leader",
@@ -40446,6 +41138,7 @@
           "since": "2018-02-10"
         }
       ],
+      "founded": 1905,
       "history": [
         {
           "date": "2024-12-01",
@@ -40470,7 +41163,6 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
-      "founded": 1970,
       "leadership": [
         {
           "role": "leader",
@@ -40478,6 +41170,7 @@
           "since": "2024-02-05"
         }
       ],
+      "founded": 1970,
       "history": [
         {
           "date": "2024-12-01",
@@ -40502,7 +41195,6 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
-      "founded": 1970,
       "leadership": [
         {
           "role": "leader",
@@ -40510,6 +41202,7 @@
           "since": "2016-10-29"
         }
       ],
+      "founded": 1970,
       "history": [
         {
           "date": "2024-12-01",
@@ -40534,7 +41227,6 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
-      "founded": 1905,
       "leadership": [
         {
           "role": "leader",
@@ -40542,6 +41234,7 @@
           "since": "2024-04-08"
         }
       ],
+      "founded": 1905,
       "history": [
         {
           "date": "2024-12-01",
@@ -40566,7 +41259,6 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
-      "founded": 2007,
       "leadership": [
         {
           "role": "leader",
@@ -40574,6 +41266,7 @@
           "since": "2007-12-07"
         }
       ],
+      "founded": 2007,
       "history": [
         {
           "date": "2024-12-01",

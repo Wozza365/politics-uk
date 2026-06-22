@@ -394,7 +394,8 @@ Opening this (or any) menu **pauses the game clock** (see [§9.5](#95-game-clock
 Levers are stubbed at MVP; the collapsed panel ships first.
 
 ### 9.4 Event feed (left) _(MVP)_
-- A **text-style feed**, no panel/background behind it (sits directly on the backdrop).
+- A scrollable panel matching the other HUD panels (rounded border, dark backdrop-blurred
+  background, header), sitting top-left.
 - Each entry: **event headline in bold**, the **action taken below it** (if any), and a **simple
   date**. Newest at top (assumed — confirm ordering).
 - Populated as the clock ticks and events fire.
@@ -431,9 +432,41 @@ The simulation heartbeat.
   - the **game clock pauses**,
   - the relevant UI area is **highlighted**,
   - the player's choice is recorded into the feed under the event.
-- **Authoring:** events need a data-driven format (triggers, conditions, weighted outcomes, effects
-  on polling/finance/membership/seats). A large library of both real and fictional events will be
-  built over time. _Format TBD — see [§13](#13-open-questions)._
+- **Authoring:** events are data-driven (`GameEvent`, `src/types/event.ts`). Minimum shape: `id`,
+  `headline`, `body?`, `scope` (`local|regional|national|international`), `severity`
+  (`minor|moderate|major`), `weight` (relative likelihood among *eligible* events on a day — the
+  roll also weighs a "nothing happens" outcome, so most days are quiet), optional `window` (`from`/
+  `to` ISO dates bounding when it can roll — e.g. a by-election can't fire in the run-up to a GE; a
+  World Cup win is bound to the tournament's dates), `once` (default `true` — fired/resolved events
+  drop out of the pool), `effects` (`polling` deltas — which can target a fixed party, `'player'`,
+  or `'incumbent'` — plus `salienceShift` and a feed `summary`), and optional `actions` (each with
+  its own `effects`) for player-decision events, which pause the clock until resolved. A recurring
+  real-world event (an annual honours list, a seasonal storm) is authored as several `GameEvent`s
+  with different `id`s/windows, not repeat logic on one event.
+  - **Callbacks (escape hatch).** Some logic can't be flat data because it depends on *current*
+    game state rather than anything knowable when the event was authored — e.g. "boost whoever
+    currently governs" can't be a fixed `partyId`. `GameEvent.callbackId` / `GameEventAction.
+    callbackId` key into a small registry (`src/sim/eventCallbacks.ts`) of functions that get a
+    narrow, store-agnostic context (current date, selected party, seat counts, and setters for
+    polling/salience) instead. Most events need none.
+  - **Pools.** `src/data/scenarios/<id>/events.seed.json` holds always-eligible ambient/minor
+    events; `events.scripted.json` holds the date-windowed, more dramatic ones (by-elections,
+    a World Cup win, a war breaking out…) — kept separate so each can grow independently as the
+    event library expands (Phase 2+).
+  - **Polling cadence.** Polling numbers don't move every day. Every event/action/callback's
+    polling effect queues onto a buffer (`pendingPollImpacts`) instead of changing the headline
+    figures immediately. A recurring `events.seed.json` entry (`publishesPoll: true`, repeatable,
+    ~weight 8 among the ambient pool — averages out to a release roughly every 1–2 weeks) is the
+    only thing that drains that buffer: when it fires, `sim/poll.ts`'s `nextPollingSnapshot` folds
+    every queued impact together with the trend between the *previous two* releases (so a move has
+    momentum rather than each release starting from scratch), caps the combined swing to whichever
+    is larger of a small absolute floor or a fraction of the party's own current standing (so a
+    fringe party on ~1% can't double in one release, and a major party can't swing double digits
+    without a long run of releases pushing the same way), rounds to 1 decimal place, sets it as the
+    live `polling`, and appends it to `pollingHistory` — then the buffer is cleared. Background
+    drift (alignment + seeded variance, which exist even with no events at all) is converted to
+    points at a much smaller rate than real event/action impacts, so a release with nothing behind
+    it barely moves anyone — credible swings need an actual event or run of events to explain them.
 
 ---
 

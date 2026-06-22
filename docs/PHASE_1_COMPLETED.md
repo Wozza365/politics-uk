@@ -171,13 +171,134 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
   action's label as `actionTaken` plus a placeholder `effect`, and clears `actions`. This is the
   **player's main lever on the game loop** — resolving an unactioned event is how a decision gets
   made; covered by `src/stores/game.spec.ts`.
-- `src/components/EventFeed.vue`: renders `game.feed` directly on the backdrop, no container
-  chrome (spec §9.4) — bold headline, then either the action-taken + effect text (`actioned`) or a
-  row of small buttons per `entry.actions` (`unactioned`) that call `resolveFeedAction` on click,
-  then the date. Newest entry appended at the bottom; auto-scrolls to it as it appears.
-- `GameScreen.vue`'s event-feed region dropped its panel chrome (border/background/header) to
-  match — `EventFeed` owns its own (lack of) styling per spec.
+- `src/components/EventFeed.vue`: renders `game.feed` as scrollable content only (no panel chrome
+  of its own) — bold headline, then either the action-taken + effect text (`actioned`) or a row of
+  small buttons per `entry.actions` (`unactioned`) that call `resolveFeedAction` on click, then the
+  date. Newest entry appended at the bottom; auto-scrolls to it as it appears.
+- `GameScreen.vue`'s event-feed region keeps the panel chrome (border/background/header) shared
+  with the other HUD panels (spec §9.4, revised) — `EventFeed` is mounted inside it as the
+  scrollable body, same split as `GameClock`/`HemicycleView`.
 - Verified manually in a running dev server (Playwright-driven Chromium): seeded one actioned and
   one unactioned entry into the store, confirmed the unactioned entry's buttons render, clicking
-  one flips it to actioned with the recorded label and placeholder effect text, and the feed has
-  no panel background.
+  one flips it to actioned with the recorded label and placeholder effect text, and the feed
+  renders inside the bordered/backdrop-blurred panel.
+
+## P1.9 — Game clock + GE countdown ✅
+
+- `src/stores/game.ts`: `pendingEvent: unknown | null` became `pendingEvents: unknown[]` — an
+  array so multiple action-required events can queue up; the clock stays paused while any remain.
+  `resolvePendingEvent(choiceId)` now shifts the resolved event off the front and only resumes the
+  clock once the array is empty.
+- `src/composables/useGameClock.ts`: drives `game.tickDay()` with a single drift-correcting
+  `setTimeout` chain (tracks remaining time to the next tick rather than naïvely re-arming a fixed
+  interval, so a pause doesn't lose or double-count progress towards the next day). Watches
+  `game.clock.running` to start/stop the timer, and watches `game.pendingEvents.length > 0` to
+  auto-call `pauseClock()` the moment an action-required event appears — `resolvePendingEvent`
+  already resumes on the way out, so the same pause path covers the future menu-open case (Phase
+  2) for free. Cleans up via `onScopeDispose` (works both for component unmount and for the
+  `effectScope`-based unit tests in `useGameClock.spec.ts`, which cover ticking, pause/resume,
+  remaining-time carry-over across a pause, auto-pause on a pending event, resume on resolution,
+  and timer cleanup on dispose).
+- `src/components/GameClock.vue`: shows the simulated date and `daysUntilElection` countdown.
+  Mounts `useGameClock()` and kicks the clock off via `resumeClock()` on mount (nothing else
+  started it before this), unless an event is already pending. The whole block is a `disabled`
+  button with an `aria-label` describing future by-election interactivity — the stub affordance
+  the plan calls for.
+- **Clock icon**: a plain circle, no hands/numbers/markers. Fill is a `conic-gradient` driven by
+  a registered custom property (`@property --clock-fill`) animated through a linear
+  `@keyframes` triangle wave (0 → 1 over day one, 1 → 0 over day two, repeating every
+  `2 × msPerDay`) — filled portion is the player's party colour, the rest is `transparent`.
+  `animation-play-state` is bound to `game.clock.running`, so the fill freezes exactly where it is
+  when the clock pauses and continues from there on resume, with no JS-driven animation loop
+  needed.
+- Verified manually in a running dev server (Playwright-driven Chromium): screenshotted the icon
+  filling clockwise across day one, ticking over to day two and unfilling, and confirmed pushing a
+  fake entry onto `game.pendingEvents` froze both the date and the icon's fill until cleared.
+
+## P1.11 — Simulation engine (MVP) ✅
+
+- `src/sim/policies.ts` + `src/data/sim/policies.json`: the **policy registry** (spec §4.4) — 10
+  major and 20 minor policy areas (some `partySpecific`), each a `PolicyDef`; a `salience:
+  Record<PolicyId, number>` snapshot of the world's current issue salience (hand-estimated, as of
+  the Jan 2025 scenario date); `TIER_WEIGHT` gives major policies more pull than minor ones in the
+  sim. Reuses the existing `CompassPosition`/`PolicyDef`/`PolicyStance` types from
+  `src/types/policy.ts` rather than redefining them.
+- `src/sim/segments.ts` + `src/data/sim/segments.json`: 8 hand-authored **voter segments**
+  (flagged tunable/estimated), each a 2D compass position + a relative size weight; some are
+  tagged `coreBaseFor: <partyId>` as that party's core-identity base.
+- `src/sim/rng.ts`: a seeded PRNG (`mulberry32` over a string hash) so any "randomness" in the sim
+  is fully deterministic per `(date, partyId, ...)` key — no `Math.random()` anywhere in the sim
+  path, per the Determinism cross-cutting concern.
+- `src/sim/poll.ts` — the polling update function (spec §10.5.1 step 5), built around one generic,
+  source-agnostic contract: `PollingImpact = { partyId, magnitude: -1..+1, source }`. Every force
+  that moves polling — including future ones outside this module — is expressed through it:
+  - `computeAlignmentImpacts()`: each voter segment splits across parties by a softmax over
+    salience/tier-weighted compass closeness (so a party invading a rival's issue-space steals
+    some of its segment share even with the rival's own stance unchanged), then a
+    **base-betrayal penalty** shrinks a party's take the further/more firmly its overall position
+    has drifted from its own core-base segment. Pure and deterministic; parties with no stances
+    defined sit out of this model (they can still move via `extraImpacts`).
+  - `computeVarianceImpacts()`: a small seeded day-to-day wobble per party, for the
+    unpredictability the spec/brief calls for, without breaking determinism.
+  - `impactsFromRecord()`: a helper for turning "this event affects every party" data (e.g. an
+    event's per-party effect record) into tagged `PollingImpact[]` — the seam the event system
+    (P1.12) and other future sources plug into.
+  - `applyPollingImpacts()`: folds any batch of impacts into the current polling, then
+    renormalises so the field's total is preserved (zero-sum — gains for one party come
+    proportionally from the rest of the field) and no party's share reaches zero.
+  - `tickPolling()`: one day's update — alignment + variance + whatever `extraImpacts` the caller
+    supplies — wired into `useGameStore().tickDay(extraImpacts)` (`src/stores/game.ts`), which was
+    previously a no-op date-advance stub.
+- `src/sim/poll.spec.ts`: unit tests reproducing the three qualitative worked examples from spec
+  §10.5.2 — (a) collapsing immigration salience removes Reform's alignment advantage, (b) a
+  governing party occupying Green issue-space squeezes the Greens' segment share, (c) the Greens
+  adopting an anti-environment stance collapses their standing via the base-betrayal penalty —
+  plus purity/determinism/zero-sum/bounds coverage for every exported function.
+- `src/data/scenarios/uk-2025-01-01/{parties,scenario}.json`: added `compass` (overall position +
+  consistency) and `stances` (per major-policy position/consistency/salience, `source:
+  'estimated'`) for the 7 national-scope parties, so the real scenario data has something for the
+  alignment model to read from day one. Minor-tier stances are left for later refinement, per the
+  spec's own note that the illustrative policy lists are a provisional starting set.
+
+## P1.12 — Event system (MVP) ✅
+
+- `src/types/event.ts` — the `GameEvent` schema (id, headline, body?, scope, severity, weight,
+  optional date `window`, `once`, `effects` (polling deltas targeting a fixed party / `'player'` /
+  `'incumbent'`, plus `salienceShift` + a feed `summary`), optional `actions` (each with its own
+  `effects`), and an optional `callbackId` escape hatch — documented in `GAME_SPEC.md` §10.
+- `src/sim/events.ts` — `rollEventForDay()`: deterministic (seeded, not `Math.random`) daily roll
+  weighted against a "nothing happens" outcome, filtered to events whose `window` covers the
+  current date and that haven't already fired; `resolvePollingEffects()` resolves `'player'`/
+  `'incumbent'` to concrete party ids.
+- `src/sim/eventCallbacks.ts` — a small registry for event/action logic that depends on *current*
+  game state (e.g. "boost whoever currently governs") rather than anything a flat data effect can
+  express.
+- `src/data/scenarios/uk-2025-01-01/events.seed.json` — always-eligible ambient/minor events
+  (a tweet row, local flooding, viral clips…), each `once: true` (fires at most once per
+  playthrough) except the recurring poll-publishing mechanism event (see below); recurring
+  *story* types (by-elections, named storms…) are authored as separate windowed events rather
+  than a single repeating record.
+- `src/data/scenarios/uk-2025-01-01/events.scripted.json` — date-windowed, more dramatic events: a
+  by-election (bounded away from the GE date), England winning the 2026 World Cup (bank holiday,
+  via callback), Trump declaring war on Iran (bounded to the start of his term), recurring annual/
+  seasonal events (New Year Honours, summer wildfire warnings, winter storms, a local football
+  promotion party) each authored per-year with its own window.
+- `src/stores/game.ts` — `tickDay()` rolls the event, applies non-action effects immediately or
+  queues an action event + pauses the clock; `resolveFeedAction()` applies the chosen action's
+  effects through the engine, runs its callback if any, records the result in the feed, and
+  resumes the clock once no events remain. Feed entries are matched by id *and* `status ===
+  'unactioned'`, not id alone, since a repeatable event's later occurrence shares its id with the
+  already-actioned feed entry from an earlier occurrence.
+- **Polling cadence replaced with poll-publishing events.** Polling no longer moves every tick.
+  Every event/action/callback's polling effect now queues onto `game.pendingPollImpacts` instead
+  of changing `game.polling` directly. A recurring seed-pool event (`polling-update`,
+  `publishesPoll: true`, the one event allowed `once: false`) is the only thing that drains that
+  buffer: `sim/poll.ts`'s `nextPollingSnapshot()` folds the queued impacts together with the trend
+  between the previous two releases (momentum), caps the combined swing relative to each party's
+  own size (so small parties can't double and big parties can't swing double digits without a
+  sustained run of releases the same way), rounds to 1 d.p., sets it as the live `polling`, and
+  appends it to `pollingHistory`. `tickPolling()` itself is untouched in `sim/poll.ts` (still
+  tested, just no longer called per-day by `game.ts`).
+- **Acceptance:** ticking generates feed entries; most days have no event; polling only moves on a
+  published-poll event, with believable, capped swings; action events pause the clock until
+  resolved via the feed's choice buttons, including on a repeatable event's second occurrence.

@@ -1,0 +1,222 @@
+[
+  {
+    "id": "by-election-safe-seat-2025",
+    "headline": "An MP's resignation triggers a by-election",
+    "body": "A sitting MP steps down for personal reasons, forcing a by-election in what had looked like a safe seat. Every party piles in resource out of all proportion to one seat.",
+    "scope": "regional",
+    "severity": "moderate",
+    "weight": 3,
+    "window": { "from": "2025-02-01", "to": "2028-09-01" },
+    "once": true,
+    "actions": [
+      {
+        "id": "campaign-hard",
+        "label": "Throw the campaign machine at it",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.12 }],
+          "summary": "A strong showing dominates a news cycle that's usually quiet for by-elections."
+        }
+      },
+      {
+        "id": "token-effort",
+        "label": "Field a candidate but don't overcommit",
+        "effects": {
+          "summary": "A respectable result that nobody outside the seat remembers by the weekend."
+        }
+      },
+      {
+        "id": "sit-out",
+        "label": "Sit this one out and save resources",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": -0.05 }],
+          "summary": "Commentators read the absence as a lack of confidence."
+        }
+      }
+    ]
+  },
+  {
+    "id": "world-cup-2026-bank-holiday",
+    "headline": "England win the World Cup — the PM declares a bank holiday",
+    "body": "Scenes of jubilation across the country as England lift the trophy for the first time since 1966. The Prime Minister announces a one-off bank holiday for the victory parade.",
+    "scope": "national",
+    "severity": "major",
+    "weight": 8,
+    "window": { "from": "2026-06-01", "to": "2026-07-31" },
+    "once": true,
+    "callbackId": "world-cup-bank-holiday"
+  },
+  {
+    "id": "trump-declares-war-on-iran",
+    "headline": "Trump orders military action against Iran",
+    "body": "After weeks of rising rhetoric, US strikes hit targets inside Iran overnight. Allied governments, the UK included, face immediate pressure to state a position.",
+    "scope": "international",
+    "severity": "major",
+    "weight": 3,
+    "window": { "from": "2025-01-20", "to": "2026-06-30" },
+    "once": true,
+    "actions": [
+      {
+        "id": "support",
+        "label": "Publicly back the US action",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": -0.1 }],
+          "summary": "A vocal minority cheer the firm line; a larger slice of opinion recoils at being dragged into another war."
+        },
+        "callbackId": "trump-iran-war"
+      },
+      {
+        "id": "condemn",
+        "label": "Condemn the escalation",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.08 }],
+          "summary": "Plays well with a war-weary public, though critics call it weak on an ally."
+        },
+        "callbackId": "trump-iran-war"
+      },
+      {
+        "id": "neutral",
+        "label": "Call for de-escalation, take no side",
+        "effects": {
+          "summary": "A carefully worded statement satisfies almost nobody but commits to nothing."
+        },
+        "callbackId": "trump-iran-war"
+      }
+    ]
+  },
+  {
+    "id": "new-year-honours-2025",
+    "headline": "The New Year Honours List makes the front pages",
+    "body": "A mix of celebrities, charity workers and a couple of eyebrow-raising political honours dominate a slow news week.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 4,
+    "window": { "from": "2025-12-28", "to": "2026-01-02" },
+    "once": true,
+    "effects": {
+      "summary": "A pleasant distraction; a couple of contested honours generate a day's grumbling."
+    }
+  },
+  {
+    "id": "new-year-honours-2026",
+    "headline": "The New Year Honours List makes the front pages",
+    "body": "Another year, another round of knighthoods and OBEs — and another round of \"who on earth approved that one\".",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 4,
+    "window": { "from": "2026-12-28", "to": "2027-01-02" },
+    "once": true,
+    "effects": {
+      "summary": "A pleasant distraction; a couple of contested honours generate a day's grumbling."
+    }
+  },
+  {
+    "id": "summer-heatwave-wildfire-warning-2025",
+    "headline": "Wildfire warning issued as heatwave grips the country",
+    "body": "Tinder-dry moorland and a run of 30°C-plus days prompt fire services to issue a rare severe wildfire warning.",
+    "scope": "regional",
+    "severity": "moderate",
+    "weight": 4,
+    "window": { "from": "2025-07-01", "to": "2025-08-31" },
+    "once": true,
+    "effects": {
+      "salienceShift": { "environment_net_zero": 0.04 },
+      "summary": "Footage of scorched hillsides keeps climate adaptation in the conversation for a week."
+    }
+  },
+  {
+    "id": "summer-heatwave-wildfire-warning-2026",
+    "headline": "Wildfire warning issued as heatwave grips the country",
+    "body": "For the second summer running, fire services warn the public to avoid disposable barbecues and naked flames on parched land.",
+    "scope": "regional",
+    "severity": "moderate",
+    "weight": 4,
+    "window": { "from": "2026-07-01", "to": "2026-08-31" },
+    "once": true,
+    "effects": {
+      "salienceShift": { "environment_net_zero": 0.04 },
+      "summary": "A second hot, dry summer in a row sharpens questions about preparedness."
+    }
+  },
+  {
+    "id": "winter-storm-disruption-2025",
+    "headline": "A named storm batters the country",
+    "body": "Trees down, trains cancelled, and tens of thousands of homes without power as a winter storm sweeps through.",
+    "scope": "regional",
+    "severity": "moderate",
+    "weight": 4,
+    "window": { "from": "2025-11-01", "to": "2026-02-28" },
+    "once": true,
+    "actions": [
+      {
+        "id": "visit-affected-area",
+        "label": "Visit the worst-hit area",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.05 }],
+          "summary": "Wellies and a hi-vis jacket go down better than a press release."
+        }
+      },
+      {
+        "id": "statement-only",
+        "label": "Issue a statement of sympathy",
+        "effects": {
+          "summary": "Standard, unremarkable, forgotten within days."
+        }
+      }
+    ]
+  },
+  {
+    "id": "winter-storm-disruption-2026",
+    "headline": "A named storm batters the country",
+    "body": "Another winter, another named storm — this one strong enough to ground flights and flood low-lying towns.",
+    "scope": "regional",
+    "severity": "moderate",
+    "weight": 4,
+    "window": { "from": "2026-11-01", "to": "2027-02-28" },
+    "once": true,
+    "actions": [
+      {
+        "id": "visit-affected-area",
+        "label": "Visit the worst-hit area",
+        "effects": {
+          "polling": [{ "partyId": "player", "magnitude": 0.05 }],
+          "summary": "Wellies and a hi-vis jacket go down better than a press release."
+        }
+      },
+      {
+        "id": "statement-only",
+        "label": "Issue a statement of sympathy",
+        "effects": {
+          "summary": "Standard, unremarkable, forgotten within days."
+        }
+      }
+    ]
+  },
+  {
+    "id": "local-football-promotion-party-2025",
+    "headline": "A local football club's promotion party takes over a town centre",
+    "body": "Thousands turn out for an open-top bus parade after an unfancied club's promotion run. The MP is photographed in the club scarf.",
+    "scope": "local",
+    "severity": "minor",
+    "weight": 3,
+    "window": { "from": "2025-05-01", "to": "2025-05-31" },
+    "once": true,
+    "effects": {
+      "polling": [{ "partyId": "incumbent", "magnitude": 0.02 }],
+      "summary": "A nice, low-stakes good-news story for the local paper."
+    }
+  },
+  {
+    "id": "local-football-promotion-party-2026",
+    "headline": "A local football club's promotion party takes over a town centre",
+    "body": "A different town, the same scenes: bunting, a bus with the roof off, and an MP who suddenly remembers they've always supported this club.",
+    "scope": "local",
+    "severity": "minor",
+    "weight": 3,
+    "window": { "from": "2026-05-01", "to": "2026-05-31" },
+    "once": true,
+    "effects": {
+      "polling": [{ "partyId": "incumbent", "magnitude": 0.02 }],
+      "summary": "A nice, low-stakes good-news story for the local paper."
+    }
+  }
+]
