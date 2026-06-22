@@ -76,10 +76,17 @@ const clockIconStyle = computed(() => ({
      Day two unfills the same way — clockwise from 0deg — by growing the *start* of the filled
      arc instead of shrinking its end, so the transparent wedge advances clockwise rather than
      the filled wedge receding counter-clockwise. */
+  --clock-start: calc(clamp(0, var(--clock-phase) - 1, 1) * 360deg);
+  --clock-end: calc(clamp(0, var(--clock-phase), 1) * 360deg);
+  /* Hard conic-gradient stops render as a slightly jagged radial edge — blend each boundary
+     over a couple of degrees instead so the moving edge looks anti-aliased. */
   background: conic-gradient(
-    transparent 0deg calc(clamp(0, var(--clock-phase) - 1, 1) * 360deg),
-    #a1a1aa calc(clamp(0, var(--clock-phase) - 1, 1) * 360deg) calc(clamp(0, var(--clock-phase), 1) * 360deg),
-    transparent calc(clamp(0, var(--clock-phase), 1) * 360deg) 360deg
+    transparent 0deg,
+    transparent calc(var(--clock-start) - 2deg),
+    #a1a1aa calc(var(--clock-start) + 2deg),
+    #a1a1aa calc(var(--clock-end) - 2deg),
+    transparent calc(var(--clock-end) + 2deg),
+    transparent 360deg
   );
   animation-name: clock-phase-cycle;
   animation-timing-function: linear;
