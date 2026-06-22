@@ -36,18 +36,31 @@ const clockIconStyle = computed(() => ({
 </script>
 
 <template>
-  <button
-    type="button"
-    disabled
-    class="flex w-full items-center gap-3 px-4 py-3 text-left"
-    aria-label="By-elections and other minor elections — coming soon"
-  >
-    <span class="clock-icon shrink-0" :style="clockIconStyle" aria-hidden="true" />
-    <span class="min-w-0">
-      <p class="font-semibold text-zinc-100">{{ formatDate(game.date) }}</p>
-      <p class="text-zinc-400">{{ electionCountdownLabel }}</p>
-    </span>
-  </button>
+  <div class="flex w-full items-center gap-3 px-4 py-3">
+    <button
+      type="button"
+      disabled
+      class="flex min-w-0 flex-1 items-center gap-3 text-left"
+      aria-label="By-elections and other minor elections — coming soon"
+    >
+      <span class="clock-icon shrink-0" :style="clockIconStyle" aria-hidden="true" />
+      <span class="min-w-0">
+        <p class="font-semibold text-zinc-100">{{ formatDate(game.date) }}</p>
+        <p class="text-zinc-400">{{ electionCountdownLabel }}</p>
+      </span>
+    </button>
+    <button
+      type="button"
+      class="shrink-0 rounded-full border border-zinc-700/70 p-1.5 text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
+      :disabled="game.pendingEvents.length > 0"
+      aria-label="Skip to next day"
+      @click="game.tickDay()"
+    >
+      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+  </div>
 </template>
 
 <style>
