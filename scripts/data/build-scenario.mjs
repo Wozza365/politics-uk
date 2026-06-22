@@ -94,6 +94,10 @@ function main() {
     tiers: { commons: commonsRegions },
     parties,
     polling: POLLING,
+    // No historical snapshots authored yet — only the single scenario-start
+    // polling figure above exists. Required by Scenario (src/types/scenario.ts)
+    // and read by stores/game.ts on game start.
+    pollingHistory: [],
     finances: FINANCES,
     membership: MEMBERSHIP,
   }

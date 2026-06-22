@@ -306,6 +306,12 @@ onUnmounted(() => {
 const hoveredRegion = () =>
   scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
 
+const hoveredSeat = computed(() => hoveredRegion()?.seats[0])
+const hoveredDemographics = computed(() => {
+  const region = hoveredRegion()
+  return region ? scenario.demographicsByRegion.get(region.geometryRef) : undefined
+})
+
 // --- "Raised" 3D depth -------------------------------------------------
 // The renderer is flat SVG, so depth is faked with drop-shadow(), which
 // (unlike box-shadow) follows the rendered content's own alpha silhouette
@@ -361,13 +367,53 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
 
     <div
       v-if="hoveredRegion()"
-      class="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 rounded bg-zinc-900/90 px-3 py-1.5 text-sm text-white shadow-lg"
+      class="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 rounded bg-zinc-900/90 px-3 py-2 text-sm text-white shadow-lg"
     >
       <p class="font-semibold">{{ hoveredRegion()?.name }}</p>
       <p class="text-zinc-300">
-        {{ scenario.party(hoveredRegion()!.seats[0]?.party)?.name }} —
-        {{ hoveredRegion()?.seats[0]?.memberName }}
+        {{ scenario.party(hoveredSeat?.party ?? '')?.name }} —
+        {{ hoveredSeat?.memberName }}
       </p>
+
+      <div v-if="hoveredSeat?.results?.length" class="mt-1.5 space-y-0.5">
+        <div
+          v-for="result in hoveredSeat.results"
+          :key="result.candidateName ?? result.party"
+          class="flex items-center gap-1.5 text-xs"
+        >
+          <span class="w-9 shrink-0 text-right text-zinc-400">{{ result.voteShare.toFixed(1) }}%</span>
+          <span
+            class="h-2 rounded-sm"
+            :style="{ width: `${Math.max(result.voteShare * 1.1, 2)}px`, backgroundColor: partyColour(result.party) }"
+          />
+          <span class="truncate text-zinc-300">{{ scenario.party(result.party)?.shortName ?? result.candidateName }}</span>
+        </div>
+        <p v-if="hoveredSeat.turnout && hoveredSeat.electorate" class="pt-0.5 text-xs text-zinc-400">
+          Turnout {{ Math.round((hoveredSeat.turnout / hoveredSeat.electorate) * 100) }}%
+          ({{ hoveredSeat.turnout.toLocaleString() }} / {{ hoveredSeat.electorate.toLocaleString() }})
+        </p>
+      </div>
+
+      <div
+        v-if="hoveredDemographics"
+        class="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-0.5 border-t border-zinc-700 pt-1.5 text-xs text-zinc-300"
+      >
+        <span v-if="hoveredDemographics.populationDensityPerKm2">
+          Density: {{ Math.round(hoveredDemographics.populationDensityPerKm2).toLocaleString() }}/km²
+        </span>
+        <span v-if="hoveredDemographics.employmentRatePct">Employment: {{ hoveredDemographics.employmentRatePct }}%</span>
+        <span v-if="hoveredDemographics.unemploymentRatePct">Unemployment: {{ hoveredDemographics.unemploymentRatePct }}%</span>
+        <span v-if="hoveredDemographics.economicInactivityRatePct">
+          Inactive: {{ hoveredDemographics.economicInactivityRatePct }}%
+        </span>
+        <span v-if="hoveredDemographics.medianAge">Median age: {{ hoveredDemographics.medianAge }}</span>
+        <span v-if="hoveredDemographics.medianHouseholdIncomeGBP">
+          Income: £{{ hoveredDemographics.medianHouseholdIncomeGBP.toLocaleString() }}
+        </span>
+        <span v-if="hoveredDemographics.source === 'estimated'" class="col-span-2 italic text-zinc-500">
+          Some figures estimated
+        </span>
+      </div>
     </div>
 
     <div class="absolute bottom-3 right-3 flex flex-col gap-1.5">

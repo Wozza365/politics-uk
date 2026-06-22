@@ -12,61 +12,12 @@
 // history (Biography endpoint) rather than trusting the search result.
 import { writeFileSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { resolvePartySlug } from './party-slugs.mjs'
+import { normaliseConstituencyName } from './constituency-name.mjs'
 
 const API = 'https://members-api.parliament.uk/api'
 const AS_OF_DATE = '2025-01-01'
 const CONCURRENCY = 2
-
-// spec §4.3 party merges + the slugs already established by the placeholder
-// fixture (src/data/scenarios/uk-2025-01-01/composition.placeholder.json).
-const PARTY_SLUGS = {
-  Conservative: 'conservative',
-  Labour: 'labour',
-  'Labour (Co-op)': 'labour',
-  'Scottish National Party': 'snp',
-  'Liberal Democrat': 'liberal_democrat',
-  'Reform UK': 'reform_uk',
-  'Green Party': 'green',
-  'Green Party of England and Wales': 'green',
-  'Scottish Greens': 'green',
-  'Plaid Cymru': 'plaid_cymru',
-  'Democratic Unionist Party': 'dup',
-  'Sinn Féin': 'sinn_fein',
-  'Social Democratic & Labour Party': 'sdlp',
-  Alliance: 'alliance',
-  'Ulster Unionist Party': 'uup',
-  'Traditional Unionist Voice': 'tuv',
-  Independent: 'independent',
-  Speaker: 'speaker',
-}
-
-function slugifyFallback(name) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-}
-
-function resolvePartySlug(name) {
-  if (PARTY_SLUGS[name]) return PARTY_SLUGS[name]
-  const slug = slugifyFallback(name)
-  console.warn(`[fetch-commons-composition] No merge mapping for party "${name}" — using fallback slug "${slug}". Add it to PARTY_SLUGS if this is wrong.`)
-  return slug
-}
-
-// ONS PCON24NM and Parliament's "membershipFrom" constituency names
-// generally agree; normalise away the handful of stylistic differences
-// (ampersand vs "and", curly vs straight apostrophes) before matching.
-function normaliseConstituencyName(name) {
-  return name
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '') // strip diacritics, e.g. "Glyndŵr" -> "Glyndwr"
-    .replace(/&/g, 'and')
-    .replace(/['']/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase()
-}
 
 async function fetchJson(url, attempt = 1) {
   const res = await fetch(url)

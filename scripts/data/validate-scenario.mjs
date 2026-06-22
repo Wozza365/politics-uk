@@ -59,7 +59,7 @@ class ValidationErrors extends Error {
   }
 }
 
-function validate(scenario, boundariesByTier) {
+function validate(scenario, boundariesByTier, demographics = null) {
   const errors = []
 
   if (!isValidIsoDate(scenario.date)) errors.push(`scenario.date is not a valid ISO date: ${scenario.date}`)
@@ -125,6 +125,21 @@ function validate(scenario, boundariesByTier) {
         if (seat.electedAt !== undefined && !isValidIsoDate(seat.electedAt)) {
           errors.push(`tier "${tierId}": region "${region.id}" seat.electedAt is not a valid ISO date`)
         }
+        if (seat.results !== undefined) {
+          if (seat.results.length === 0) {
+            errors.push(`tier "${tierId}": region "${region.id}" seat.results is present but empty`)
+          } else {
+            const shareSum = seat.results.reduce((sum, r) => sum + r.voteShare, 0)
+            if (Math.abs(shareSum - 100) > 1) {
+              errors.push(`tier "${tierId}": region "${region.id}" seat.results vote shares sum to ${shareSum.toFixed(2)}%, expected ~100%`)
+            }
+            // Not cross-checked against seat.party: seat.party is resolved
+            // as-of the scenario date from party-affiliation history (see
+            // fetch-commons-composition.mjs), so it correctly diverges from
+            // results[0].party (the party the member won the seat as) for
+            // anyone who's since defected, lost the whip, or sat as Speaker.
+          }
+        }
       }
     }
 
@@ -164,6 +179,23 @@ function validate(scenario, boundariesByTier) {
     }
   }
 
+  // Demographics (P1.14): every entry's regionId resolves to a real commons
+  // region, no duplicates, and source is provenance-flagged.
+  if (demographics) {
+    const allRegionIds = new Set(Object.values(scenario.tiers).flatMap((regions) => regions.map((r) => r.id)))
+    const seenRegionIds = new Set()
+    for (const entry of demographics) {
+      if (!allRegionIds.has(entry.regionId)) {
+        errors.push(`demographics entry references unknown regionId "${entry.regionId}"`)
+      }
+      if (seenRegionIds.has(entry.regionId)) errors.push(`demographics: duplicate regionId "${entry.regionId}"`)
+      seenRegionIds.add(entry.regionId)
+      if (entry.source !== 'official' && entry.source !== 'estimated') {
+        errors.push(`demographics.${entry.regionId}.source must be 'official' or 'estimated', got "${entry.source}"`)
+      }
+    }
+  }
+
   return errors
 }
 
@@ -186,7 +218,11 @@ function main() {
 
   const boundariesByTier = { commons: boundaryRefsFromTopology(boundariesTopology, 'regions') }
 
-  const errors = validate(scenario, boundariesByTier)
+  const demographics = usePlaceholder
+    ? null
+    : readJson('../../src/data/scenarios/uk-2025-01-01/demographics.commons.json')
+
+  const errors = validate(scenario, boundariesByTier, demographics)
 
   if (errors.length > 0) {
     console.error(new ValidationErrors(errors).message)
