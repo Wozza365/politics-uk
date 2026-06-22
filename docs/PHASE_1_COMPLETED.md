@@ -213,3 +213,48 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
 - Verified manually in a running dev server (Playwright-driven Chromium): screenshotted the icon
   filling clockwise across day one, ticking over to day two and unfilling, and confirmed pushing a
   fake entry onto `game.pendingEvents` froze both the date and the icon's fill until cleared.
+
+## P1.11 — Simulation engine (MVP) ✅
+
+- `src/sim/policies.ts` + `src/data/sim/policies.json`: the **policy registry** (spec §4.4) — 10
+  major and 20 minor policy areas (some `partySpecific`), each a `PolicyDef`; a `salience:
+  Record<PolicyId, number>` snapshot of the world's current issue salience (hand-estimated, as of
+  the Jan 2025 scenario date); `TIER_WEIGHT` gives major policies more pull than minor ones in the
+  sim. Reuses the existing `CompassPosition`/`PolicyDef`/`PolicyStance` types from
+  `src/types/policy.ts` rather than redefining them.
+- `src/sim/segments.ts` + `src/data/sim/segments.json`: 8 hand-authored **voter segments**
+  (flagged tunable/estimated), each a 2D compass position + a relative size weight; some are
+  tagged `coreBaseFor: <partyId>` as that party's core-identity base.
+- `src/sim/rng.ts`: a seeded PRNG (`mulberry32` over a string hash) so any "randomness" in the sim
+  is fully deterministic per `(date, partyId, ...)` key — no `Math.random()` anywhere in the sim
+  path, per the Determinism cross-cutting concern.
+- `src/sim/poll.ts` — the polling update function (spec §10.5.1 step 5), built around one generic,
+  source-agnostic contract: `PollingImpact = { partyId, magnitude: -1..+1, source }`. Every force
+  that moves polling — including future ones outside this module — is expressed through it:
+  - `computeAlignmentImpacts()`: each voter segment splits across parties by a softmax over
+    salience/tier-weighted compass closeness (so a party invading a rival's issue-space steals
+    some of its segment share even with the rival's own stance unchanged), then a
+    **base-betrayal penalty** shrinks a party's take the further/more firmly its overall position
+    has drifted from its own core-base segment. Pure and deterministic; parties with no stances
+    defined sit out of this model (they can still move via `extraImpacts`).
+  - `computeVarianceImpacts()`: a small seeded day-to-day wobble per party, for the
+    unpredictability the spec/brief calls for, without breaking determinism.
+  - `impactsFromRecord()`: a helper for turning "this event affects every party" data (e.g. an
+    event's per-party effect record) into tagged `PollingImpact[]` — the seam the event system
+    (P1.12) and other future sources plug into.
+  - `applyPollingImpacts()`: folds any batch of impacts into the current polling, then
+    renormalises so the field's total is preserved (zero-sum — gains for one party come
+    proportionally from the rest of the field) and no party's share reaches zero.
+  - `tickPolling()`: one day's update — alignment + variance + whatever `extraImpacts` the caller
+    supplies — wired into `useGameStore().tickDay(extraImpacts)` (`src/stores/game.ts`), which was
+    previously a no-op date-advance stub.
+- `src/sim/poll.spec.ts`: unit tests reproducing the three qualitative worked examples from spec
+  §10.5.2 — (a) collapsing immigration salience removes Reform's alignment advantage, (b) a
+  governing party occupying Green issue-space squeezes the Greens' segment share, (c) the Greens
+  adopting an anti-environment stance collapses their standing via the base-betrayal penalty —
+  plus purity/determinism/zero-sum/bounds coverage for every exported function.
+- `src/data/scenarios/uk-2025-01-01/{parties,scenario}.json`: added `compass` (overall position +
+  consistency) and `stances` (per major-policy position/consistency/salience, `source:
+  'estimated'`) for the 7 national-scope parties, so the real scenario data has something for the
+  alignment model to read from day one. Minor-tier stances are left for later refinement, per the
+  spec's own note that the illustrative policy lists are a provisional starting set.

@@ -80,6 +80,7 @@ Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) fo
 | Loading screen (P1.3) | `src/screens/LoadingScreen.vue` | ✅ |
 | Westminster map (P1.4, P1.5) | `src/screens/GameScreen.vue`, `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Game-screen layout built; map zoom/pan/focus integrated into its centre slot |
 | Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
+| Simulation engine (P1.11) | `src/sim/{policies,segments,poll,rng}.ts`, `src/data/sim/{policies,segments}.json` | ✅ Deterministic spatial/issue-salience polling model + generic `-1..+1` impact contract wired into `game.tickDay()` |
 
 Everything else in Phase 1 below is TODO.
 
@@ -142,51 +143,8 @@ UI store); MVP only reacts to Westminster.
 **Acceptance:** Bar shows all views with only Westminster selectable; selection state stored;
 disabled items are visibly inactive and non-interactive.
 
-### P1.11 — Simulation engine (MVP) `🔲`
-**Goal.** Spec §10.5: a **deterministic** spatial/issue-salience model that moves polling from
-day one. MVP = a working, balanced minimal version; depth comes later.
-
-**Depends on:** P1.1.
-
-#### P1.11.1 — Policy registry + compass types
-**Goal.** Spec §4.4 (resolved): the **2D political-compass** model. Stance/compass types
-already live in `src/types/policy.ts` (`CompassPosition`, `PolicyDef`, `PolicyStance`,
-`CompassSummary`) — **use them, don't redefine**.
-**Steps:**
-1. In `src/sim/policies.ts` (or `src/data/sim/policies.json`), define the **policy registry**: the
-   **major (~8–10)** and **minor (~16–20, some `partySpecific`)** areas from spec §4.4. Treat the
-   illustrative lists there as the provisional starting set; refine when scoring manifestos.
-2. Each policy is positioned on the **2D compass** (economic × social), not a 1D value. Major
-   policies carry a larger **tier weight** than minor ones in the sim.
-3. Provide a `salience: Record<PolicyId, number>` for the world's current issue salience.
-**Acceptance:** Registry centralised with major/minor tiers; `Party.stances` is keyed by these
-`PolicyId`s and typed as `PolicyStance`; types compile; no duplicate stance type definitions.
-
-#### P1.11.2 — Voter segments + party base
-**Steps:** In `src/sim/segments.ts`, define voter segments positioned in the **same 2D compass
-space**, each with a size weight, plus per-party **core base** positions. For MVP these can be a
-small hand-authored set in `src/data/sim/segments.json` (flagged as tunable/estimated). Structure
-for later data-driven refinement.
-**Acceptance:** Segments + bases load from data with 2D positions; sum of segment weights normalised.
-
-#### P1.11.3 — Polling update function
-**Steps:** In `src/sim/poll.ts`, implement: `polling = f(alignment(party, segment) weighted by
-policy tier × salience) − baseBetrayalPenalty(party movement vs core base)` (spec §10.5.1 step 5).
-Alignment is **2D distance** on the compass; a stance's `consistency` modulates exposure (a fuzzy
-position pleases fewer voters intensely but is less betrayal-prone). Pure, deterministic,
-synchronous, client-side. Normalise outputs so the field sums sensibly.
-**Acceptance:** Pure function; given identical inputs returns identical outputs; no randomness in
-the core path (any procedural variety must be seeded/deterministic).
-
-#### P1.11.4 — Validate against the spec's worked examples
-**Steps:** Add unit tests reproducing spec §10.5.2: (a) immigration salience → ~0 ⇒ Reform dips;
-(b) governing party occupies green space ⇒ Greens squeezed; (c) Greens adopt anti-environment ⇒
-base-betrayal collapse among their segment. Assert the **direction** of each move.
-**Acceptance:** All three qualitative outcomes reproduced by tests.
-
-**Files (P1.11):** `src/sim/{policies,segments,poll,difficulty}.ts`,
-`src/data/sim/{policies,segments}.json`, plus tests. (Stance/compass **types** already exist in
-`src/types/policy.ts` — reuse them.)
+### P1.11 — Simulation engine (MVP) `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p111--simulation-engine-mvp-).
 
 ### P1.12 — Event system (MVP) `🔲`
 **Goal.** Spec §10 + §9.5: a daily event roll from a weighted pool; some events require a player

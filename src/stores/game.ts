@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { FeedEntry, ISODate, PartyId } from '@/types'
 import { useScenarioStore } from './scenario'
+import { tickPolling, type PollingImpact } from '@/sim/poll'
 
 /** Adds `days` whole days to an ISO date string ("2025-01-01" + 1 -> "2025-01-02"). */
 function addDays(date: ISODate, days: number): ISODate {
@@ -76,8 +77,16 @@ export const useGameStore = defineStore('game', {
       }))
       this.clock.running = false
     },
-    tickDay() {
+    /**
+     * Advances the date and updates polling for everyone (spec §10.5). `extraImpacts` is the
+     * seam for impacts from outside this tick's own alignment/variance model — the event system
+     * (P1.12), player actions, or anything else that wants to nudge a party's standing.
+     */
+    tickDay(extraImpacts: PollingImpact[] = []) {
       this.date = addDays(this.date, 1)
+      const scenario = useScenarioStore()
+      this.polling = tickPolling(this.polling, scenario.scenario.parties, this.date, { extraImpacts })
+      this.pollingHistory.push({ date: this.date, polling: { ...this.polling } })
     },
     pauseClock() {
       this.clock.running = false
