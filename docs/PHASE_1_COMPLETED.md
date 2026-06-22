@@ -317,6 +317,37 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
   published-poll event, with believable, capped swings; action events pause the clock until
   resolved via the feed's choice buttons, including on a repeatable event's second occurrence.
 
+## P1.13 — End-to-end loop wire-up ✅
+
+- The Start → Loading → Game path was already real wiring from P1.0–P1.9 (no placeholders to
+  remove); P1.13's own work was closing the loop at the other end — the GE win/lose check — since
+  every other region (map/hemicycle/panel/feed/clock) is already reactive to `game`/`scenario`
+  state and needed no changes to "wire up".
+- `src/stores/game.ts` — `result: 'won' | 'lost' | null` state, reset to `null` in `startGame()`.
+  `checkElectionResult()` runs at the end of every `tickDay()`: once `date >= scenario.scenario.
+  nextElectionDate`, it evaluates `playerSeatCount >= winThresholdSeats` (spec §11.2) against the
+  current Commons seat composition, sets `result`, and pauses the clock. Action events that fire
+  the same day still take priority (the clock was already paused for them); the result is simply
+  evaluated once that day's processing is done, so it isn't lost.
+- `src/stores/ui.ts` — added the `'result'` screen + `goToResult()`, following the same
+  one-action-per-transition pattern as `goToStart`/`goToLoading`/`goToGame`.
+- `src/screens/GameScreen.vue` — a `watch(() => game.result, ...)` calls `ui.goToResult()` the
+  moment a result is set, matching the existing convention that *screens* drive transitions (e.g.
+  `LoadingScreen` auto-advancing), not the stores themselves.
+- `src/screens/ResultScreen.vue` — minimal win/lose screen (a full results breakdown is Phase 2):
+  headline in the player's party colour, seats won vs. seats needed, and a "Play again" button
+  that calls `ui.goToStart()`. `App.vue`'s screen lookup map gained the `result` entry.
+- **No seat-projection model exists yet** (Commons seats are still the static scenario
+  composition — only polling moves day-to-day), so the win check is necessarily evaluated against
+  that same static composition; a polling-driven seat-swing model is out of scope for MVP per the
+  spec's own Phase 2 boundary, not an oversight here.
+- Verified manually in a running dev server (Playwright-driven Chromium): played Labour (402/650
+  seats, comfortably over the 326-seat threshold) and a minor party (UKIP, 0 seats) through to the
+  scenario's 1 Jan 2029 GE date, confirming the "You won"/"You lost" screens render the right
+  seat counts and threshold, and that "Play again" returns cleanly to the start menu.
+- **Acceptance:** a user can play from the start menu through ticking days with live, drifting
+  numbers and resolvable events, to a GE win/lose evaluation; `npm run build` clean.
+
 ## P1.14 — Constituency tooltip data enrichment ✅
 
 - `src/types/region.ts` — added `CandidateResult` (`party`, `candidateName?`, `votes`,

@@ -9,7 +9,7 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. Phase 1 is **in progress**; P1.0–P1.10 are done — see
+> how. Phase 1 is **complete** — see
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
 > how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
@@ -82,8 +82,9 @@ Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) fo
 | View switcher (P1.10) | `src/components/ViewSwitcher.vue`, `src/stores/ui.ts` | ✅ Bottom-centre nav bar; only Westminster selectable, rest disabled/upcoming |
 | Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
 | Simulation engine (P1.11) | `src/sim/{policies,segments,poll,rng}.ts`, `src/data/sim/{policies,segments}.json` | ✅ Deterministic spatial/issue-salience polling model + generic `-1..+1` impact contract wired into `game.tickDay()` |
+| End-to-end loop (P1.13) | `src/stores/{game,ui}.ts`, `src/screens/ResultScreen.vue`, `src/screens/GameScreen.vue` | ✅ GE-date win check (`playerSeats >= winThresholdSeats`) wired into `tickDay()`; result screen + "Play again" loop back to the start menu |
 
-Everything else in Phase 1 below is TODO.
+Phase 1 is now complete — every task below is `✅ DONE`.
 
 ---
 
@@ -140,22 +141,8 @@ See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p111--simulation-engine-mvp-
 ### P1.12 — Event system (MVP) `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p112--event-system-mvp-).
 
-### P1.13 — End-to-end loop wire-up `🔲`
-**Goal.** A coherent playable slice: pick a party → load → play days → events fire → polling
-drifts → numbers update across map/hemicycle/panel/feed → GE countdown runs toward a win check.
-
-**Depends on:** P1.2–P1.12.
-
-**Steps:**
-1. Confirm the full path Start → Loading → Game works with real wiring (not placeholders).
-2. On each `tickDay()`: advance date, roll events (P1.12), update polling (P1.11), refresh all
-   bound UI (map/hemicycle/panel/feed/clock are reactive to stores, so this should be automatic).
-3. Implement the **win check** at the GE date: `playerSeats > totalSeats / 2` (spec §11.2);
-   show a minimal win/lose result. (A full results screen is Phase 2; MVP just needs the
-   condition evaluated and surfaced.)
-4. Manual playthrough QA pass; fix reactivity gaps.
-**Acceptance:** A user can play from the start menu through ticking days with live, drifting
-numbers and resolvable events, to a GE win/lose evaluation; `npm run build` clean.
+### P1.13 — End-to-end loop wire-up `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p113--end-to-end-loop-wire-up-).
 
 ### P1.14 — Constituency tooltip data enrichment `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p114--constituency-tooltip-data-enrichment-).
@@ -200,12 +187,13 @@ Phase 0 ✅ (done — see PHASE_0_COMPLETED.md)
                                          │                    ├─ P1.9 clock
                                          │                    └─ P1.10 view switcher
                                          ├─ P1.11 sim engine ─┐
-                                         └─ P1.12 events ◄─────┴─ P1.13 end-to-end
+                                         └─ P1.12 events ◄─────┴─ P1.13 end-to-end ✅
 
 P1.5 map ─ P1.14 tooltip data enrichment (independent follow-up, no downstream dependents)
 ```
 
-**Critical path:** P1.0 → P1.1 → P1.4 → (components) → P1.11/P1.12 → P1.13.
+**Critical path:** P1.0 → P1.1 → P1.4 → (components) → P1.11/P1.12 → P1.13. ✅ All complete —
+Phase 1 is done.
 
 **Parallelisable once P1.1 + P1.4 exist** (good sub-agent boundaries — each owns its files):
 P1.5 (map), P1.6 (hemicycle), P1.7 (panel), P1.8 (feed), P1.9 (clock), P1.10 (switcher),

@@ -1,10 +1,26 @@
 <script setup lang="ts">
+// Game screen (spec §9): the live play loop. `useGameClock()` (mounted by `GameClock`) drives
+// `tickDay()`; this screen's only other job is to hand off to the result screen once the GE
+// date resolves a win/lose (P1.13 — the end of the otherwise-automatic-from-here loop).
+import { watch } from 'vue'
 import MapView from '@/components/MapView.vue'
 import PartyPanel from '@/components/PartyPanel.vue'
 import HemicycleView from '@/components/HemicycleView.vue'
 import EventFeed from '@/components/EventFeed.vue'
 import GameClock from '@/components/GameClock.vue'
 import ViewSwitcher from '@/components/ViewSwitcher.vue'
+import { useGameStore } from '@/stores/game'
+import { useUiStore } from '@/stores/ui'
+
+const game = useGameStore()
+const ui = useUiStore()
+
+watch(
+  () => game.result,
+  (result) => {
+    if (result) ui.goToResult()
+  },
+)
 </script>
 
 <template>

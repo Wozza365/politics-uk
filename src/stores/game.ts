@@ -60,6 +60,9 @@ export const useGameStore = defineStore('game', {
     // Per-playthrough issue salience (spec §10.5.1 step 1); starts as the world baseline and
     // events can nudge it via `effects.salienceShift` / event callbacks.
     salience: { ...WORLD_SALIENCE } as Record<string, number>,
+    // Set once the GE date is reached (spec §11.2 win check); null while the game is still
+    // running. A screen (GameScreen) watches this to drive the start→loading→game→result loop.
+    result: null as 'won' | 'lost' | null,
   }),
   getters: {
     selectedParty(state) {
@@ -111,6 +114,7 @@ export const useGameStore = defineStore('game', {
       this.firedEventIds = []
       this.pendingPollImpacts = []
       this.salience = { ...WORLD_SALIENCE }
+      this.result = null
     },
     /** Builds the narrow context an event callback (`sim/eventCallbacks.ts`) gets to work with —
      * closures over this store's own actions, so `sim/` never has to import `stores/`. */
@@ -179,6 +183,21 @@ export const useGameStore = defineStore('game', {
           })
         }
       }
+
+      this.checkElectionResult()
+    },
+    /** Win check (spec §11.2): once the GE date is reached, evaluate `playerSeats >
+     * totalSeats / 2` against the current Commons seat composition and record the result.
+     * Action events still take priority that same day — the clock stays paused on whichever
+     * came first, and the result stands once the queue drains. A full seat-projection model
+     * (polling-driven seat changes) is Phase 2; MVP evaluates the static seat composition. */
+    checkElectionResult() {
+      if (this.result) return
+      const scenario = useScenarioStore()
+      const electionDate = scenario.scenario.nextElectionDate
+      if (!electionDate || this.date < electionDate) return
+      this.result = this.playerSeatCount >= this.winThresholdSeats ? 'won' : 'lost'
+      this.pauseClock()
     },
     /** Folds every impact accumulated since the last release (plus this release's own
      * alignment/variance/trend) into a new polling snapshot, makes it the live number, and
