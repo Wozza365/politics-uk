@@ -27,10 +27,9 @@ const electionCountdownLabel = computed(() => {
   return `${days.toLocaleString('en-GB')} day${days === 1 ? '' : 's'} to GE`
 })
 
-// Triangle-wave fill: 0 -> 1 over day one, 1 -> 0 over day two, repeating — driven entirely
-// by CSS so it pauses/resumes in lockstep with `animationPlayState` below.
+// Phase sawtooth 0 -> 2 over the two-day cycle, driven entirely by CSS so it pauses/resumes
+// in lockstep with `animationPlayState` below (the CSS derives the fill/unfill angles from it).
 const clockIconStyle = computed(() => ({
-  '--clock-colour': game.selectedParty?.colours.primary ?? '#a1a1aa',
   animationDuration: `${game.clock.msPerDay * 2}ms`,
   animationPlayState: game.clock.running ? 'running' : 'paused',
 }))
@@ -52,21 +51,20 @@ const clockIconStyle = computed(() => ({
 </template>
 
 <style>
-@property --clock-fill {
+@property --clock-phase {
   syntax: '<number>';
   inherits: false;
   initial-value: 0;
 }
 
-@keyframes clock-fill-cycle {
+/* 0 -> 2 sawtooth: day one is phase 0-1, day two is phase 1-2. It resets 2 -> 0 at the loop
+   point, but both ends render as an empty circle (see .clock-icon below) so the jump is invisible. */
+@keyframes clock-phase-cycle {
   0% {
-    --clock-fill: 0;
-  }
-  50% {
-    --clock-fill: 1;
+    --clock-phase: 0;
   }
   100% {
-    --clock-fill: 0;
+    --clock-phase: 2;
   }
 }
 
@@ -74,12 +72,16 @@ const clockIconStyle = computed(() => ({
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  border: 1px solid rgba(161, 161, 170, 0.5);
+  /* Fill sweeps clockwise from 0deg on day one (start fixed at 0, end grows 0deg -> 360deg).
+     Day two unfills the same way — clockwise from 0deg — by growing the *start* of the filled
+     arc instead of shrinking its end, so the transparent wedge advances clockwise rather than
+     the filled wedge receding counter-clockwise. */
   background: conic-gradient(
-    var(--clock-colour) calc(var(--clock-fill) * 360deg),
-    transparent calc(var(--clock-fill) * 360deg) 360deg
+    transparent 0deg calc(clamp(0, var(--clock-phase) - 1, 1) * 360deg),
+    #a1a1aa calc(clamp(0, var(--clock-phase) - 1, 1) * 360deg) calc(clamp(0, var(--clock-phase), 1) * 360deg),
+    transparent calc(clamp(0, var(--clock-phase), 1) * 360deg) 360deg
   );
-  animation-name: clock-fill-cycle;
+  animation-name: clock-phase-cycle;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
