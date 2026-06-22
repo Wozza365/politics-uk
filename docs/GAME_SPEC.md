@@ -456,14 +456,17 @@ The simulation heartbeat.
   - **Polling cadence.** Polling numbers don't move every day. Every event/action/callback's
     polling effect queues onto a buffer (`pendingPollImpacts`) instead of changing the headline
     figures immediately. A recurring `events.seed.json` entry (`publishesPoll: true`, repeatable,
-    ~weight 18 among the ambient pool — averages out to a release every few in-game days) is the
+    ~weight 8 among the ambient pool — averages out to a release roughly every 1–2 weeks) is the
     only thing that drains that buffer: when it fires, `sim/poll.ts`'s `nextPollingSnapshot` folds
     every queued impact together with the trend between the *previous two* releases (so a move has
     momentum rather than each release starting from scratch), caps the combined swing to whichever
     is larger of a small absolute floor or a fraction of the party's own current standing (so a
     fringe party on ~1% can't double in one release, and a major party can't swing double digits
     without a long run of releases pushing the same way), rounds to 1 decimal place, sets it as the
-    live `polling`, and appends it to `pollingHistory` — then the buffer is cleared.
+    live `polling`, and appends it to `pollingHistory` — then the buffer is cleared. Background
+    drift (alignment + seeded variance, which exist even with no events at all) is converted to
+    points at a much smaller rate than real event/action impacts, so a release with nothing behind
+    it barely moves anyone — credible swings need an actual event or run of events to explain them.
 
 ---
 

@@ -198,14 +198,14 @@ describe('nextPollingSnapshot', () => {
     expect(a).toEqual(b)
   })
 
-  it('moves a party by a believable handful of points for a major event, not a landslide', () => {
+  it('moves a party by a believable point or two for a major event, not a landslide', () => {
     const history = [{ date: '2025-01-01', polling: { labour: 25, conservative: 25 } }]
     const next = nextPollingSnapshot(parties, history, '2025-01-05', {
       ...isolated,
       extraImpacts: [{ partyId: 'labour', magnitude: 0.25, source: 'major-event' }],
     })
     expect(next.labour).toBeGreaterThan(25)
-    expect(next.labour - 25).toBeLessThan(5)
+    expect(next.labour - 25).toBeLessThan(2.5)
   })
 
   it('rounds every party to 1 decimal place', () => {
@@ -252,6 +252,16 @@ describe('nextPollingSnapshot', () => {
     ]
     const next = nextPollingSnapshot(parties, history, '2025-01-05', isolated)
     expect(next.labour).toBeGreaterThan(27)
+  })
+
+  it('barely moves anyone when no events have fired and there is no prior trend (background drift only)', () => {
+    const before: Record<string, number> = { labour: 28, conservative: 24, reform_uk: 22, green: 8 }
+    const history = [{ date: '2025-01-01', polling: before }]
+    const realParties = [makeParty('labour'), makeParty('conservative'), makeParty('reform_uk'), makeParty('green')]
+    const next = nextPollingSnapshot(realParties, history, '2025-01-05', {})
+    for (const partyId of Object.keys(before)) {
+      expect(Math.abs(next[partyId] - before[partyId])).toBeLessThan(0.5)
+    }
   })
 })
 

@@ -202,10 +202,13 @@ export interface NextPollingSnapshotOptions {
   extraImpacts?: PollingImpact[]
   varianceMagnitude?: number
   alignment?: AlignmentOptions
-  /** How many points a net impact magnitude of ±1 is worth in one poll release — the
-   * per-release analogue of `ApplyPollingImpactsOptions.maxPointsPerDay`, just larger, since a
-   * release covers several days of accumulated impacts at once. */
+  /** How many points a net *event/action* impact magnitude of ±1 is worth in one poll release. */
   maxPointsPerRelease?: number
+  /** How many points a net *background* (alignment + variance — present every release, even with
+   * no events at all) magnitude of ±1 is worth — deliberately much smaller than
+   * `maxPointsPerRelease`, since with nothing else happening a party's standing should barely
+   * move: alignment drift is a slow structural pull, not news. */
+  backgroundPointsPerRelease?: number
   /** How much of the *previous* release's point-change keeps carrying forward (momentum/trend) —
    * 0 = no memory of trend, 1 = fully repeats last time's move on top of this release's impacts. */
   momentum?: number
@@ -220,13 +223,16 @@ export interface NextPollingSnapshotOptions {
 
 /**
  * One poll release's update (spec §10.5 polling cadence): unlike `tickPolling` (a per-day nudge),
- * this is called only when a "publishesPoll" event fires (`sim/events.ts`), and folds in everything
- * that's happened since the *previous* release — alignment drift, seeded variance, and every
- * accumulated event/action impact — blended with the trend between the last two releases (so a
- * move keeps some momentum rather than each release starting from a blank slate), then caps the
- * combined swing relative to each party's own size so headline numbers stay credible: a fringe
- * party on ~1% can't double in one release, and a major party can't swing double digits without
- * a long run of release-after-release impacts in the same direction. Rounded to 1 decimal place.
+ * this is called only when a "publishesPoll" event fires (`sim/events.ts`), and folds in
+ * everything that's happened since the *previous* release. Event/action impacts (`extraImpacts`)
+ * and ambient background drift (alignment + seeded variance) are converted to points separately —
+ * background drift uses a much smaller factor, so a release with *no* events behind it barely
+ * moves anyone, while a real event/action still lands with its intended weight. The result is
+ * blended with the trend between the last two releases (so a move keeps some momentum rather than
+ * each release starting from a blank slate), then capped relative to each party's own size so
+ * headline numbers stay credible: a fringe party on ~1% can't double in one release, and a major
+ * party can't swing double digits without a long run of releases pushing the same way. Rounded to
+ * 1 decimal place.
  */
 export function nextPollingSnapshot(
   parties: Party[],
@@ -234,30 +240,35 @@ export function nextPollingSnapshot(
   date: ISODate,
   opts: NextPollingSnapshotOptions = {},
 ): Record<PartyId, number> {
-  const maxPointsPerRelease = opts.maxPointsPerRelease ?? 8
-  const momentum = opts.momentum ?? 0.3
-  const relativeCap = opts.relativeCap ?? 0.12
-  const minCap = opts.minCap ?? 0.3
+  const maxPointsPerRelease = opts.maxPointsPerRelease ?? 4
+  const backgroundPointsPerRelease = opts.backgroundPointsPerRelease ?? 1
+  const momentum = opts.momentum ?? 0.15
+  const relativeCap = opts.relativeCap ?? 0.06
+  const minCap = opts.minCap ?? 0.15
   const minPoint = opts.minPoint ?? 0.1
 
   const current = history[history.length - 1]?.polling ?? {}
   const previous = history[history.length - 2]?.polling
 
-  const impacts = [
+  const backgroundImpacts = [
     ...computeAlignmentImpacts(parties, current, opts.alignment),
     ...computeVarianceImpacts(Object.keys(current), date, opts.varianceMagnitude),
-    ...(opts.extraImpacts ?? []),
   ]
-  const netMagnitude: Record<PartyId, number> = {}
-  for (const impact of impacts) {
-    netMagnitude[impact.partyId] = (netMagnitude[impact.partyId] ?? 0) + impact.magnitude
+  const netBackground: Record<PartyId, number> = {}
+  for (const impact of backgroundImpacts) {
+    netBackground[impact.partyId] = (netBackground[impact.partyId] ?? 0) + impact.magnitude
+  }
+  const netExtra: Record<PartyId, number> = {}
+  for (const impact of opts.extraImpacts ?? []) {
+    netExtra[impact.partyId] = (netExtra[impact.partyId] ?? 0) + impact.magnitude
   }
 
   const originalTotal = Object.values(current).reduce((sum, value) => sum + value, 0)
   const next: Record<PartyId, number> = { ...current }
   for (const partyId of Object.keys(current)) {
     const trend = previous ? (current[partyId] ?? 0) - (previous[partyId] ?? 0) : 0
-    const impactDelta = (netMagnitude[partyId] ?? 0) * maxPointsPerRelease
+    const impactDelta =
+      (netExtra[partyId] ?? 0) * maxPointsPerRelease + (netBackground[partyId] ?? 0) * backgroundPointsPerRelease
     const combinedDelta = impactDelta + momentum * trend
     const cap = Math.max(minCap, (current[partyId] ?? 0) * relativeCap)
     const cappedDelta = Math.max(-cap, Math.min(cap, combinedDelta))

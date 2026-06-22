@@ -91,7 +91,7 @@
     "body": "The latest voting-intention poll lands, folding in everything that's happened since the last one.",
     "scope": "national",
     "severity": "minor",
-    "weight": 18,
+    "weight": 8,
     "once": false,
     "publishesPoll": true,
     "effects": {
