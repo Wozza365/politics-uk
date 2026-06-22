@@ -3,6 +3,19 @@ import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useGameClock } from './useGameClock'
 import { useGameStore } from '@/stores/game'
+import type { GameEvent } from '@/types'
+
+/** Minimal valid action event for tests that just need *something* pause-worthy in the queue. */
+function makePendingEvent(): GameEvent {
+  return {
+    id: 'evt-1',
+    headline: 'Test event',
+    scope: 'national',
+    severity: 'minor',
+    weight: 1,
+    actions: [{ id: 'choice', label: 'Respond' }],
+  }
+}
 
 describe('useGameClock', () => {
   beforeEach(() => {
@@ -73,7 +86,7 @@ describe('useGameClock', () => {
     const scope = effectScope()
     scope.run(() => useGameClock())
 
-    game.pendingEvents.push({ id: 'evt-1' })
+    game.pendingEvents.push(makePendingEvent())
     expect(game.clock.running).toBe(false)
 
     vi.advanceTimersByTime(game.clock.msPerDay * 3)
@@ -89,7 +102,9 @@ describe('useGameClock', () => {
     const scope = effectScope()
     scope.run(() => useGameClock())
 
-    game.pendingEvents.push({ id: 'evt-1' })
+    const event = makePendingEvent()
+    game.pendingEvents.push(event)
+    game.feed.push({ id: event.id, date: game.date, headline: event.headline, status: 'unactioned', actions: event.actions })
     game.resolvePendingEvent('choice')
     expect(game.clock.running).toBe(true)
 

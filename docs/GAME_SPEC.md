@@ -432,9 +432,27 @@ The simulation heartbeat.
   - the **game clock pauses**,
   - the relevant UI area is **highlighted**,
   - the player's choice is recorded into the feed under the event.
-- **Authoring:** events need a data-driven format (triggers, conditions, weighted outcomes, effects
-  on polling/finance/membership/seats). A large library of both real and fictional events will be
-  built over time. _Format TBD — see [§13](#13-open-questions)._
+- **Authoring:** events are data-driven (`GameEvent`, `src/types/event.ts`). Minimum shape: `id`,
+  `headline`, `body?`, `scope` (`local|regional|national|international`), `severity`
+  (`minor|moderate|major`), `weight` (relative likelihood among *eligible* events on a day — the
+  roll also weighs a "nothing happens" outcome, so most days are quiet), optional `window` (`from`/
+  `to` ISO dates bounding when it can roll — e.g. a by-election can't fire in the run-up to a GE; a
+  World Cup win is bound to the tournament's dates), `once` (default `true` — fired/resolved events
+  drop out of the pool), `effects` (`polling` deltas — which can target a fixed party, `'player'`,
+  or `'incumbent'` — plus `salienceShift` and a feed `summary`), and optional `actions` (each with
+  its own `effects`) for player-decision events, which pause the clock until resolved. A recurring
+  real-world event (an annual honours list, a seasonal storm) is authored as several `GameEvent`s
+  with different `id`s/windows, not repeat logic on one event.
+  - **Callbacks (escape hatch).** Some logic can't be flat data because it depends on *current*
+    game state rather than anything knowable when the event was authored — e.g. "boost whoever
+    currently governs" can't be a fixed `partyId`. `GameEvent.callbackId` / `GameEventAction.
+    callbackId` key into a small registry (`src/sim/eventCallbacks.ts`) of functions that get a
+    narrow, store-agnostic context (current date, selected party, seat counts, and setters for
+    polling/salience) instead. Most events need none.
+  - **Pools.** `src/data/scenarios/<id>/events.seed.json` holds always-eligible ambient/minor
+    events; `events.scripted.json` holds the date-windowed, more dramatic ones (by-elections,
+    a World Cup win, a war breaking out…) — kept separate so each can grow independently as the
+    event library expands (Phase 2+).
 
 ---
 

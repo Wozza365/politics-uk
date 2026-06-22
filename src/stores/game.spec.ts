@@ -1,12 +1,26 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useGameStore } from './game'
-import type { FeedEntry } from '@/types'
+import type { FeedEntry, GameEvent } from '@/types'
 
 describe('useGameStore.resolveFeedAction', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
   })
+
+  function pendingEvent(): GameEvent {
+    return {
+      id: 'evt-1',
+      headline: 'A by-election is called',
+      scope: 'regional',
+      severity: 'moderate',
+      weight: 1,
+      actions: [
+        { id: 'campaign', label: 'Campaign hard', effects: { summary: 'A strong showing.' } },
+        { id: 'ignore', label: 'Leave it to the local party' },
+      ],
+    }
+  }
 
   function unactionedEntry(): FeedEntry {
     return {
@@ -21,8 +35,9 @@ describe('useGameStore.resolveFeedAction', () => {
     }
   }
 
-  it('marks the entry actioned and records the chosen action + a placeholder effect', () => {
+  it('marks the entry actioned and records the chosen action + its effect', () => {
     const game = useGameStore()
+    game.pendingEvents.push(pendingEvent())
     game.feed.push(unactionedEntry())
 
     game.resolveFeedAction('evt-1', 'campaign')
@@ -45,6 +60,7 @@ describe('useGameStore.resolveFeedAction', () => {
 
   it('does nothing for an unknown action id', () => {
     const game = useGameStore()
+    game.pendingEvents.push(pendingEvent())
     game.feed.push(unactionedEntry())
 
     game.resolveFeedAction('evt-1', 'does-not-exist')
@@ -54,6 +70,7 @@ describe('useGameStore.resolveFeedAction', () => {
 
   it('is a no-op on an already-actioned entry', () => {
     const game = useGameStore()
+    game.pendingEvents.push(pendingEvent())
     const entry = unactionedEntry()
     entry.status = 'actioned'
     entry.actionTaken = 'Already resolved'

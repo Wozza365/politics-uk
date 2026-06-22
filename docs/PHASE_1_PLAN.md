@@ -146,38 +146,36 @@ disabled items are visibly inactive and non-interactive.
 ### P1.11 — Simulation engine (MVP) `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p111--simulation-engine-mvp-).
 
-### P1.12 — Event system (MVP) `🔲`
+### P1.12 — Event system (MVP) `✅ DONE`
 **Goal.** Spec §10 + §9.5: a daily event roll from a weighted pool; some events require a player
 decision (which pauses the clock and is recorded to the feed). MVP = a handful of seeded events,
 with and without actions.
 
-**Depends on:** P1.1, P1.11 (effects feed the engine), P1.8 (feed), P1.9 (clock pause).
-
-#### P1.12.1 — Event data format
-**Steps:** Design and document a data-driven event schema (this is spec §13's open "event
-schema" item — propose, then confirm). Minimum fields: `id`, `headline`, `body?`, `scope`
-(`local|regional|national|international`), `weight`, optional `triggers`/`conditions`, `effects`
-(deltas to axis positions/salience/finance/membership/seats), and optional `actions: [{ id,
-label, effects }]` for player-decision events. Put the schema in `src/types/event.ts` and a short
-note in `GAME_SPEC.md` §10 (replace "Format TBD").
-**Acceptance:** `GameEvent` type compiles; schema documented; a couple of seeded events authored
-in `src/data/scenarios/uk-2025-01-01/events.seed.json`.
-
-#### P1.12.2 — Event roll + dispatch
-**Steps:** In `src/sim/events.ts`: on `tickDay()`, roll from the weighted pool (deterministic
-seeded RNG so runs are reproducible). Mix **real/historical** seeds (so early play tracks
-reality) with **fictional/procedural** ones (spec §10). Apply non-action event effects
-immediately via the engine; for action events, set `game.pendingEvent`, **pause the clock**, and
-highlight the relevant UI area (spec §10 / §9.5).
-**Acceptance:** Ticking generates feed entries; most events have little/no effect, some move
-numbers; action events pause the clock until resolved.
-
-#### P1.12.3 — Action resolution
-**Steps:** A modal/inline prompt renders `pendingEvent.actions`; choosing one applies its
-effects through the engine, records the choice under the event in the feed (spec §9.4), clears
-`pendingEvent`, and resumes the clock.
-**Acceptance:** Player choice applies effects, appears in the feed beneath the headline, and the
-clock resumes.
+**What shipped:**
+- `src/types/event.ts` — the `GameEvent` schema (id, headline, body?, scope, severity, weight,
+  optional date `window`, `once`, `effects` (polling deltas targeting a fixed party / `'player'` /
+  `'incumbent'`, plus `salienceShift` + a feed `summary`), optional `actions` (each with its own
+  `effects`), and an optional `callbackId` escape hatch — documented in `GAME_SPEC.md` §10.
+- `src/sim/events.ts` — `rollEventForDay()`: deterministic (seeded, not `Math.random`) daily roll
+  weighted against a "nothing happens" outcome, filtered to events whose `window` covers the
+  current date and that haven't already fired; `resolvePollingEffects()` resolves `'player'`/
+  `'incumbent'` to concrete party ids.
+- `src/sim/eventCallbacks.ts` — a small registry for event/action logic that depends on *current*
+  game state (e.g. "boost whoever currently governs") rather than anything a flat data effect can
+  express.
+- `src/data/scenarios/uk-2025-01-01/events.seed.json` — always-eligible ambient/minor events
+  (a tweet row, local flooding, viral clips…).
+- `src/data/scenarios/uk-2025-01-01/events.scripted.json` — date-windowed, more dramatic events: a
+  by-election (bounded away from the GE date), England winning the 2026 World Cup (bank holiday,
+  via callback), Trump declaring war on Iran (bounded to the start of his term), recurring annual/
+  seasonal events (New Year Honours, summer wildfire warnings, winter storms, a local football
+  promotion party) each authored per-year with its own window.
+- `src/stores/game.ts` — `tickDay()` rolls the event, applies non-action effects immediately or
+  queues an action event + pauses the clock; `resolveFeedAction()` applies the chosen action's
+  effects through the engine, runs its callback if any, records the result in the feed, and
+  resumes the clock once no events remain.
+**Acceptance:** ✅ Ticking generates feed entries; most days have no event; some move polling/
+salience; action events pause the clock until resolved via the feed's choice buttons.
 
 ### P1.13 — End-to-end loop wire-up `🔲`
 **Goal.** A coherent playable slice: pick a party → load → play days → events fire → polling

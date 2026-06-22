@@ -34,3 +34,9 @@ export function seededVariance(key: string, magnitude = 1): number {
   const next = mulberry32(hashSeed(key))
   return (next() * 2 - 1) * magnitude
 }
+
+/** A deterministic value in `[0, 1)`, derived purely from `key` — the building block for seeded
+ * weighted picks (e.g. the daily event roll in `sim/events.ts`). */
+export function seededUniform(key: string): number {
+  return mulberry32(hashSeed(key))()
+}
