@@ -9,12 +9,19 @@ import GameClock from '@/components/GameClock.vue'
 <template>
   <main class="relative h-screen w-screen overflow-hidden bg-zinc-900 text-zinc-100">
     <section
-      class="absolute left-4 top-4 bottom-4 z-20 w-80 max-w-[calc(100vw-2rem)]"
+      class="absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
       aria-label="Event feed"
     >
-      <slot name="event-feed">
-        <EventFeed />
-      </slot>
+      <header class="border-b border-zinc-800/80 px-4 py-3">
+        <p class="text-sm font-semibold tracking-wide text-zinc-100">Event feed</p>
+        <p class="text-xs text-zinc-400">Chronological log</p>
+      </header>
+
+      <div class="min-h-0 flex-1 px-4 py-4 text-sm">
+        <slot name="event-feed">
+          <EventFeed />
+        </slot>
+      </div>
     </section>
 
     <PartyPanel />

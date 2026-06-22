@@ -394,7 +394,8 @@ Opening this (or any) menu **pauses the game clock** (see [§9.5](#95-game-clock
 Levers are stubbed at MVP; the collapsed panel ships first.
 
 ### 9.4 Event feed (left) _(MVP)_
-- A **text-style feed**, no panel/background behind it (sits directly on the backdrop).
+- A scrollable panel matching the other HUD panels (rounded border, dark backdrop-blurred
+  background, header), sitting top-left.
 - Each entry: **event headline in bold**, the **action taken below it** (if any), and a **simple
   date**. Newest at top (assumed — confirm ordering).
 - Populated as the clock ticks and events fire.

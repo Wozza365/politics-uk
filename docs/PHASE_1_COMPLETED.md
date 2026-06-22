@@ -171,16 +171,17 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
   action's label as `actionTaken` plus a placeholder `effect`, and clears `actions`. This is the
   **player's main lever on the game loop** — resolving an unactioned event is how a decision gets
   made; covered by `src/stores/game.spec.ts`.
-- `src/components/EventFeed.vue`: renders `game.feed` directly on the backdrop, no container
-  chrome (spec §9.4) — bold headline, then either the action-taken + effect text (`actioned`) or a
-  row of small buttons per `entry.actions` (`unactioned`) that call `resolveFeedAction` on click,
-  then the date. Newest entry appended at the bottom; auto-scrolls to it as it appears.
-- `GameScreen.vue`'s event-feed region dropped its panel chrome (border/background/header) to
-  match — `EventFeed` owns its own (lack of) styling per spec.
+- `src/components/EventFeed.vue`: renders `game.feed` as scrollable content only (no panel chrome
+  of its own) — bold headline, then either the action-taken + effect text (`actioned`) or a row of
+  small buttons per `entry.actions` (`unactioned`) that call `resolveFeedAction` on click, then the
+  date. Newest entry appended at the bottom; auto-scrolls to it as it appears.
+- `GameScreen.vue`'s event-feed region keeps the panel chrome (border/background/header) shared
+  with the other HUD panels (spec §9.4, revised) — `EventFeed` is mounted inside it as the
+  scrollable body, same split as `GameClock`/`HemicycleView`.
 - Verified manually in a running dev server (Playwright-driven Chromium): seeded one actioned and
   one unactioned entry into the store, confirmed the unactioned entry's buttons render, clicking
-  one flips it to actioned with the recorded label and placeholder effect text, and the feed has
-  no panel background.
+  one flips it to actioned with the recorded label and placeholder effect text, and the feed
+  renders inside the bordered/backdrop-blurred panel.
 
 ## P1.9 — Game clock + GE countdown ✅
 
