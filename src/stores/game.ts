@@ -25,8 +25,9 @@ export const useGameStore = defineStore('game', {
     polling: {} as Record<PartyId, number>,
     pollingHistory: [] as Array<{ date: ISODate; polling: Record<PartyId, number> }>,
     feed: [] as FeedEntry[],
-    // No GameEvent type yet (that's P1.12's job) — typed loosely for now.
-    pendingEvent: null as unknown | null,
+    // No GameEvent type yet (that's P1.12's job) — typed loosely for now. An array so
+    // multiple action-required events can queue up; the clock stays paused while any remain.
+    pendingEvents: [] as unknown[],
   }),
   getters: {
     selectedParty(state) {
@@ -101,10 +102,12 @@ export const useGameStore = defineStore('game', {
     },
     resolvePendingEvent(_choiceId: string) {
       // MVP scope: full effect-application (modifying polling/finances/etc. based on
-      // the chosen option) arrives with P1.12's GameEvent system. For now we just
-      // clear the pending event and let the clock resume.
-      this.pendingEvent = null
-      this.resumeClock()
+      // the chosen option) arrives with P1.12's GameEvent system. For now we just clear
+      // the resolved event and resume once none remain.
+      this.pendingEvents.shift()
+      if (this.pendingEvents.length === 0) {
+        this.resumeClock()
+      }
     },
   },
 })

@@ -3,6 +3,7 @@ import MapView from '@/components/MapView.vue'
 import PartyPanel from '@/components/PartyPanel.vue'
 import HemicycleView from '@/components/HemicycleView.vue'
 import EventFeed from '@/components/EventFeed.vue'
+import GameClock from '@/components/GameClock.vue'
 </script>
 
 <template>
@@ -19,14 +20,11 @@ import EventFeed from '@/components/EventFeed.vue'
     <PartyPanel />
 
     <section
-      class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-right text-sm shadow-2xl backdrop-blur-sm"
+      class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
       aria-label="Game clock and election countdown"
     >
       <slot name="clock">
-        <div class="px-4 py-3">
-          <p class="font-semibold text-zinc-100">1 January 2025</p>
-          <p class="text-zinc-400">General Election countdown</p>
-        </div>
+        <GameClock />
       </slot>
     </section>
 

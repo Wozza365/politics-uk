@@ -181,3 +181,35 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
   one unactioned entry into the store, confirmed the unactioned entry's buttons render, clicking
   one flips it to actioned with the recorded label and placeholder effect text, and the feed has
   no panel background.
+
+## P1.9 — Game clock + GE countdown ✅
+
+- `src/stores/game.ts`: `pendingEvent: unknown | null` became `pendingEvents: unknown[]` — an
+  array so multiple action-required events can queue up; the clock stays paused while any remain.
+  `resolvePendingEvent(choiceId)` now shifts the resolved event off the front and only resumes the
+  clock once the array is empty.
+- `src/composables/useGameClock.ts`: drives `game.tickDay()` with a single drift-correcting
+  `setTimeout` chain (tracks remaining time to the next tick rather than naïvely re-arming a fixed
+  interval, so a pause doesn't lose or double-count progress towards the next day). Watches
+  `game.clock.running` to start/stop the timer, and watches `game.pendingEvents.length > 0` to
+  auto-call `pauseClock()` the moment an action-required event appears — `resolvePendingEvent`
+  already resumes on the way out, so the same pause path covers the future menu-open case (Phase
+  2) for free. Cleans up via `onScopeDispose` (works both for component unmount and for the
+  `effectScope`-based unit tests in `useGameClock.spec.ts`, which cover ticking, pause/resume,
+  remaining-time carry-over across a pause, auto-pause on a pending event, resume on resolution,
+  and timer cleanup on dispose).
+- `src/components/GameClock.vue`: shows the simulated date and `daysUntilElection` countdown.
+  Mounts `useGameClock()` and kicks the clock off via `resumeClock()` on mount (nothing else
+  started it before this), unless an event is already pending. The whole block is a `disabled`
+  button with an `aria-label` describing future by-election interactivity — the stub affordance
+  the plan calls for.
+- **Clock icon**: a plain circle, no hands/numbers/markers. Fill is a `conic-gradient` driven by
+  a registered custom property (`@property --clock-fill`) animated through a linear
+  `@keyframes` triangle wave (0 → 1 over day one, 1 → 0 over day two, repeating every
+  `2 × msPerDay`) — filled portion is the player's party colour, the rest is `transparent`.
+  `animation-play-state` is bound to `game.clock.running`, so the fill freezes exactly where it is
+  when the clock pauses and continues from there on resume, with no JS-driven animation loop
+  needed.
+- Verified manually in a running dev server (Playwright-driven Chromium): screenshotted the icon
+  filling clockwise across day one, ticking over to day two and unfilling, and confirmed pushing a
+  fake entry onto `game.pendingEvents` froze both the date and the icon's fill until cleared.

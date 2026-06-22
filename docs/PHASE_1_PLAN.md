@@ -9,7 +9,7 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. Phase 1 is **in progress**; P1.0–P1.7 are done — see
+> how. Phase 1 is **in progress**; P1.0–P1.9 are done — see
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
 > how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
@@ -126,24 +126,8 @@ See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p17--top-centre-party-panel-
 ### P1.8 — Event feed `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p18--event-feed-).
 
-### P1.9 — Game clock + GE countdown `🔲`
-**Goal.** Spec §9.5: visible simulated date, auto-advances **one day per ~15s**, GE countdown,
-pauses on action-events (and later on open menus).
-
-**Depends on:** P1.1.
-
-**Steps:**
-1. Create `src/composables/useGameClock.ts`: drives `game.tickDay()` on an interval of
-   `game.clock.msPerDay` while `game.clock.running`. Use a single timer; clean up on unmount.
-   Prefer a drift-correcting timer (compare timestamps) over naïve `setInterval`.
-2. Create `src/components/GameClock.vue`: show the current simulated date and a **countdown to
-   the next General Election** (`daysUntilElection` getter). The clock UI is an interactive
-   element later (by-elections list) — leave a stub affordance.
-3. **Pause/resume rules** (spec §9.5): pause when an action-required event is pending
-   (`game.pendingEvent != null`); resume on resolution. (Menu-open pause is Phase 2 but wire the
-   same pause path so it's trivial to extend.)
-**Acceptance:** Date advances ~1 day/15s, pauses when an action event fires and resumes when
-resolved, GE countdown decrements; timer cleaned up on unmount (no leaks/double-timers).
+### P1.9 — Game clock + GE countdown `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p19--game-clock--ge-countdown-).
 
 ### P1.10 — View-switcher shell `🔲`
 **Goal.** Spec §9.6: bottom-centre nav bar to switch map/hemicycle views; **only Westminster
