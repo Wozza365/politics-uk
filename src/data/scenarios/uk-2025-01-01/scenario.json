@@ -4120,7 +4120,7 @@
           {
             "regionId": "E14001130",
             "party": "green",
-            "memberName": "Si\u00e2n Berry",
+            "memberName": "Siân Berry",
             "majority": 14290,
             "electedAt": "2024-07-04",
             "turnout": 52363,
@@ -11978,7 +11978,7 @@
           {
             "regionId": "E14001258",
             "party": "liberal_democrat",
-            "memberName": "Z\u00f6e Franklin",
+            "memberName": "Zöe Franklin",
             "majority": 8429,
             "electedAt": "2024-07-04",
             "turnout": 48294,
@@ -33838,7 +33838,7 @@
           {
             "regionId": "N05000011",
             "party": "sinn_fein",
-            "memberName": "D\u00e1ire Hughes",
+            "memberName": "Dáire Hughes",
             "majority": 15493,
             "electedAt": "2024-07-04",
             "turnout": 45942,
@@ -34302,7 +34302,7 @@
           {
             "regionId": "N05000018",
             "party": "sinn_fein",
-            "memberName": "\u00d3rfhlaith Begley",
+            "memberName": "Órfhlaith Begley",
             "majority": 15917,
             "electedAt": "2024-07-04",
             "turnout": 43695,
@@ -39398,7 +39398,7 @@
       {
         "id": "W07000102",
         "tier": "commons",
-        "name": "Montgomeryshire and Glynd\u0175r",
+        "name": "Montgomeryshire and Glyndŵr",
         "geometryRef": "W07000102",
         "seats": [
           {
@@ -40030,7 +40030,7 @@
       {
         "id": "W07000112",
         "tier": "commons",
-        "name": "Ynys M\u00f4n",
+        "name": "Ynys Môn",
         "geometryRef": "W07000112",
         "seats": [
           {
@@ -40138,7 +40138,7 @@
         "economy_tax": {
           "position": {
             "economic": -0.15,
-            "social": 0.0
+            "social": 0
           },
           "consistency": 0.55,
           "salience": 0.85,
@@ -40147,7 +40147,7 @@
         "public_spending": {
           "position": {
             "economic": -0.3,
-            "social": 0.0
+            "social": 0
           },
           "consistency": 0.6,
           "salience": 0.7,
@@ -40278,7 +40278,7 @@
         "public_spending": {
           "position": {
             "economic": 0.45,
-            "social": 0.0
+            "social": 0
           },
           "consistency": 0.55,
           "salience": 0.7,
@@ -41124,7 +41124,7 @@
     },
     {
       "id": "sinn_fein",
-      "name": "Sinn F\u00e9in",
+      "name": "Sinn Féin",
       "shortName": "SF",
       "colours": {
         "primary": "#326760",
