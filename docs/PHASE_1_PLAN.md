@@ -9,7 +9,7 @@
 >
 > Phase 0 (Foundations) is **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) for what was built and
-> how. Phase 1 is **in progress**; P1.0–P1.9 are done — see
+> how. Phase 1 is **in progress**; P1.0–P1.10 are done — see
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and
 > how. Both are kept in separate files so this document only carries
 > still-relevant, forward-looking work.
@@ -79,6 +79,7 @@ Phase 1 progress so far (see [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) fo
 | Start menu (P1.2) | `src/screens/StartScreen.vue`, `src/components/{PartyCard,DifficultyBadge,CompassView}.vue`, `src/sim/difficulty.ts` | ✅ Timeline stub, party cards, difficulty banding, compass view, Start button |
 | Loading screen (P1.3) | `src/screens/LoadingScreen.vue` | ✅ |
 | Westminster map (P1.4, P1.5) | `src/screens/GameScreen.vue`, `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts` | ✅ Game-screen layout built; map zoom/pan/focus integrated into its centre slot |
+| View switcher (P1.10) | `src/components/ViewSwitcher.vue`, `src/stores/ui.ts` | ✅ Bottom-centre nav bar; only Westminster selectable, rest disabled/upcoming |
 | Testing | `vitest`, `src/sim/difficulty.spec.ts`, `src/components/compassMath.spec.ts` | ✅ `npm run test` wired (cross-cutting concern, started early per §3) |
 | Simulation engine (P1.11) | `src/sim/{policies,segments,poll,rng}.ts`, `src/data/sim/{policies,segments}.json` | ✅ Deterministic spatial/issue-salience polling model + generic `-1..+1` impact contract wired into `game.tickDay()` |
 
@@ -130,18 +131,8 @@ See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p18--event-feed-).
 ### P1.9 — Game clock + GE countdown `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p19--game-clock--ge-countdown-).
 
-### P1.10 — View-switcher shell `🔲`
-**Goal.** Spec §9.6: bottom-centre nav bar to switch map/hemicycle views; **only Westminster
-active** at MVP, others shown as upcoming/disabled.
-
-**Depends on:** P1.4.
-
-**Steps:** Create `src/components/ViewSwitcher.vue` with a tab/nav bar listing views
-(Westminster, Holyrood, Senedd, NI, London, Councils…). Westminster active; the rest rendered
-**disabled** with an "coming soon" affordance. Selecting a view sets `ui.activeView` (add to the
-UI store); MVP only reacts to Westminster.
-**Acceptance:** Bar shows all views with only Westminster selectable; selection state stored;
-disabled items are visibly inactive and non-interactive.
+### P1.10 — View-switcher shell `✅ DONE`
+See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p110--view-switcher-shell-).
 
 ### P1.11 — Simulation engine (MVP) `✅ DONE`
 See [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p111--simulation-engine-mvp-).

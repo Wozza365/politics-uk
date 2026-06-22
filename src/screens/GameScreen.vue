@@ -4,6 +4,7 @@ import PartyPanel from '@/components/PartyPanel.vue'
 import HemicycleView from '@/components/HemicycleView.vue'
 import EventFeed from '@/components/EventFeed.vue'
 import GameClock from '@/components/GameClock.vue'
+import ViewSwitcher from '@/components/ViewSwitcher.vue'
 </script>
 
 <template>
@@ -60,12 +61,7 @@ import GameClock from '@/components/GameClock.vue'
       aria-label="View switcher"
     >
       <slot name="view-switcher">
-        <div class="flex items-center justify-center gap-2 px-3 py-3 text-sm">
-          <button type="button" class="rounded-xl bg-zinc-100 px-3 py-1 text-zinc-900">Westminster</button>
-          <button type="button" class="rounded-xl px-3 py-1 text-zinc-400" disabled>Holyrood</button>
-          <button type="button" class="rounded-xl px-3 py-1 text-zinc-400" disabled>Senedd</button>
-          <button type="button" class="rounded-xl px-3 py-1 text-zinc-400" disabled>Councils</button>
-        </div>
+        <ViewSwitcher />
       </slot>
     </nav>
   </main>

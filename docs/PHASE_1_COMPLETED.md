@@ -215,6 +215,20 @@ Commit `150b213` (initial build), refined in `e30fa1d` (metrics/history).
   filling clockwise across day one, ticking over to day two and unfilling, and confirmed pushing a
   fake entry onto `game.pendingEvents` froze both the date and the icon's fill until cleared.
 
+## P1.10 — View-switcher shell ✅
+
+- `src/stores/ui.ts`: added `GameView` (`'westminster' | 'holyrood' | 'senedd' | 'ni-assembly' |
+  'london' | 'councils'`), `activeView` state (defaults to `'westminster'`), and
+  `setActiveView(view)`.
+- `src/components/ViewSwitcher.vue`: a `role="tablist"` nav bar listing all six views. Only
+  Westminster is `available`; the rest render `disabled`, dimmed, with a "coming soon" `title`,
+  and don't call `setActiveView` on click. The active view gets the inverted (light-on-dark)
+  selected style, matching the other HUD chrome.
+- `src/screens/GameScreen.vue`'s `view-switcher` slot now defaults to `<ViewSwitcher />` instead
+  of the inline static button row that was standing in for it since P1.4.
+- MVP only ever reacts to Westminster (the only view that exists), per spec §9.6 — the other five
+  are stubs for Phase 2+ devolved/council views.
+
 ## P1.11 — Simulation engine (MVP) ✅
 
 - `src/sim/policies.ts` + `src/data/sim/policies.json`: the **policy registry** (spec §4.4) — 10
