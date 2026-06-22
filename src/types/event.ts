@@ -70,6 +70,11 @@ export interface GameEvent {
   /** Same escape hatch as `GameEventAction.callbackId`, but for non-action events — runs
    * immediately when the event fires, since there's no action to attach it to. */
   callbackId?: string
+  /** Marks this as a poll-publishing event: firing it triggers a full polling recalculation
+   * (trend + every impact accumulated since the last poll), sets `polling` to the result, and
+   * appends that result to `pollingHistory` — see `sim/poll.ts`'s `nextPollingSnapshot`. Replaces
+   * the old "recalculate every day" cadence with "recalculate whenever a poll is published". */
+  publishesPoll?: boolean
 }
 
 /** What an event callback (`sim/eventCallbacks.ts`) is handed to do its work. Deliberately a

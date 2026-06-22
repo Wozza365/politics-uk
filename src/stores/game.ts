@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import type { EventCallbackContext, FeedEntry, GameEvent, ISODate, PartyId } from '@/types'
+import type { EventCallbackContext, FeedEntry, GameEvent, ISODate, PartyId, PollingSnapshot } from '@/types'
 import { useScenarioStore } from './scenario'
-import { applyPollingImpacts, tickPolling, type PollingImpact } from '@/sim/poll'
+import { nextPollingSnapshot, type PollingImpact } from '@/sim/poll'
 import { resolvePollingEffects, rollEventForDay } from '@/sim/events'
 import { runEventCallback } from '@/sim/eventCallbacks'
 import { WORLD_SALIENCE } from '@/sim/policies'
@@ -21,13 +21,35 @@ function daysBetween(from: ISODate, to: ISODate): number {
   return Math.round((toMs - fromMs) / msPerDay)
 }
 
+/** Feed text for a poll release, e.g. "Latest poll: Lab 27.4% (+1.2), Con 24.1% (-0.6)." */
+function describePollMovement(
+  previous: Record<PartyId, number>,
+  next: Record<PartyId, number>,
+  scenario: ReturnType<typeof useScenarioStore>,
+): string {
+  const parts = Object.entries(next)
+    .sort((a, b) => b[1] - a[1])
+    .map(([partyId, value]) => {
+      const delta = value - (previous[partyId] ?? 0)
+      const sign = delta > 0 ? '+' : ''
+      const name = scenario.party(partyId)?.shortName ?? partyId
+      return `${name} ${value.toFixed(1)}% (${sign}${delta.toFixed(1)})`
+    })
+  return `Latest poll: ${parts.join(', ')}.`
+}
+
 export const useGameStore = defineStore('game', {
   state: () => ({
     selectedPartyId: null as PartyId | null,
     date: '' as ISODate,
     clock: { running: false, msPerDay: 15000 },
     polling: {} as Record<PartyId, number>,
-    pollingHistory: [] as Array<{ date: ISODate; polling: Record<PartyId, number> }>,
+    pollingHistory: [] as PollingSnapshot[],
+    // Polling impacts (from events, action choices, callbacks) accumulated since the last
+    // published poll — folded in all at once by `publishPoll`, not applied immediately, so a
+    // poll release can weigh a run of small events against each other rather than each one
+    // moving the headline number on its own (see `sim/poll.ts`'s `nextPollingSnapshot`).
+    pendingPollImpacts: [] as PollingImpact[],
     feed: [] as FeedEntry[],
     // An array so multiple action-required events could in principle queue up; the clock stays
     // paused while any remain (currently the roll only ever produces one per day).
@@ -87,6 +109,7 @@ export const useGameStore = defineStore('game', {
       this.clock.running = false
       this.pendingEvents = []
       this.firedEventIds = []
+      this.pendingPollImpacts = []
       this.salience = { ...WORLD_SALIENCE }
     },
     /** Builds the narrow context an event callback (`sim/eventCallbacks.ts`) gets to work with —
@@ -100,7 +123,7 @@ export const useGameStore = defineStore('game', {
         commonsSeatsByParty: this.commonsSeatsByParty,
         applyPollingImpacts: (impacts) => {
           const resolved = resolvePollingEffects(impacts, this, `event:${event.id}:callback`)
-          this.polling = applyPollingImpacts(this.polling, resolved)
+          this.pendingPollImpacts.push(...resolved)
         },
         bumpSalience: (policyId, delta) => this.applySalienceShift({ [policyId]: delta }),
         appendSummary: (text) => summary.push(text),
@@ -114,16 +137,17 @@ export const useGameStore = defineStore('game', {
       }
     },
     /**
-     * Advances the date, rolls the day's event (P1.12 — most days roll nothing), and updates
-     * polling for everyone (spec §10.5). `extraImpacts` is the seam for impacts from outside this
-     * tick's own alignment/variance/event model — player actions or anything else that wants to
-     * nudge a party's standing directly.
+     * Advances the date and rolls the day's event (P1.12 — most days roll nothing). Polling no
+     * longer moves every day: events/actions/callbacks only queue their `PollingImpact`s onto
+     * `pendingPollImpacts`, and the headline numbers only change when a "publishesPoll" event
+     * fires (`publishPoll`) — see `sim/poll.ts`'s `nextPollingSnapshot`. `extraImpacts` is the
+     * seam for impacts from outside the event system (e.g. player actions); they queue the same
+     * way and surface at the next poll release.
      */
     tickDay(extraImpacts: PollingImpact[] = []) {
       this.date = addDays(this.date, 1)
-      const scenario = useScenarioStore()
+      this.pendingPollImpacts.push(...extraImpacts)
       const rolled = rollEventForDay(this.date, this.firedEventIds)
-      let impacts = [...extraImpacts]
 
       if (rolled) {
         if (rolled.actions?.length) {
@@ -141,9 +165,11 @@ export const useGameStore = defineStore('game', {
         } else {
           this.firedEventIds.push(rolled.id)
           const summary: string[] = []
-          impacts = [...impacts, ...resolvePollingEffects(rolled.effects?.polling, this, `event:${rolled.id}`)]
+          const impacts = resolvePollingEffects(rolled.effects?.polling, this, `event:${rolled.id}`)
+          this.pendingPollImpacts.push(...impacts)
           if (rolled.effects?.salienceShift) this.applySalienceShift(rolled.effects.salienceShift)
           runEventCallback(rolled.callbackId, this.buildCallbackContext(rolled, undefined, summary))
+          if (rolled.publishesPoll) this.publishPoll(summary)
           this.recordFeedEntry({
             id: rolled.id,
             date: this.date,
@@ -153,12 +179,21 @@ export const useGameStore = defineStore('game', {
           })
         }
       }
-
-      this.polling = tickPolling(this.polling, scenario.scenario.parties, this.date, {
-        extraImpacts: impacts,
+    },
+    /** Folds every impact accumulated since the last release (plus this release's own
+     * alignment/variance/trend) into a new polling snapshot, makes it the live number, and
+     * appends it to history (spec — "set to the current poll, and the current poll added to the
+     * history"). `summary` collects a feed-text line describing the movement. */
+    publishPoll(summary: string[]) {
+      const scenario = useScenarioStore()
+      const polling = nextPollingSnapshot(scenario.scenario.parties, this.pollingHistory, this.date, {
+        extraImpacts: this.pendingPollImpacts,
         alignment: { salience: this.salience },
       })
-      this.pollingHistory.push({ date: this.date, polling: { ...this.polling } })
+      summary.push(describePollMovement(this.polling, polling, scenario))
+      this.polling = polling
+      this.pollingHistory.push({ date: this.date, polling: { ...polling } })
+      this.pendingPollImpacts = []
     },
     pauseClock() {
       this.clock.running = false
@@ -183,10 +218,11 @@ export const useGameStore = defineStore('game', {
       const summary: string[] = []
       if (action.effects?.polling?.length) {
         const impacts = resolvePollingEffects(action.effects.polling, this, `event:${event.id}:${action.id}`)
-        this.polling = applyPollingImpacts(this.polling, impacts)
+        this.pendingPollImpacts.push(...impacts)
       }
       if (action.effects?.salienceShift) this.applySalienceShift(action.effects.salienceShift)
       runEventCallback(action.callbackId, this.buildCallbackContext(event, action.id, summary))
+      if (event.publishesPoll) this.publishPoll(summary)
 
       entry.status = 'actioned'
       entry.actionTaken = action.label

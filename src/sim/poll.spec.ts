@@ -4,6 +4,7 @@ import {
   computeAlignmentImpacts,
   computeVarianceImpacts,
   impactsFromRecord,
+  nextPollingSnapshot,
   tickPolling,
 } from './poll'
 import type { VoterSegment } from './segments'
@@ -182,6 +183,75 @@ describe('computeVarianceImpacts', () => {
     const a = computeVarianceImpacts(['labour'], '2025-03-01')[0].magnitude
     const b = computeVarianceImpacts(['labour'], '2025-03-02')[0].magnitude
     expect(a).not.toBe(b)
+  })
+})
+
+describe('nextPollingSnapshot', () => {
+  const parties = [makeParty('labour'), makeParty('conservative')]
+  const isolated = { varianceMagnitude: 0 as const } // parties have no stances => alignment is [] too
+
+  it('is deterministic given the same history, date and impacts', () => {
+    const history = [{ date: '2025-01-01', polling: { labour: 30, conservative: 25 } }]
+    const opts = { ...isolated, extraImpacts: [{ partyId: 'labour', magnitude: 0.25, source: 'evt-test' }] }
+    const a = nextPollingSnapshot(parties, history, '2025-01-05', opts)
+    const b = nextPollingSnapshot(parties, history, '2025-01-05', opts)
+    expect(a).toEqual(b)
+  })
+
+  it('moves a party by a believable handful of points for a major event, not a landslide', () => {
+    const history = [{ date: '2025-01-01', polling: { labour: 25, conservative: 25 } }]
+    const next = nextPollingSnapshot(parties, history, '2025-01-05', {
+      ...isolated,
+      extraImpacts: [{ partyId: 'labour', magnitude: 0.25, source: 'major-event' }],
+    })
+    expect(next.labour).toBeGreaterThan(25)
+    expect(next.labour - 25).toBeLessThan(5)
+  })
+
+  it('rounds every party to 1 decimal place', () => {
+    const history = [{ date: '2025-01-01', polling: { labour: 30.333, conservative: 25.111 } }]
+    const next = nextPollingSnapshot(parties, history, '2025-01-05', isolated)
+    for (const value of Object.values(next)) {
+      expect(Math.round(value * 10)).toBeCloseTo(value * 10, 6)
+    }
+  })
+
+  it('preserves the field total (zero-sum redistribution)', () => {
+    const history = [{ date: '2025-01-01', polling: { labour: 30, conservative: 25 } }]
+    const next = nextPollingSnapshot(parties, history, '2025-01-05', {
+      ...isolated,
+      extraImpacts: [{ partyId: 'labour', magnitude: 0.5, source: 'evt-test' }],
+    })
+    const originalTotal = 30 + 25
+    const nextTotal = Object.values(next).reduce((sum, v) => sum + v, 0)
+    expect(nextTotal).toBeCloseTo(originalTotal, 1)
+  })
+
+  it("caps a fringe party's swing so it can't double in one release", () => {
+    const history = [{ date: '2025-01-01', polling: { tiny: 1, big: 99 } }]
+    const next = nextPollingSnapshot([makeParty('tiny'), makeParty('big')], history, '2025-01-05', {
+      ...isolated,
+      extraImpacts: [{ partyId: 'tiny', magnitude: 1, source: 'max-positive-event' }],
+    })
+    expect(next.tiny).toBeLessThan(2)
+  })
+
+  it("caps a major party's drop so it can't lose double digits from one release", () => {
+    const history = [{ date: '2025-01-01', polling: { labour: 35, conservative: 35 } }]
+    const next = nextPollingSnapshot(parties, history, '2025-01-05', {
+      ...isolated,
+      extraImpacts: [{ partyId: 'labour', magnitude: -1, source: 'max-negative-event' }],
+    })
+    expect(35 - next.labour).toBeLessThan(10)
+  })
+
+  it('continues a prior trend (momentum) even with no new impacts this release', () => {
+    const history = [
+      { date: '2024-12-28', polling: { labour: 25, conservative: 30 } },
+      { date: '2025-01-01', polling: { labour: 27, conservative: 28 } },
+    ]
+    const next = nextPollingSnapshot(parties, history, '2025-01-05', isolated)
+    expect(next.labour).toBeGreaterThan(27)
   })
 })
 

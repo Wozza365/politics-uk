@@ -86,6 +86,19 @@
     ]
   },
   {
+    "id": "polling-update",
+    "headline": "A new opinion poll is published",
+    "body": "The latest voting-intention poll lands, folding in everything that's happened since the last one.",
+    "scope": "national",
+    "severity": "minor",
+    "weight": 18,
+    "once": false,
+    "publishesPoll": true,
+    "effects": {
+      "summary": "The pollsters have their say."
+    }
+  },
+  {
     "id": "council-by-election-gain",
     "headline": "A ward by-election result lands quietly",
     "body": "A routine council by-election, caused by a resignation, returns a result nobody outside the ward much notices.",

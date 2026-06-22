@@ -174,8 +174,19 @@ with and without actions.
   queues an action event + pauses the clock; `resolveFeedAction()` applies the chosen action's
   effects through the engine, runs its callback if any, records the result in the feed, and
   resumes the clock once no events remain.
-**Acceptance:** ✅ Ticking generates feed entries; most days have no event; some move polling/
-salience; action events pause the clock until resolved via the feed's choice buttons.
+- **Polling cadence replaced with poll-publishing events.** Polling no longer moves every tick.
+  Every event/action/callback's polling effect now queues onto `game.pendingPollImpacts` instead
+  of changing `game.polling` directly. A recurring seed-pool event (`polling-update`,
+  `publishesPoll: true`) is the only thing that drains that buffer: `sim/poll.ts`'s
+  `nextPollingSnapshot()` folds the queued impacts together with the trend between the previous
+  two releases (momentum), caps the combined swing relative to each party's own size (so small
+  parties can't double and big parties can't swing double digits without a sustained run of
+  releases the same way), rounds to 1 d.p., sets it as the live `polling`, and appends it to
+  `pollingHistory`. `tickPolling()` itself is untouched in `sim/poll.ts` (still tested, just no
+  longer called per-day by `game.ts`).
+**Acceptance:** ✅ Ticking generates feed entries; most days have no event; polling only moves on a
+published-poll event, with believable, capped swings; action events pause the clock until resolved
+via the feed's choice buttons.
 
 ### P1.13 — End-to-end loop wire-up `🔲`
 **Goal.** A coherent playable slice: pick a party → load → play days → events fire → polling

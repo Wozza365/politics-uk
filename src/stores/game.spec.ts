@@ -80,4 +80,65 @@ describe('useGameStore.resolveFeedAction', () => {
 
     expect(game.feed[0].actionTaken).toBe('Already resolved')
   })
+
+  it("queues an action's polling effect instead of moving polling immediately", () => {
+    const game = useGameStore()
+    game.selectedPartyId = 'labour'
+    game.polling = { labour: 25, conservative: 25 }
+    const event = pendingEvent()
+    event.actions![0].effects = { polling: [{ partyId: 'player', magnitude: 0.1 }], summary: 'A strong showing.' }
+    game.pendingEvents.push(event)
+    game.feed.push(unactionedEntry())
+
+    game.resolveFeedAction('evt-1', 'campaign')
+
+    expect(game.polling.labour).toBe(25)
+    expect(game.pendingPollImpacts).toEqual([{ partyId: 'labour', magnitude: 0.1, source: 'event:evt-1:campaign' }])
+  })
+
+  function publishingEvent(): GameEvent {
+    return {
+      id: 'poll-evt',
+      headline: 'A new opinion poll is published',
+      scope: 'national',
+      severity: 'minor',
+      weight: 1,
+      publishesPoll: true,
+      actions: [{ id: 'ok', label: 'Acknowledge' }],
+    }
+  }
+
+  it('publishes a poll (sets polling + appends history + clears the buffer) when a publishesPoll action event resolves', () => {
+    const game = useGameStore()
+    game.selectedPartyId = 'labour'
+    game.date = '2025-01-05'
+    const fullPolling = {
+      labour: 28,
+      conservative: 24,
+      reform_uk: 22,
+      liberal_democrat: 12,
+      green: 8,
+      workers_party: 1,
+      ukip: 0.3,
+      snp: 3,
+    }
+    game.polling = { ...fullPolling }
+    game.pollingHistory = [{ date: '2025-01-01', polling: { ...fullPolling } }]
+    game.pendingPollImpacts = [{ partyId: 'labour', magnitude: 0.25, source: 'major-event' }]
+    game.pendingEvents.push(publishingEvent())
+    game.feed.push({
+      id: 'poll-evt',
+      date: game.date,
+      headline: publishingEvent().headline,
+      status: 'unactioned',
+      actions: [{ id: 'ok', label: 'Acknowledge' }],
+    })
+
+    game.resolveFeedAction('poll-evt', 'ok')
+
+    expect(game.polling.labour).toBeGreaterThan(25)
+    expect(game.pollingHistory).toHaveLength(2)
+    expect(game.pollingHistory.at(-1)?.polling).toEqual(game.polling)
+    expect(game.pendingPollImpacts).toEqual([])
+  })
 })

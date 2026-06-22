@@ -453,6 +453,17 @@ The simulation heartbeat.
     events; `events.scripted.json` holds the date-windowed, more dramatic ones (by-elections,
     a World Cup win, a war breaking out…) — kept separate so each can grow independently as the
     event library expands (Phase 2+).
+  - **Polling cadence.** Polling numbers don't move every day. Every event/action/callback's
+    polling effect queues onto a buffer (`pendingPollImpacts`) instead of changing the headline
+    figures immediately. A recurring `events.seed.json` entry (`publishesPoll: true`, repeatable,
+    ~weight 18 among the ambient pool — averages out to a release every few in-game days) is the
+    only thing that drains that buffer: when it fires, `sim/poll.ts`'s `nextPollingSnapshot` folds
+    every queued impact together with the trend between the *previous two* releases (so a move has
+    momentum rather than each release starting from scratch), caps the combined swing to whichever
+    is larger of a small absolute floor or a fraction of the party's own current standing (so a
+    fringe party on ~1% can't double in one release, and a major party can't swing double digits
+    without a long run of releases pushing the same way), rounds to 1 decimal place, sets it as the
+    live `polling`, and appends it to `pollingHistory` — then the buffer is cleared.
 
 ---
 
