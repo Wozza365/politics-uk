@@ -81,6 +81,25 @@ describe('useGameStore.resolveFeedAction', () => {
     expect(game.feed[0].actionTaken).toBe('Already resolved')
   })
 
+  it('resolves a repeatable event correctly even when an earlier, already-actioned entry shares its id', () => {
+    const game = useGameStore()
+    // A repeatable event (`once: false`) fired once already this playthrough, was resolved, and
+    // its feed entry is still sitting in `feed` — then it fires again later in the playthrough.
+    const staleEntry = unactionedEntry()
+    staleEntry.status = 'actioned'
+    staleEntry.actionTaken = 'Campaign hard'
+    staleEntry.actions = undefined
+    game.feed.push(staleEntry)
+    game.feed.push(unactionedEntry())
+    game.pendingEvents.push(pendingEvent())
+
+    game.resolveFeedAction('evt-1', 'ignore')
+
+    expect(game.feed[0].actionTaken).toBe('Campaign hard') // untouched
+    expect(game.feed[1].status).toBe('actioned')
+    expect(game.feed[1].actionTaken).toBe('Leave it to the local party')
+  })
+
   it("queues an action's polling effect instead of moving polling immediately", () => {
     const game = useGameStore()
     game.selectedPartyId = 'labour'

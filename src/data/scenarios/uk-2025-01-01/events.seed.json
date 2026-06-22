@@ -6,7 +6,6 @@
     "scope": "national",
     "severity": "minor",
     "weight": 6,
-    "once": false,
     "actions": [
       {
         "id": "distance",
@@ -40,7 +39,6 @@
     "scope": "local",
     "severity": "minor",
     "weight": 5,
-    "once": false,
     "effects": {
       "summary": "Local services are praised for a quick response; no national ripple."
     }
@@ -52,7 +50,6 @@
     "scope": "national",
     "severity": "minor",
     "weight": 5,
-    "once": false,
     "effects": {
       "polling": [{ "partyId": "incumbent", "magnitude": -0.05 }],
       "salienceShift": { "economy_tax": 0.02 },
@@ -66,7 +63,6 @@
     "scope": "national",
     "severity": "minor",
     "weight": 4,
-    "once": false,
     "actions": [
       {
         "id": "self-deprecate",
@@ -105,7 +101,6 @@
     "scope": "regional",
     "severity": "minor",
     "weight": 4,
-    "once": false,
     "effects": {
       "summary": "Barely registers beyond the local paper."
     }

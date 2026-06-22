@@ -208,8 +208,12 @@ export const useGameStore = defineStore('game', {
      * (P1.12.3): resolving one applies that action's effects through the engine, records the
      * choice + its effect under the headline, and resumes the clock once no events remain. */
     resolveFeedAction(entryId: string, actionId: string) {
-      const entry = this.feed.find((candidate) => candidate.id === entryId)
-      if (!entry || entry.status !== 'unactioned') return
+      // `id` isn't unique across the whole feed for repeatable events (the same event can fire
+      // more than once in a playthrough) — match the *unactioned* one, not whichever happens to
+      // sit first in the array, or a stale already-actioned entry from an earlier occurrence
+      // would silently swallow the click.
+      const entry = this.feed.find((candidate) => candidate.id === entryId && candidate.status === 'unactioned')
+      if (!entry) return
       const eventIndex = this.pendingEvents.findIndex((candidate) => candidate.id === entryId)
       const event = eventIndex >= 0 ? this.pendingEvents[eventIndex] : undefined
       const action = event?.actions?.find((candidate) => candidate.id === actionId)
