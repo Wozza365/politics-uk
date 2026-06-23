@@ -6,6 +6,50 @@
 > authoritative design remains [`GAME_SPEC.md`](./GAME_SPEC.md). See
 > `PHASE_2_PLAN.md` §A for what's still open and the current critical path.
 
+## P2.1 — Regional view: Holyrood, Senedd, NI Assembly, London Assembly ✅
+
+- One combined **Regional** view, not four separate ones: `src/stores/ui.ts`'s `GameView` union
+  collapsed `holyrood`/`senedd`/`ni-assembly`/`london` into a single `'regional'` member;
+  `ViewSwitcher.vue` now shows three buttons (Westminster / Regional / Councils) instead of six.
+  The four bodies stay separate `TierId`s in `Scenario.tiers` underneath — only the view is merged.
+- Real boundary + composition data fetched for all four bodies as of 2025-01-01: Holyrood (73
+  constituencies + 8 list regions, 129 MSPs), Senedd (40 constituencies + 5 list regions, 60 MS,
+  the pre-2026 system), NI Assembly (18 Westminster-coincident STV constituencies, 90 MLAs —
+  `scripts/data/derive-ni-assembly-boundaries.mjs` reuses `boundaries.commons.json` rather than
+  re-fetching), London Assembly (14 constituencies + 1 London-wide list region, 25 AMs). New
+  parties encountered (Alba Party, People Before Profit) added to `parties.json`/`party-slugs.mjs`.
+- **Holyrood/Senedd/London Assembly's list-seat regions have no boundary geometry of their own** —
+  only their 73/40/14 constituencies do (`fetch-holyrood-boundaries.mjs`'s header comment records
+  why: the map only needs constituency-level shapes). Those list regions still exist in
+  `composition.<tier>.json` for seat-count/stats purposes; they just never get a `geometryRef` hit
+  in `boundaries.regional.json`, so they're invisible on the map by design, not by omission.
+- `scripts/data/build-regional-boundaries.mjs` (new) merges the four tiers' boundary topologies
+  into one `boundaries.regional.json`, plus England-outside-London filler from
+  `boundaries.commons.json`. There's no official ONS lookup from the 2024 Westminster boundary
+  review to "is this constituency in London" yet, so
+  `scripts/data/fetch-london-constituencies.mjs` (new) derives it geometrically: point-in-polygon
+  test of each constituency's ONS-supplied centroid against the official London region polygon
+  (ArcGIS item `d471e7de92fc43aba1050dcec35d1fb3`) — 75 matches, the well-known figure for Greater
+  London's post-2023-review seat count.
+- `src/stores/scenario.ts` gained `regionalBoundaries` and a `regionalRegionsByGeometryRef` getter
+  flattening all four tiers keyed by `geometryRef`. `MapView.vue` branches on
+  `useUiStore().activeView`: `'regional'` colours each constituency by its seat-holder's party and
+  marks every filler region `disabled: true` (greyed out, non-interactive, no tooltip, per spec
+  §9.1) via the existing `RegionDisplayState.disabled` field.
+- **Hemicycle stays Commons-only** (deliberately out of scope) — four disjoint legislatures don't
+  compose into one hemicycle the way Westminster's single chamber does.
+- Fixed two latent bugs surfaced while building this: `validate-scenario.mjs`'s seat-count check
+  compared region *count* to the known seat total, which only happened to work for Commons'
+  one-seat-per-region shape — it now sums `seats.length` across regions. `build-parties.mjs`'s
+  `PARTIES_SOURCE` never carried the `history` field at all (it was hand-patched into the output
+  JSON once, in a commit that didn't touch the generator), so the routine act of regenerating
+  `parties.json` to add the two new parties silently dropped every existing party's history;
+  `history` is now part of `PARTIES_SOURCE` so regeneration is safe going forward.
+- **Acceptance:** the view switcher flips between Westminster and Regional; Regional shows real
+  Holyrood/Senedd/NI Assembly/London Assembly boundaries and composition simultaneously, each
+  coloured by current seat-holder's party, with England-outside-London fully greyed out and
+  non-interactive; `npm run validate:data`, `npm run build`, and `npm run test` (66 tests) clean.
+
 ## P2.0 — Polling-driven seat projection at the GE ✅
 
 - `src/sim/projection.ts` (new) — `projectSeatsByParty(regions, startPolling, currentPolling)`: a
