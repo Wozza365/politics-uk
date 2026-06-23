@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export type Screen = 'start' | 'loading' | 'game' | 'result'
 
-export type GameView = 'westminster' | 'holyrood' | 'senedd' | 'ni-assembly' | 'london' | 'councils'
+export type GameView = 'westminster' | 'regional' | 'councils'
 
 export const useUiStore = defineStore('ui', {
   state: () => ({

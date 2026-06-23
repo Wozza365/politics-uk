@@ -28,6 +28,8 @@ export const PARTY_SLUGS = {
   'Workers Party of Britain': 'workers_party',
   'UK Independence Party': 'ukip',
   'Scottish Green Party': 'green',
+  'Alba Party': 'alba_party',
+  'People Before Profit': 'people_before_profit',
 }
 
 function slugifyFallback(name) {

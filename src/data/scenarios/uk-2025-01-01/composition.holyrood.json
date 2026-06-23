@@ -1,0 +1,1424 @@
+[
+  {
+    "id": "region:central_scotland",
+    "tier": "holyrood",
+    "name": "Central Scotland (region)",
+    "geometryRef": "region:central_scotland",
+    "seats": [
+      {
+        "regionId": "region:central_scotland",
+        "party": "labour",
+        "memberName": "Richard Leonard",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "labour",
+        "memberName": "Monica Lennon",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "labour",
+        "memberName": "Mark Griffin",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "conservative",
+        "memberName": "Stephen Kerr",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "conservative",
+        "memberName": "Graham Simpson",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "conservative",
+        "memberName": "Meghan Gallacher",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:central_scotland",
+        "party": "green",
+        "memberName": "Gillian Mackay",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:glasgow",
+    "tier": "holyrood",
+    "name": "Glasgow (region)",
+    "geometryRef": "region:glasgow",
+    "seats": [
+      {
+        "regionId": "region:glasgow",
+        "party": "labour",
+        "memberName": "Pauline McNeill",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "labour",
+        "memberName": "Anas Sarwar",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "labour",
+        "memberName": "Paul Sweeney",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "labour",
+        "memberName": "Pam Duncan-Glancy",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "conservative",
+        "memberName": "Annie Wells",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "conservative",
+        "memberName": "Sandesh Gulhane",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:glasgow",
+        "party": "green",
+        "memberName": "Patrick Harvie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:highlands_and_islands",
+    "tier": "holyrood",
+    "name": "Highlands and Islands (region)",
+    "geometryRef": "region:highlands_and_islands",
+    "seats": [
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "snp",
+        "memberName": "Emma Roddick",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "conservative",
+        "memberName": "Douglas Ross",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "conservative",
+        "memberName": "Donald Cameron",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "conservative",
+        "memberName": "Edward Mountain",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "conservative",
+        "memberName": "Jamie Halcro Johnston",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "labour",
+        "memberName": "Rhoda Grant",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:highlands_and_islands",
+        "party": "green",
+        "memberName": "Ariane Burgess",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:lothian",
+    "tier": "holyrood",
+    "name": "Lothian (region)",
+    "geometryRef": "region:lothian",
+    "seats": [
+      {
+        "regionId": "region:lothian",
+        "party": "conservative",
+        "memberName": "Miles Briggs",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "conservative",
+        "memberName": "Sue Webber",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "conservative",
+        "memberName": "Jeremy Balfour",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "labour",
+        "memberName": "Sarah Boyack",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "labour",
+        "memberName": "Foysol Choudhury",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "green",
+        "memberName": "Alison Johnstone",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:lothian",
+        "party": "green",
+        "memberName": "Lorna Slater",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:mid_scotland_and_fife",
+    "tier": "holyrood",
+    "name": "Mid Scotland and Fife (region)",
+    "geometryRef": "region:mid_scotland_and_fife",
+    "seats": [
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "conservative",
+        "memberName": "Murdo Fraser",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "conservative",
+        "memberName": "Liz Smith",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "conservative",
+        "memberName": "Dean Lockhart",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "conservative",
+        "memberName": "Alexander Stewart",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "labour",
+        "memberName": "Claire Baker",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "labour",
+        "memberName": "Alex Rowley",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid_scotland_and_fife",
+        "party": "green",
+        "memberName": "Mark Ruskell",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:north_east_scotland",
+    "tier": "holyrood",
+    "name": "North East Scotland (region)",
+    "geometryRef": "region:north_east_scotland",
+    "seats": [
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "conservative",
+        "memberName": "Liam Kerr",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "conservative",
+        "memberName": "Douglas Lumsden",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "conservative",
+        "memberName": "Maurice Golden",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "conservative",
+        "memberName": "Tess White",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "labour",
+        "memberName": "Michael Marra",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "labour",
+        "memberName": "Mercedes Villalba",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north_east_scotland",
+        "party": "green",
+        "memberName": "Maggie Chapman",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:south_scotland",
+    "tier": "holyrood",
+    "name": "South Scotland (region)",
+    "geometryRef": "region:south_scotland",
+    "seats": [
+      {
+        "regionId": "region:south_scotland",
+        "party": "labour",
+        "memberName": "Colin Smyth",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "labour",
+        "memberName": "Carol Mochan",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "labour",
+        "memberName": "Martin Whitfield",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "conservative",
+        "memberName": "Craig Hoy",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "conservative",
+        "memberName": "Brian Whittle",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "conservative",
+        "memberName": "Sharon Dowey",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south_scotland",
+        "party": "snp",
+        "memberName": "Emma Harper",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:west_scotland",
+    "tier": "holyrood",
+    "name": "West Scotland (region)",
+    "geometryRef": "region:west_scotland",
+    "seats": [
+      {
+        "regionId": "region:west_scotland",
+        "party": "labour",
+        "memberName": "Neil Bibby",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "labour",
+        "memberName": "Katy Clark",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "labour",
+        "memberName": "Paul O’Kane",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "conservative",
+        "memberName": "Russell Findlay",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "conservative",
+        "memberName": "Jamie Greene",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "conservative",
+        "memberName": "Pam Gosal",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:west_scotland",
+        "party": "green",
+        "memberName": "Ross Greer",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000074",
+    "tier": "holyrood",
+    "name": "Aberdeen Central",
+    "geometryRef": "S16000074",
+    "seats": [
+      {
+        "regionId": "S16000074",
+        "party": "snp",
+        "memberName": "Kevin Stewart",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000075",
+    "tier": "holyrood",
+    "name": "Aberdeen Donside",
+    "geometryRef": "S16000075",
+    "seats": [
+      {
+        "regionId": "S16000075",
+        "party": "snp",
+        "memberName": "Jackie Dunbar",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000076",
+    "tier": "holyrood",
+    "name": "Aberdeen South and North Kincardine",
+    "geometryRef": "S16000076",
+    "seats": [
+      {
+        "regionId": "S16000076",
+        "party": "snp",
+        "memberName": "Audrey Nicoll",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000077",
+    "tier": "holyrood",
+    "name": "Aberdeenshire East",
+    "geometryRef": "S16000077",
+    "seats": [
+      {
+        "regionId": "S16000077",
+        "party": "snp",
+        "memberName": "Gillian Martin",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000078",
+    "tier": "holyrood",
+    "name": "Aberdeenshire West",
+    "geometryRef": "S16000078",
+    "seats": [
+      {
+        "regionId": "S16000078",
+        "party": "conservative",
+        "memberName": "Alexander Burnett",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000079",
+    "tier": "holyrood",
+    "name": "Airdrie and Shotts",
+    "geometryRef": "S16000079",
+    "seats": [
+      {
+        "regionId": "S16000079",
+        "party": "snp",
+        "memberName": "Neil Gray",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000080",
+    "tier": "holyrood",
+    "name": "Almond Valley",
+    "geometryRef": "S16000080",
+    "seats": [
+      {
+        "regionId": "S16000080",
+        "party": "snp",
+        "memberName": "Angela Constance",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000081",
+    "tier": "holyrood",
+    "name": "Angus North and Mearns",
+    "geometryRef": "S16000081",
+    "seats": [
+      {
+        "regionId": "S16000081",
+        "party": "snp",
+        "memberName": "Mairi Gougeon",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000082",
+    "tier": "holyrood",
+    "name": "Angus South",
+    "geometryRef": "S16000082",
+    "seats": [
+      {
+        "regionId": "S16000082",
+        "party": "snp",
+        "memberName": "Graeme Dey",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000083",
+    "tier": "holyrood",
+    "name": "Argyll and Bute",
+    "geometryRef": "S16000083",
+    "seats": [
+      {
+        "regionId": "S16000083",
+        "party": "snp",
+        "memberName": "Jenni Minto",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000084",
+    "tier": "holyrood",
+    "name": "Ayr",
+    "geometryRef": "S16000084",
+    "seats": [
+      {
+        "regionId": "S16000084",
+        "party": "snp",
+        "memberName": "Siobhian Brown",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000085",
+    "tier": "holyrood",
+    "name": "Banffshire and Buchan Coast",
+    "geometryRef": "S16000085",
+    "seats": [
+      {
+        "regionId": "S16000085",
+        "party": "snp",
+        "memberName": "Karen Adam",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000086",
+    "tier": "holyrood",
+    "name": "Caithness, Sutherland and Ross",
+    "geometryRef": "S16000086",
+    "seats": [
+      {
+        "regionId": "S16000086",
+        "party": "snp",
+        "memberName": "Maree Todd",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000087",
+    "tier": "holyrood",
+    "name": "Carrick, Cumnock and Doon Valley",
+    "geometryRef": "S16000087",
+    "seats": [
+      {
+        "regionId": "S16000087",
+        "party": "snp",
+        "memberName": "Elena Whitham",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000088",
+    "tier": "holyrood",
+    "name": "Clackmannanshire and Dunblane",
+    "geometryRef": "S16000088",
+    "seats": [
+      {
+        "regionId": "S16000088",
+        "party": "snp",
+        "memberName": "Keith Brown",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000089",
+    "tier": "holyrood",
+    "name": "Clydebank and Milngavie",
+    "geometryRef": "S16000089",
+    "seats": [
+      {
+        "regionId": "S16000089",
+        "party": "snp",
+        "memberName": "Marie McNair",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000090",
+    "tier": "holyrood",
+    "name": "Clydesdale",
+    "geometryRef": "S16000090",
+    "seats": [
+      {
+        "regionId": "S16000090",
+        "party": "snp",
+        "memberName": "Màiri McAllan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000092",
+    "tier": "holyrood",
+    "name": "Cowdenbeath",
+    "geometryRef": "S16000092",
+    "seats": [
+      {
+        "regionId": "S16000092",
+        "party": "snp",
+        "memberName": "Annabelle Ewing",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000093",
+    "tier": "holyrood",
+    "name": "Cumbernauld and Kilsyth",
+    "geometryRef": "S16000093",
+    "seats": [
+      {
+        "regionId": "S16000093",
+        "party": "snp",
+        "memberName": "Jamie Hepburn",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000094",
+    "tier": "holyrood",
+    "name": "Cunninghame North",
+    "geometryRef": "S16000094",
+    "seats": [
+      {
+        "regionId": "S16000094",
+        "party": "snp",
+        "memberName": "Kenneth Gibson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000095",
+    "tier": "holyrood",
+    "name": "Cunninghame South",
+    "geometryRef": "S16000095",
+    "seats": [
+      {
+        "regionId": "S16000095",
+        "party": "snp",
+        "memberName": "Ruth Maguire",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000096",
+    "tier": "holyrood",
+    "name": "Dumbarton",
+    "geometryRef": "S16000096",
+    "seats": [
+      {
+        "regionId": "S16000096",
+        "party": "labour",
+        "memberName": "Jackie Baillie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000097",
+    "tier": "holyrood",
+    "name": "Dumfriesshire",
+    "geometryRef": "S16000097",
+    "seats": [
+      {
+        "regionId": "S16000097",
+        "party": "conservative",
+        "memberName": "Oliver Mundell",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000098",
+    "tier": "holyrood",
+    "name": "Dundee City East",
+    "geometryRef": "S16000098",
+    "seats": [
+      {
+        "regionId": "S16000098",
+        "party": "snp",
+        "memberName": "Shona Robison",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000099",
+    "tier": "holyrood",
+    "name": "Dundee City West",
+    "geometryRef": "S16000099",
+    "seats": [
+      {
+        "regionId": "S16000099",
+        "party": "snp",
+        "memberName": "Joe FitzPatrick",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000100",
+    "tier": "holyrood",
+    "name": "Dunfermline",
+    "geometryRef": "S16000100",
+    "seats": [
+      {
+        "regionId": "S16000100",
+        "party": "snp",
+        "memberName": "Shirley-Anne Somerville",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000101",
+    "tier": "holyrood",
+    "name": "East Kilbride",
+    "geometryRef": "S16000101",
+    "seats": [
+      {
+        "regionId": "S16000101",
+        "party": "snp",
+        "memberName": "Collette Stevenson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000102",
+    "tier": "holyrood",
+    "name": "East Lothian",
+    "geometryRef": "S16000102",
+    "seats": [
+      {
+        "regionId": "S16000102",
+        "party": "snp",
+        "memberName": "Paul McLennan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000103",
+    "tier": "holyrood",
+    "name": "Eastwood",
+    "geometryRef": "S16000103",
+    "seats": [
+      {
+        "regionId": "S16000103",
+        "party": "conservative",
+        "memberName": "Jackson Carlaw",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000104",
+    "tier": "holyrood",
+    "name": "Edinburgh Central",
+    "geometryRef": "S16000104",
+    "seats": [
+      {
+        "regionId": "S16000104",
+        "party": "snp",
+        "memberName": "Angus Robertson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000105",
+    "tier": "holyrood",
+    "name": "Edinburgh Eastern",
+    "geometryRef": "S16000105",
+    "seats": [
+      {
+        "regionId": "S16000105",
+        "party": "alba_party",
+        "memberName": "Ash Regan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000106",
+    "tier": "holyrood",
+    "name": "Edinburgh Northern and Leith",
+    "geometryRef": "S16000106",
+    "seats": [
+      {
+        "regionId": "S16000106",
+        "party": "snp",
+        "memberName": "Ben Macpherson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000107",
+    "tier": "holyrood",
+    "name": "Edinburgh Pentlands",
+    "geometryRef": "S16000107",
+    "seats": [
+      {
+        "regionId": "S16000107",
+        "party": "snp",
+        "memberName": "Gordon MacDonald",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000108",
+    "tier": "holyrood",
+    "name": "Edinburgh Southern",
+    "geometryRef": "S16000108",
+    "seats": [
+      {
+        "regionId": "S16000108",
+        "party": "labour",
+        "memberName": "Daniel Johnson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000109",
+    "tier": "holyrood",
+    "name": "Edinburgh Western",
+    "geometryRef": "S16000109",
+    "seats": [
+      {
+        "regionId": "S16000109",
+        "party": "liberal_democrat",
+        "memberName": "Alex Cole-Hamilton",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000110",
+    "tier": "holyrood",
+    "name": "Na h-Eileanan an Iar",
+    "geometryRef": "S16000110",
+    "seats": [
+      {
+        "regionId": "S16000110",
+        "party": "snp",
+        "memberName": "Alasdair Allan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000111",
+    "tier": "holyrood",
+    "name": "Ettrick, Roxburgh and Berwickshire",
+    "geometryRef": "S16000111",
+    "seats": [
+      {
+        "regionId": "S16000111",
+        "party": "conservative",
+        "memberName": "Rachael Hamilton",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000112",
+    "tier": "holyrood",
+    "name": "Falkirk East",
+    "geometryRef": "S16000112",
+    "seats": [
+      {
+        "regionId": "S16000112",
+        "party": "snp",
+        "memberName": "Michelle Thomson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000113",
+    "tier": "holyrood",
+    "name": "Falkirk West",
+    "geometryRef": "S16000113",
+    "seats": [
+      {
+        "regionId": "S16000113",
+        "party": "snp",
+        "memberName": "Michael Matheson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000114",
+    "tier": "holyrood",
+    "name": "Galloway and West Dumfries",
+    "geometryRef": "S16000114",
+    "seats": [
+      {
+        "regionId": "S16000114",
+        "party": "conservative",
+        "memberName": "Finlay Carson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000115",
+    "tier": "holyrood",
+    "name": "Glasgow Anniesland",
+    "geometryRef": "S16000115",
+    "seats": [
+      {
+        "regionId": "S16000115",
+        "party": "snp",
+        "memberName": "Bill Kidd",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000116",
+    "tier": "holyrood",
+    "name": "Glasgow Cathcart",
+    "geometryRef": "S16000116",
+    "seats": [
+      {
+        "regionId": "S16000116",
+        "party": "snp",
+        "memberName": "James Dornan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000117",
+    "tier": "holyrood",
+    "name": "Glasgow Kelvin",
+    "geometryRef": "S16000117",
+    "seats": [
+      {
+        "regionId": "S16000117",
+        "party": "snp",
+        "memberName": "Kaukab Stewart",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000118",
+    "tier": "holyrood",
+    "name": "Glasgow Maryhill and Springburn",
+    "geometryRef": "S16000118",
+    "seats": [
+      {
+        "regionId": "S16000118",
+        "party": "snp",
+        "memberName": "Bob Doris",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000119",
+    "tier": "holyrood",
+    "name": "Glasgow Pollok",
+    "geometryRef": "S16000119",
+    "seats": [
+      {
+        "regionId": "S16000119",
+        "party": "snp",
+        "memberName": "Humza Yousaf",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000121",
+    "tier": "holyrood",
+    "name": "Glasgow Shettleston",
+    "geometryRef": "S16000121",
+    "seats": [
+      {
+        "regionId": "S16000121",
+        "party": "independent",
+        "memberName": "John Mason",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000122",
+    "tier": "holyrood",
+    "name": "Glasgow Southside",
+    "geometryRef": "S16000122",
+    "seats": [
+      {
+        "regionId": "S16000122",
+        "party": "snp",
+        "memberName": "Nicola Sturgeon",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000123",
+    "tier": "holyrood",
+    "name": "Greenock and Inverclyde",
+    "geometryRef": "S16000123",
+    "seats": [
+      {
+        "regionId": "S16000123",
+        "party": "snp",
+        "memberName": "Stuart McMillan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000124",
+    "tier": "holyrood",
+    "name": "Hamilton, Larkhall and Stonehouse",
+    "geometryRef": "S16000124",
+    "seats": [
+      {
+        "regionId": "S16000124",
+        "party": "snp",
+        "memberName": "Christina McKelvie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000125",
+    "tier": "holyrood",
+    "name": "Inverness and Nairn",
+    "geometryRef": "S16000125",
+    "seats": [
+      {
+        "regionId": "S16000125",
+        "party": "snp",
+        "memberName": "Fergus Ewing",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000126",
+    "tier": "holyrood",
+    "name": "Kilmarnock and Irvine Valley",
+    "geometryRef": "S16000126",
+    "seats": [
+      {
+        "regionId": "S16000126",
+        "party": "snp",
+        "memberName": "Willie Coffey",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000127",
+    "tier": "holyrood",
+    "name": "Kirkcaldy",
+    "geometryRef": "S16000127",
+    "seats": [
+      {
+        "regionId": "S16000127",
+        "party": "snp",
+        "memberName": "David Torrance",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000128",
+    "tier": "holyrood",
+    "name": "Linlithgow",
+    "geometryRef": "S16000128",
+    "seats": [
+      {
+        "regionId": "S16000128",
+        "party": "snp",
+        "memberName": "Fiona Hyslop",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000129",
+    "tier": "holyrood",
+    "name": "Mid Fife and Glenrothes",
+    "geometryRef": "S16000129",
+    "seats": [
+      {
+        "regionId": "S16000129",
+        "party": "snp",
+        "memberName": "Jenny Gilruth",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000130",
+    "tier": "holyrood",
+    "name": "Midlothian North and Musselburgh",
+    "geometryRef": "S16000130",
+    "seats": [
+      {
+        "regionId": "S16000130",
+        "party": "snp",
+        "memberName": "Colin Beattie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000131",
+    "tier": "holyrood",
+    "name": "Midlothian South, Tweeddale and Lauderdale",
+    "geometryRef": "S16000131",
+    "seats": [
+      {
+        "regionId": "S16000131",
+        "party": "snp",
+        "memberName": "Christine Grahame",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000132",
+    "tier": "holyrood",
+    "name": "Moray",
+    "geometryRef": "S16000132",
+    "seats": [
+      {
+        "regionId": "S16000132",
+        "party": "snp",
+        "memberName": "Richard Lochhead",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000133",
+    "tier": "holyrood",
+    "name": "Motherwell and Wishaw",
+    "geometryRef": "S16000133",
+    "seats": [
+      {
+        "regionId": "S16000133",
+        "party": "snp",
+        "memberName": "Clare Adamson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000134",
+    "tier": "holyrood",
+    "name": "North East Fife",
+    "geometryRef": "S16000134",
+    "seats": [
+      {
+        "regionId": "S16000134",
+        "party": "liberal_democrat",
+        "memberName": "Willie Rennie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000135",
+    "tier": "holyrood",
+    "name": "Orkney Islands",
+    "geometryRef": "S16000135",
+    "seats": [
+      {
+        "regionId": "S16000135",
+        "party": "liberal_democrat",
+        "memberName": "Liam McArthur",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000136",
+    "tier": "holyrood",
+    "name": "Paisley",
+    "geometryRef": "S16000136",
+    "seats": [
+      {
+        "regionId": "S16000136",
+        "party": "snp",
+        "memberName": "George Adam",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000137",
+    "tier": "holyrood",
+    "name": "Perthshire North",
+    "geometryRef": "S16000137",
+    "seats": [
+      {
+        "regionId": "S16000137",
+        "party": "snp",
+        "memberName": "John Swinney",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000138",
+    "tier": "holyrood",
+    "name": "Perthshire South and Kinross-shire",
+    "geometryRef": "S16000138",
+    "seats": [
+      {
+        "regionId": "S16000138",
+        "party": "snp",
+        "memberName": "Jim Fairlie",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000139",
+    "tier": "holyrood",
+    "name": "Renfrewshire North and West",
+    "geometryRef": "S16000139",
+    "seats": [
+      {
+        "regionId": "S16000139",
+        "party": "snp",
+        "memberName": "Natalie Don",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000140",
+    "tier": "holyrood",
+    "name": "Renfrewshire South",
+    "geometryRef": "S16000140",
+    "seats": [
+      {
+        "regionId": "S16000140",
+        "party": "snp",
+        "memberName": "Tom Arthur",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000141",
+    "tier": "holyrood",
+    "name": "Rutherglen",
+    "geometryRef": "S16000141",
+    "seats": [
+      {
+        "regionId": "S16000141",
+        "party": "snp",
+        "memberName": "Clare Haughey",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000142",
+    "tier": "holyrood",
+    "name": "Shetland Islands",
+    "geometryRef": "S16000142",
+    "seats": [
+      {
+        "regionId": "S16000142",
+        "party": "liberal_democrat",
+        "memberName": "Beatrice Wishart",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000143",
+    "tier": "holyrood",
+    "name": "Skye, Lochaber and Badenoch",
+    "geometryRef": "S16000143",
+    "seats": [
+      {
+        "regionId": "S16000143",
+        "party": "snp",
+        "memberName": "Kate Forbes",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000144",
+    "tier": "holyrood",
+    "name": "Stirling",
+    "geometryRef": "S16000144",
+    "seats": [
+      {
+        "regionId": "S16000144",
+        "party": "snp",
+        "memberName": "Evelyn Tweed",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000146",
+    "tier": "holyrood",
+    "name": "Uddingston and Bellshill",
+    "geometryRef": "S16000146",
+    "seats": [
+      {
+        "regionId": "S16000146",
+        "party": "snp",
+        "memberName": "Stephanie Callaghan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000148",
+    "tier": "holyrood",
+    "name": "Strathkelvin and Bearsden",
+    "geometryRef": "S16000148",
+    "seats": [
+      {
+        "regionId": "S16000148",
+        "party": "snp",
+        "memberName": "Rona Mackay",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000149",
+    "tier": "holyrood",
+    "name": "Coatbridge and Chryston",
+    "geometryRef": "S16000149",
+    "seats": [
+      {
+        "regionId": "S16000149",
+        "party": "snp",
+        "memberName": "Fulton MacGregor",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "S16000150",
+    "tier": "holyrood",
+    "name": "Glasgow Provan",
+    "geometryRef": "S16000150",
+    "seats": [
+      {
+        "regionId": "S16000150",
+        "party": "snp",
+        "memberName": "Ivan McKee",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  }
+]

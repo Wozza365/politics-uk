@@ -30,6 +30,16 @@ const PARTIES_SOURCE = [
     founded: 1900,
     mergedFrom: ['labour_coop'],
     leadership: [{ role: 'leader', personName: 'Keir Starmer', since: '2020-04-04' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 27.72,
+        finance: { estimatedCashOnHand: 7920000, annualIncome: 35525000, source: 'estimated' },
+        membership: 366300,
+        commonsSeats: 402,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'conservative',
@@ -39,6 +49,16 @@ const PARTIES_SOURCE = [
     scope: 'national',
     founded: 1834,
     leadership: [{ role: 'leader', personName: 'Kemi Badenoch', since: '2024-11-02' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 24.36,
+        finance: { estimatedCashOnHand: 6090000, annualIncome: 24500000, source: 'estimated' },
+        membership: 131950,
+        commonsSeats: 121,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'liberal_democrat',
@@ -48,6 +68,16 @@ const PARTIES_SOURCE = [
     scope: 'national',
     founded: 1988,
     leadership: [{ role: 'leader', personName: 'Ed Davey', since: '2020-08-27' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 11.76,
+        finance: { estimatedCashOnHand: 1470000, annualIncome: 6075000, source: 'estimated' },
+        membership: 73500,
+        commonsSeats: 72,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'reform_uk',
@@ -57,6 +87,16 @@ const PARTIES_SOURCE = [
     scope: 'national',
     founded: 2018,
     leadership: [{ role: 'leader', personName: 'Nigel Farage', since: '2024-06-03' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 22.28,
+        finance: { estimatedCashOnHand: 2025000, annualIncome: 7920000, source: 'estimated' },
+        membership: 222750,
+        commonsSeats: 5,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'green',
@@ -70,6 +110,16 @@ const PARTIES_SOURCE = [
       { role: 'leader', personName: 'Adrian Ramsay', since: '2024-09-06' },
       { role: 'leader', personName: 'Carla Denyer', since: '2024-09-06' },
     ],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 7.92,
+        finance: { estimatedCashOnHand: 495000, annualIncome: 2030000, source: 'estimated' },
+        membership: 59400,
+        commonsSeats: 4,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'workers_party',
@@ -79,6 +129,16 @@ const PARTIES_SOURCE = [
     scope: 'national',
     founded: 2019,
     leadership: [{ role: 'leader', personName: 'George Galloway', since: '2019-01-30' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 1.01,
+        finance: { estimatedCashOnHand: 20300, annualIncome: 98000, source: 'estimated' },
+        membership: 4060,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'ukip',
@@ -88,6 +148,16 @@ const PARTIES_SOURCE = [
     scope: 'national',
     founded: 1993,
     leadership: [{ role: 'leader', personName: 'Nick Tenconi', since: '2024-09-21' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0.29,
+        finance: { estimatedCashOnHand: 4900, annualIncome: 30375, source: 'estimated' },
+        membership: 2940,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'snp',
@@ -97,6 +167,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1934,
     leadership: [{ role: 'leader', personName: 'John Swinney', since: '2024-05-05' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 3.04,
+        finance: { estimatedCashOnHand: 405000, annualIncome: 2970000, source: 'estimated' },
+        membership: 50625,
+        commonsSeats: 9,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'plaid_cymru',
@@ -106,6 +186,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1925,
     leadership: [{ role: 'leader', personName: 'Rhun ap Iorwerth', since: '2023-08-19' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 99000, annualIncome: 507500, source: 'estimated' },
+        membership: 9900,
+        commonsSeats: 4,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'dup',
@@ -115,6 +205,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1971,
     leadership: [{ role: 'leader', personName: 'Gavin Robinson', since: '2024-06-29' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 152250, annualIncome: 588000, source: 'estimated' },
+        membership: 5075,
+        commonsSeats: 5,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'sinn_fein',
@@ -124,6 +224,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1905,
     leadership: [{ role: 'leader', personName: 'Mary Lou McDonald', since: '2018-02-10' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 196000, annualIncome: 810000, source: 'estimated' },
+        membership: 7840,
+        commonsSeats: 7,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'sdlp',
@@ -133,6 +243,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1970,
     leadership: [{ role: 'leader', personName: 'Claire Hanna', since: '2024-02-05' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 50625, annualIncome: 198000, source: 'estimated' },
+        membership: 2025,
+        commonsSeats: 2,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'alliance',
@@ -142,6 +262,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1970,
     leadership: [{ role: 'leader', personName: 'Naomi Long', since: '2016-10-29' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 79200, annualIncome: 304500, source: 'estimated' },
+        membership: 2970,
+        commonsSeats: 1,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'uup',
@@ -151,6 +281,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 1905,
     leadership: [{ role: 'leader', personName: 'Mike Nesbitt', since: '2024-04-08' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 40600, annualIncome: 147000, source: 'estimated' },
+        membership: 2030,
+        commonsSeats: 1,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'tuv',
@@ -160,6 +300,16 @@ const PARTIES_SOURCE = [
     scope: 'regional',
     founded: 2007,
     leadership: [{ role: 'leader', personName: 'Jim Allister', since: '2007-12-07' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 19600, annualIncome: 81000, source: 'estimated' },
+        membership: 1470,
+        commonsSeats: 1,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'speaker',
@@ -168,6 +318,16 @@ const PARTIES_SOURCE = [
     colours: { primary: '#4D4D4D' },
     scope: 'local',
     leadership: [{ role: 'leader', personName: 'Sir Lindsay Hoyle', since: '2019-11-04' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 0, annualIncome: 0, source: 'estimated' },
+        membership: 0,
+        commonsSeats: 1,
+        otherSeats: 0,
+      },
+    ],
   },
   {
     id: 'independent',
@@ -176,6 +336,54 @@ const PARTIES_SOURCE = [
     colours: { primary: '#909090' },
     scope: 'local',
     leadership: [],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 0, annualIncome: 0, source: 'estimated' },
+        membership: 0,
+        commonsSeats: 15,
+        otherSeats: 0,
+      },
+    ],
+  },
+  {
+    id: 'alba_party',
+    name: 'Alba Party',
+    shortName: 'Alba',
+    colours: { primary: '#001489' },
+    scope: 'regional',
+    founded: 2021,
+    leadership: [{ role: 'leader', personName: 'Alex Salmond', since: '2021-03-26' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 10000, annualIncome: 50000, source: 'estimated' },
+        membership: 3000,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
+  },
+  {
+    id: 'people_before_profit',
+    name: 'People Before Profit',
+    shortName: 'PBP',
+    colours: { primary: '#A6132B' },
+    scope: 'regional',
+    founded: 2005,
+    leadership: [],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 8000, annualIncome: 40000, source: 'estimated' },
+        membership: 1000,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
   },
 ]
 

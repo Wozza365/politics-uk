@@ -1,0 +1,686 @@
+[
+  {
+    "id": "N05000001",
+    "tier": "ni_assembly",
+    "name": "Belfast East",
+    "geometryRef": "N05000001",
+    "seats": [
+      {
+        "regionId": "N05000001",
+        "party": "alliance",
+        "memberName": "Naomi Long",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000001",
+        "party": "dup",
+        "memberName": "Joanne Bunting",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000001",
+        "party": "alliance",
+        "memberName": "Peter McReynolds",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000001",
+        "party": "dup",
+        "memberName": "David Brooks",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000001",
+        "party": "uup",
+        "memberName": "Andy Allen",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000002",
+    "tier": "ni_assembly",
+    "name": "Belfast North",
+    "geometryRef": "N05000002",
+    "seats": [
+      {
+        "regionId": "N05000002",
+        "party": "sinn_fein",
+        "memberName": "Gerry Kelly",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000002",
+        "party": "sinn_fein",
+        "memberName": "Carál Ní Chuilín",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000002",
+        "party": "dup",
+        "memberName": "Phillip Brett",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000002",
+        "party": "dup",
+        "memberName": "Brian Kingston",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000002",
+        "party": "alliance",
+        "memberName": "Nuala McAllister",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000003",
+    "tier": "ni_assembly",
+    "name": "Belfast South and Mid Down",
+    "geometryRef": "N05000003",
+    "seats": [
+      {
+        "regionId": "N05000003",
+        "party": "sinn_fein",
+        "memberName": "Deirdre Hargey",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000003",
+        "party": "speaker",
+        "memberName": "Edwin Poots",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000003",
+        "party": "sdlp",
+        "memberName": "Matthew O'Toole",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000003",
+        "party": "alliance",
+        "memberName": "Paula Bradshaw",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000003",
+        "party": "alliance",
+        "memberName": "Kate Nicholl",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000004",
+    "tier": "ni_assembly",
+    "name": "Belfast West",
+    "geometryRef": "N05000004",
+    "seats": [
+      {
+        "regionId": "N05000004",
+        "party": "sinn_fein",
+        "memberName": "Danny Baker",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000004",
+        "party": "sinn_fein",
+        "memberName": "Órlaithí Flynn",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000004",
+        "party": "sinn_fein",
+        "memberName": "Aisling Reilly",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000004",
+        "party": "sinn_fein",
+        "memberName": "Pat Sheehan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000004",
+        "party": "people_before_profit",
+        "memberName": "Gerry Carroll",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000005",
+    "tier": "ni_assembly",
+    "name": "East Antrim",
+    "geometryRef": "N05000005",
+    "seats": [
+      {
+        "regionId": "N05000005",
+        "party": "dup",
+        "memberName": "Gordon Lyons",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000005",
+        "party": "dup",
+        "memberName": "Cheryl Brownlee",
+        "electedAt": "2023-09-08"
+      },
+      {
+        "regionId": "N05000005",
+        "party": "uup",
+        "memberName": "John Stewart",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000005",
+        "party": "alliance",
+        "memberName": "Stewart Dickson",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000005",
+        "party": "alliance",
+        "memberName": "Danny Donnelly",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000006",
+    "tier": "ni_assembly",
+    "name": "East Londonderry",
+    "geometryRef": "N05000006",
+    "seats": [
+      {
+        "regionId": "N05000006",
+        "party": "dup",
+        "memberName": "Maurice Bradley",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000006",
+        "party": "dup",
+        "memberName": "Alan Robinson",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000006",
+        "party": "sinn_fein",
+        "memberName": "Caoimhe Archibald",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000006",
+        "party": "sdlp",
+        "memberName": "Cara Hunter",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000006",
+        "party": "independent",
+        "memberName": "Claire Sugden",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000007",
+    "tier": "ni_assembly",
+    "name": "Fermanagh and South Tyrone",
+    "geometryRef": "N05000007",
+    "seats": [
+      {
+        "regionId": "N05000007",
+        "party": "dup",
+        "memberName": "Deborah Erskine",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000007",
+        "party": "sinn_fein",
+        "memberName": "Jemma Dolan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000007",
+        "party": "sinn_fein",
+        "memberName": "Colm Gildernew",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000007",
+        "party": "sinn_fein",
+        "memberName": "Áine Murphy",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000007",
+        "party": "uup",
+        "memberName": "Tom Elliott",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000008",
+    "tier": "ni_assembly",
+    "name": "Foyle",
+    "geometryRef": "N05000008",
+    "seats": [
+      {
+        "regionId": "N05000008",
+        "party": "dup",
+        "memberName": "Gary Middleton",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000008",
+        "party": "sinn_fein",
+        "memberName": "Pádraig Delargy",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000008",
+        "party": "sinn_fein",
+        "memberName": "Ciara Ferguson",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000008",
+        "party": "sdlp",
+        "memberName": "Mark H. Durkan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000008",
+        "party": "sdlp",
+        "memberName": "Sinéad McLaughlin",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000009",
+    "tier": "ni_assembly",
+    "name": "Lagan Valley",
+    "geometryRef": "N05000009",
+    "seats": [
+      {
+        "regionId": "N05000009",
+        "party": "dup",
+        "memberName": "Emma Little-Pengelly",
+        "electedAt": "2022-05-12"
+      },
+      {
+        "regionId": "N05000009",
+        "party": "dup",
+        "memberName": "Paul Givan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000009",
+        "party": "uup",
+        "memberName": "Robbie Butler",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000009",
+        "party": "alliance",
+        "memberName": "Sorcha Eastwood",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000009",
+        "party": "alliance",
+        "memberName": "David Honeyford",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000010",
+    "tier": "ni_assembly",
+    "name": "Mid Ulster",
+    "geometryRef": "N05000010",
+    "seats": [
+      {
+        "regionId": "N05000010",
+        "party": "sinn_fein",
+        "memberName": "Michelle O’Neill",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000010",
+        "party": "sinn_fein",
+        "memberName": "Linda Dillon",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000010",
+        "party": "sinn_fein",
+        "memberName": "Emma Sheerin",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000010",
+        "party": "dup",
+        "memberName": "Keith Buchanan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000010",
+        "party": "sdlp",
+        "memberName": "Patsy McGlone",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000011",
+    "tier": "ni_assembly",
+    "name": "Newry and Armagh",
+    "geometryRef": "N05000011",
+    "seats": [
+      {
+        "regionId": "N05000011",
+        "party": "sinn_fein",
+        "memberName": "Cathal Boylan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000011",
+        "party": "sinn_fein",
+        "memberName": "Liz Kimmins",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000011",
+        "party": "sinn_fein",
+        "memberName": "Conor Murphy",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000011",
+        "party": "dup",
+        "memberName": "William Irwin",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000011",
+        "party": "sdlp",
+        "memberName": "Justin McNulty",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000012",
+    "tier": "ni_assembly",
+    "name": "North Antrim",
+    "geometryRef": "N05000012",
+    "seats": [
+      {
+        "regionId": "N05000012",
+        "party": "dup",
+        "memberName": "Paul Frew",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000012",
+        "party": "sinn_fein",
+        "memberName": "Philip McGuigan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000012",
+        "party": "uup",
+        "memberName": "Robin Swann",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000012",
+        "party": "tuv",
+        "memberName": "Jim Allister",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000012",
+        "party": "alliance",
+        "memberName": "Sian Mulholland",
+        "electedAt": "2023-03-31"
+      }
+    ]
+  },
+  {
+    "id": "N05000013",
+    "tier": "ni_assembly",
+    "name": "North Down",
+    "geometryRef": "N05000013",
+    "seats": [
+      {
+        "regionId": "N05000013",
+        "party": "dup",
+        "memberName": "Stephen Dunne",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000013",
+        "party": "uup",
+        "memberName": "Alan Chambers",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000013",
+        "party": "alliance",
+        "memberName": "Connie Egan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000013",
+        "party": "alliance",
+        "memberName": "Andrew Muir",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000013",
+        "party": "independent",
+        "memberName": "Alex Easton",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000014",
+    "tier": "ni_assembly",
+    "name": "South Antrim",
+    "geometryRef": "N05000014",
+    "seats": [
+      {
+        "regionId": "N05000014",
+        "party": "dup",
+        "memberName": "Pam Cameron",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000014",
+        "party": "dup",
+        "memberName": "Trevor Clarke",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000014",
+        "party": "sinn_fein",
+        "memberName": "Declan Kearney",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000014",
+        "party": "uup",
+        "memberName": "Steve Aiken",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000014",
+        "party": "alliance",
+        "memberName": "John Blair",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000015",
+    "tier": "ni_assembly",
+    "name": "South Down",
+    "geometryRef": "N05000015",
+    "seats": [
+      {
+        "regionId": "N05000015",
+        "party": "sinn_fein",
+        "memberName": "Sinéad Ennis",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000015",
+        "party": "sinn_fein",
+        "memberName": "Cathy Mason",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000015",
+        "party": "dup",
+        "memberName": "Diane Forsythe",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000015",
+        "party": "sdlp",
+        "memberName": "Colin McGrath",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000015",
+        "party": "alliance",
+        "memberName": "Andrew McMurray",
+        "electedAt": "2024-04-01"
+      }
+    ]
+  },
+  {
+    "id": "N05000016",
+    "tier": "ni_assembly",
+    "name": "Strangford",
+    "geometryRef": "N05000016",
+    "seats": [
+      {
+        "regionId": "N05000016",
+        "party": "alliance",
+        "memberName": "Kellie Armstrong",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000016",
+        "party": "alliance",
+        "memberName": "Nick Mathison",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000016",
+        "party": "dup",
+        "memberName": "Harry Harvey",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000016",
+        "party": "dup",
+        "memberName": "Michelle McIlveen",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000016",
+        "party": "uup",
+        "memberName": "Mike Nesbitt",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000017",
+    "tier": "ni_assembly",
+    "name": "Upper Bann",
+    "geometryRef": "N05000017",
+    "seats": [
+      {
+        "regionId": "N05000017",
+        "party": "dup",
+        "memberName": "Jonathan Buckley",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000017",
+        "party": "dup",
+        "memberName": "Diane Dodds",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000017",
+        "party": "sinn_fein",
+        "memberName": "John O'Dowd",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000017",
+        "party": "uup",
+        "memberName": "Doug Beattie",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000017",
+        "party": "alliance",
+        "memberName": "Eóin Tennyson",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  },
+  {
+    "id": "N05000018",
+    "tier": "ni_assembly",
+    "name": "West Tyrone",
+    "geometryRef": "N05000018",
+    "seats": [
+      {
+        "regionId": "N05000018",
+        "party": "sinn_fein",
+        "memberName": "Nicola Brogan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000018",
+        "party": "sinn_fein",
+        "memberName": "Declan McAleer",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000018",
+        "party": "sinn_fein",
+        "memberName": "Maolíosa McHugh",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000018",
+        "party": "dup",
+        "memberName": "Tom Buchanan",
+        "electedAt": "2022-05-05"
+      },
+      {
+        "regionId": "N05000018",
+        "party": "sdlp",
+        "memberName": "Daniel McCrossan",
+        "electedAt": "2022-05-05"
+      }
+    ]
+  }
+]

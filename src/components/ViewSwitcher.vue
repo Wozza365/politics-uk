@@ -6,10 +6,7 @@ const ui = useUiStore()
 
 const views: { id: GameView; label: string; available: boolean }[] = [
   { id: 'westminster', label: 'Westminster', available: true },
-  { id: 'holyrood', label: 'Holyrood', available: false },
-  { id: 'senedd', label: 'Senedd', available: false },
-  { id: 'ni-assembly', label: 'NI Assembly', available: false },
-  { id: 'london', label: 'London', available: false },
+  { id: 'regional', label: 'Regional', available: true },
   { id: 'councils', label: 'Councils', available: false },
 ]
 </script>

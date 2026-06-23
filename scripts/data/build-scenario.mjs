@@ -84,6 +84,10 @@ function readJson(relativePath) {
 
 function main() {
   const commonsRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.commons.json')
+  const holyroodRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.holyrood.json')
+  const seneddRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.senedd.json')
+  const niAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.ni_assembly.json')
+  const londonAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.london_assembly.json')
   const parties = readJson('../../src/data/scenarios/uk-2025-01-01/parties.json')
 
   const scenario = {
@@ -91,7 +95,13 @@ function main() {
     date: SCENARIO_DATE,
     label: `United Kingdom, ${SCENARIO_DATE}`,
     nextElectionDate: NEXT_ELECTION_DATE_PLACEHOLDER,
-    tiers: { commons: commonsRegions },
+    tiers: {
+      commons: commonsRegions,
+      holyrood: holyroodRegions,
+      senedd: seneddRegions,
+      ni_assembly: niAssemblyRegions,
+      london_assembly: londonAssemblyRegions,
+    },
     parties,
     polling: POLLING,
     // No historical snapshots authored yet — only the single scenario-start

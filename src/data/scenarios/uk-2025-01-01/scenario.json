@@ -40095,6 +40095,3110 @@
           }
         ]
       }
+    ],
+    "holyrood": [
+      {
+        "id": "region:central_scotland",
+        "tier": "holyrood",
+        "name": "Central Scotland (region)",
+        "geometryRef": "region:central_scotland",
+        "seats": [
+          {
+            "regionId": "region:central_scotland",
+            "party": "labour",
+            "memberName": "Richard Leonard",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "labour",
+            "memberName": "Monica Lennon",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "labour",
+            "memberName": "Mark Griffin",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "conservative",
+            "memberName": "Stephen Kerr",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "conservative",
+            "memberName": "Graham Simpson",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "conservative",
+            "memberName": "Meghan Gallacher",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:central_scotland",
+            "party": "green",
+            "memberName": "Gillian Mackay",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:glasgow",
+        "tier": "holyrood",
+        "name": "Glasgow (region)",
+        "geometryRef": "region:glasgow",
+        "seats": [
+          {
+            "regionId": "region:glasgow",
+            "party": "labour",
+            "memberName": "Pauline McNeill",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "labour",
+            "memberName": "Anas Sarwar",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "labour",
+            "memberName": "Paul Sweeney",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "labour",
+            "memberName": "Pam Duncan-Glancy",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "conservative",
+            "memberName": "Annie Wells",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "conservative",
+            "memberName": "Sandesh Gulhane",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:glasgow",
+            "party": "green",
+            "memberName": "Patrick Harvie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:highlands_and_islands",
+        "tier": "holyrood",
+        "name": "Highlands and Islands (region)",
+        "geometryRef": "region:highlands_and_islands",
+        "seats": [
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "snp",
+            "memberName": "Emma Roddick",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "conservative",
+            "memberName": "Douglas Ross",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "conservative",
+            "memberName": "Donald Cameron",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "conservative",
+            "memberName": "Edward Mountain",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "conservative",
+            "memberName": "Jamie Halcro Johnston",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "labour",
+            "memberName": "Rhoda Grant",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:highlands_and_islands",
+            "party": "green",
+            "memberName": "Ariane Burgess",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:lothian",
+        "tier": "holyrood",
+        "name": "Lothian (region)",
+        "geometryRef": "region:lothian",
+        "seats": [
+          {
+            "regionId": "region:lothian",
+            "party": "conservative",
+            "memberName": "Miles Briggs",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "conservative",
+            "memberName": "Sue Webber",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "conservative",
+            "memberName": "Jeremy Balfour",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "labour",
+            "memberName": "Sarah Boyack",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "labour",
+            "memberName": "Foysol Choudhury",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "green",
+            "memberName": "Alison Johnstone",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:lothian",
+            "party": "green",
+            "memberName": "Lorna Slater",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:mid_scotland_and_fife",
+        "tier": "holyrood",
+        "name": "Mid Scotland and Fife (region)",
+        "geometryRef": "region:mid_scotland_and_fife",
+        "seats": [
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "conservative",
+            "memberName": "Murdo Fraser",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "conservative",
+            "memberName": "Liz Smith",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "conservative",
+            "memberName": "Dean Lockhart",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "conservative",
+            "memberName": "Alexander Stewart",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "labour",
+            "memberName": "Claire Baker",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "labour",
+            "memberName": "Alex Rowley",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid_scotland_and_fife",
+            "party": "green",
+            "memberName": "Mark Ruskell",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:north_east_scotland",
+        "tier": "holyrood",
+        "name": "North East Scotland (region)",
+        "geometryRef": "region:north_east_scotland",
+        "seats": [
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "conservative",
+            "memberName": "Liam Kerr",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "conservative",
+            "memberName": "Douglas Lumsden",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "conservative",
+            "memberName": "Maurice Golden",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "conservative",
+            "memberName": "Tess White",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "labour",
+            "memberName": "Michael Marra",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "labour",
+            "memberName": "Mercedes Villalba",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north_east_scotland",
+            "party": "green",
+            "memberName": "Maggie Chapman",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:south_scotland",
+        "tier": "holyrood",
+        "name": "South Scotland (region)",
+        "geometryRef": "region:south_scotland",
+        "seats": [
+          {
+            "regionId": "region:south_scotland",
+            "party": "labour",
+            "memberName": "Colin Smyth",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "labour",
+            "memberName": "Carol Mochan",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "labour",
+            "memberName": "Martin Whitfield",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "conservative",
+            "memberName": "Craig Hoy",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "conservative",
+            "memberName": "Brian Whittle",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "conservative",
+            "memberName": "Sharon Dowey",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south_scotland",
+            "party": "snp",
+            "memberName": "Emma Harper",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:west_scotland",
+        "tier": "holyrood",
+        "name": "West Scotland (region)",
+        "geometryRef": "region:west_scotland",
+        "seats": [
+          {
+            "regionId": "region:west_scotland",
+            "party": "labour",
+            "memberName": "Neil Bibby",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "labour",
+            "memberName": "Katy Clark",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "labour",
+            "memberName": "Paul O’Kane",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "conservative",
+            "memberName": "Russell Findlay",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "conservative",
+            "memberName": "Jamie Greene",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "conservative",
+            "memberName": "Pam Gosal",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:west_scotland",
+            "party": "green",
+            "memberName": "Ross Greer",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000074",
+        "tier": "holyrood",
+        "name": "Aberdeen Central",
+        "geometryRef": "S16000074",
+        "seats": [
+          {
+            "regionId": "S16000074",
+            "party": "snp",
+            "memberName": "Kevin Stewart",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000075",
+        "tier": "holyrood",
+        "name": "Aberdeen Donside",
+        "geometryRef": "S16000075",
+        "seats": [
+          {
+            "regionId": "S16000075",
+            "party": "snp",
+            "memberName": "Jackie Dunbar",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000076",
+        "tier": "holyrood",
+        "name": "Aberdeen South and North Kincardine",
+        "geometryRef": "S16000076",
+        "seats": [
+          {
+            "regionId": "S16000076",
+            "party": "snp",
+            "memberName": "Audrey Nicoll",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000077",
+        "tier": "holyrood",
+        "name": "Aberdeenshire East",
+        "geometryRef": "S16000077",
+        "seats": [
+          {
+            "regionId": "S16000077",
+            "party": "snp",
+            "memberName": "Gillian Martin",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000078",
+        "tier": "holyrood",
+        "name": "Aberdeenshire West",
+        "geometryRef": "S16000078",
+        "seats": [
+          {
+            "regionId": "S16000078",
+            "party": "conservative",
+            "memberName": "Alexander Burnett",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000079",
+        "tier": "holyrood",
+        "name": "Airdrie and Shotts",
+        "geometryRef": "S16000079",
+        "seats": [
+          {
+            "regionId": "S16000079",
+            "party": "snp",
+            "memberName": "Neil Gray",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000080",
+        "tier": "holyrood",
+        "name": "Almond Valley",
+        "geometryRef": "S16000080",
+        "seats": [
+          {
+            "regionId": "S16000080",
+            "party": "snp",
+            "memberName": "Angela Constance",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000081",
+        "tier": "holyrood",
+        "name": "Angus North and Mearns",
+        "geometryRef": "S16000081",
+        "seats": [
+          {
+            "regionId": "S16000081",
+            "party": "snp",
+            "memberName": "Mairi Gougeon",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000082",
+        "tier": "holyrood",
+        "name": "Angus South",
+        "geometryRef": "S16000082",
+        "seats": [
+          {
+            "regionId": "S16000082",
+            "party": "snp",
+            "memberName": "Graeme Dey",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000083",
+        "tier": "holyrood",
+        "name": "Argyll and Bute",
+        "geometryRef": "S16000083",
+        "seats": [
+          {
+            "regionId": "S16000083",
+            "party": "snp",
+            "memberName": "Jenni Minto",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000084",
+        "tier": "holyrood",
+        "name": "Ayr",
+        "geometryRef": "S16000084",
+        "seats": [
+          {
+            "regionId": "S16000084",
+            "party": "snp",
+            "memberName": "Siobhian Brown",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000085",
+        "tier": "holyrood",
+        "name": "Banffshire and Buchan Coast",
+        "geometryRef": "S16000085",
+        "seats": [
+          {
+            "regionId": "S16000085",
+            "party": "snp",
+            "memberName": "Karen Adam",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000086",
+        "tier": "holyrood",
+        "name": "Caithness, Sutherland and Ross",
+        "geometryRef": "S16000086",
+        "seats": [
+          {
+            "regionId": "S16000086",
+            "party": "snp",
+            "memberName": "Maree Todd",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000087",
+        "tier": "holyrood",
+        "name": "Carrick, Cumnock and Doon Valley",
+        "geometryRef": "S16000087",
+        "seats": [
+          {
+            "regionId": "S16000087",
+            "party": "snp",
+            "memberName": "Elena Whitham",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000088",
+        "tier": "holyrood",
+        "name": "Clackmannanshire and Dunblane",
+        "geometryRef": "S16000088",
+        "seats": [
+          {
+            "regionId": "S16000088",
+            "party": "snp",
+            "memberName": "Keith Brown",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000089",
+        "tier": "holyrood",
+        "name": "Clydebank and Milngavie",
+        "geometryRef": "S16000089",
+        "seats": [
+          {
+            "regionId": "S16000089",
+            "party": "snp",
+            "memberName": "Marie McNair",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000090",
+        "tier": "holyrood",
+        "name": "Clydesdale",
+        "geometryRef": "S16000090",
+        "seats": [
+          {
+            "regionId": "S16000090",
+            "party": "snp",
+            "memberName": "Màiri McAllan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000092",
+        "tier": "holyrood",
+        "name": "Cowdenbeath",
+        "geometryRef": "S16000092",
+        "seats": [
+          {
+            "regionId": "S16000092",
+            "party": "snp",
+            "memberName": "Annabelle Ewing",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000093",
+        "tier": "holyrood",
+        "name": "Cumbernauld and Kilsyth",
+        "geometryRef": "S16000093",
+        "seats": [
+          {
+            "regionId": "S16000093",
+            "party": "snp",
+            "memberName": "Jamie Hepburn",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000094",
+        "tier": "holyrood",
+        "name": "Cunninghame North",
+        "geometryRef": "S16000094",
+        "seats": [
+          {
+            "regionId": "S16000094",
+            "party": "snp",
+            "memberName": "Kenneth Gibson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000095",
+        "tier": "holyrood",
+        "name": "Cunninghame South",
+        "geometryRef": "S16000095",
+        "seats": [
+          {
+            "regionId": "S16000095",
+            "party": "snp",
+            "memberName": "Ruth Maguire",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000096",
+        "tier": "holyrood",
+        "name": "Dumbarton",
+        "geometryRef": "S16000096",
+        "seats": [
+          {
+            "regionId": "S16000096",
+            "party": "labour",
+            "memberName": "Jackie Baillie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000097",
+        "tier": "holyrood",
+        "name": "Dumfriesshire",
+        "geometryRef": "S16000097",
+        "seats": [
+          {
+            "regionId": "S16000097",
+            "party": "conservative",
+            "memberName": "Oliver Mundell",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000098",
+        "tier": "holyrood",
+        "name": "Dundee City East",
+        "geometryRef": "S16000098",
+        "seats": [
+          {
+            "regionId": "S16000098",
+            "party": "snp",
+            "memberName": "Shona Robison",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000099",
+        "tier": "holyrood",
+        "name": "Dundee City West",
+        "geometryRef": "S16000099",
+        "seats": [
+          {
+            "regionId": "S16000099",
+            "party": "snp",
+            "memberName": "Joe FitzPatrick",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000100",
+        "tier": "holyrood",
+        "name": "Dunfermline",
+        "geometryRef": "S16000100",
+        "seats": [
+          {
+            "regionId": "S16000100",
+            "party": "snp",
+            "memberName": "Shirley-Anne Somerville",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000101",
+        "tier": "holyrood",
+        "name": "East Kilbride",
+        "geometryRef": "S16000101",
+        "seats": [
+          {
+            "regionId": "S16000101",
+            "party": "snp",
+            "memberName": "Collette Stevenson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000102",
+        "tier": "holyrood",
+        "name": "East Lothian",
+        "geometryRef": "S16000102",
+        "seats": [
+          {
+            "regionId": "S16000102",
+            "party": "snp",
+            "memberName": "Paul McLennan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000103",
+        "tier": "holyrood",
+        "name": "Eastwood",
+        "geometryRef": "S16000103",
+        "seats": [
+          {
+            "regionId": "S16000103",
+            "party": "conservative",
+            "memberName": "Jackson Carlaw",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000104",
+        "tier": "holyrood",
+        "name": "Edinburgh Central",
+        "geometryRef": "S16000104",
+        "seats": [
+          {
+            "regionId": "S16000104",
+            "party": "snp",
+            "memberName": "Angus Robertson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000105",
+        "tier": "holyrood",
+        "name": "Edinburgh Eastern",
+        "geometryRef": "S16000105",
+        "seats": [
+          {
+            "regionId": "S16000105",
+            "party": "alba_party",
+            "memberName": "Ash Regan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000106",
+        "tier": "holyrood",
+        "name": "Edinburgh Northern and Leith",
+        "geometryRef": "S16000106",
+        "seats": [
+          {
+            "regionId": "S16000106",
+            "party": "snp",
+            "memberName": "Ben Macpherson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000107",
+        "tier": "holyrood",
+        "name": "Edinburgh Pentlands",
+        "geometryRef": "S16000107",
+        "seats": [
+          {
+            "regionId": "S16000107",
+            "party": "snp",
+            "memberName": "Gordon MacDonald",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000108",
+        "tier": "holyrood",
+        "name": "Edinburgh Southern",
+        "geometryRef": "S16000108",
+        "seats": [
+          {
+            "regionId": "S16000108",
+            "party": "labour",
+            "memberName": "Daniel Johnson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000109",
+        "tier": "holyrood",
+        "name": "Edinburgh Western",
+        "geometryRef": "S16000109",
+        "seats": [
+          {
+            "regionId": "S16000109",
+            "party": "liberal_democrat",
+            "memberName": "Alex Cole-Hamilton",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000110",
+        "tier": "holyrood",
+        "name": "Na h-Eileanan an Iar",
+        "geometryRef": "S16000110",
+        "seats": [
+          {
+            "regionId": "S16000110",
+            "party": "snp",
+            "memberName": "Alasdair Allan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000111",
+        "tier": "holyrood",
+        "name": "Ettrick, Roxburgh and Berwickshire",
+        "geometryRef": "S16000111",
+        "seats": [
+          {
+            "regionId": "S16000111",
+            "party": "conservative",
+            "memberName": "Rachael Hamilton",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000112",
+        "tier": "holyrood",
+        "name": "Falkirk East",
+        "geometryRef": "S16000112",
+        "seats": [
+          {
+            "regionId": "S16000112",
+            "party": "snp",
+            "memberName": "Michelle Thomson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000113",
+        "tier": "holyrood",
+        "name": "Falkirk West",
+        "geometryRef": "S16000113",
+        "seats": [
+          {
+            "regionId": "S16000113",
+            "party": "snp",
+            "memberName": "Michael Matheson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000114",
+        "tier": "holyrood",
+        "name": "Galloway and West Dumfries",
+        "geometryRef": "S16000114",
+        "seats": [
+          {
+            "regionId": "S16000114",
+            "party": "conservative",
+            "memberName": "Finlay Carson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000115",
+        "tier": "holyrood",
+        "name": "Glasgow Anniesland",
+        "geometryRef": "S16000115",
+        "seats": [
+          {
+            "regionId": "S16000115",
+            "party": "snp",
+            "memberName": "Bill Kidd",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000116",
+        "tier": "holyrood",
+        "name": "Glasgow Cathcart",
+        "geometryRef": "S16000116",
+        "seats": [
+          {
+            "regionId": "S16000116",
+            "party": "snp",
+            "memberName": "James Dornan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000117",
+        "tier": "holyrood",
+        "name": "Glasgow Kelvin",
+        "geometryRef": "S16000117",
+        "seats": [
+          {
+            "regionId": "S16000117",
+            "party": "snp",
+            "memberName": "Kaukab Stewart",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000118",
+        "tier": "holyrood",
+        "name": "Glasgow Maryhill and Springburn",
+        "geometryRef": "S16000118",
+        "seats": [
+          {
+            "regionId": "S16000118",
+            "party": "snp",
+            "memberName": "Bob Doris",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000119",
+        "tier": "holyrood",
+        "name": "Glasgow Pollok",
+        "geometryRef": "S16000119",
+        "seats": [
+          {
+            "regionId": "S16000119",
+            "party": "snp",
+            "memberName": "Humza Yousaf",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000121",
+        "tier": "holyrood",
+        "name": "Glasgow Shettleston",
+        "geometryRef": "S16000121",
+        "seats": [
+          {
+            "regionId": "S16000121",
+            "party": "independent",
+            "memberName": "John Mason",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000122",
+        "tier": "holyrood",
+        "name": "Glasgow Southside",
+        "geometryRef": "S16000122",
+        "seats": [
+          {
+            "regionId": "S16000122",
+            "party": "snp",
+            "memberName": "Nicola Sturgeon",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000123",
+        "tier": "holyrood",
+        "name": "Greenock and Inverclyde",
+        "geometryRef": "S16000123",
+        "seats": [
+          {
+            "regionId": "S16000123",
+            "party": "snp",
+            "memberName": "Stuart McMillan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000124",
+        "tier": "holyrood",
+        "name": "Hamilton, Larkhall and Stonehouse",
+        "geometryRef": "S16000124",
+        "seats": [
+          {
+            "regionId": "S16000124",
+            "party": "snp",
+            "memberName": "Christina McKelvie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000125",
+        "tier": "holyrood",
+        "name": "Inverness and Nairn",
+        "geometryRef": "S16000125",
+        "seats": [
+          {
+            "regionId": "S16000125",
+            "party": "snp",
+            "memberName": "Fergus Ewing",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000126",
+        "tier": "holyrood",
+        "name": "Kilmarnock and Irvine Valley",
+        "geometryRef": "S16000126",
+        "seats": [
+          {
+            "regionId": "S16000126",
+            "party": "snp",
+            "memberName": "Willie Coffey",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000127",
+        "tier": "holyrood",
+        "name": "Kirkcaldy",
+        "geometryRef": "S16000127",
+        "seats": [
+          {
+            "regionId": "S16000127",
+            "party": "snp",
+            "memberName": "David Torrance",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000128",
+        "tier": "holyrood",
+        "name": "Linlithgow",
+        "geometryRef": "S16000128",
+        "seats": [
+          {
+            "regionId": "S16000128",
+            "party": "snp",
+            "memberName": "Fiona Hyslop",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000129",
+        "tier": "holyrood",
+        "name": "Mid Fife and Glenrothes",
+        "geometryRef": "S16000129",
+        "seats": [
+          {
+            "regionId": "S16000129",
+            "party": "snp",
+            "memberName": "Jenny Gilruth",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000130",
+        "tier": "holyrood",
+        "name": "Midlothian North and Musselburgh",
+        "geometryRef": "S16000130",
+        "seats": [
+          {
+            "regionId": "S16000130",
+            "party": "snp",
+            "memberName": "Colin Beattie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000131",
+        "tier": "holyrood",
+        "name": "Midlothian South, Tweeddale and Lauderdale",
+        "geometryRef": "S16000131",
+        "seats": [
+          {
+            "regionId": "S16000131",
+            "party": "snp",
+            "memberName": "Christine Grahame",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000132",
+        "tier": "holyrood",
+        "name": "Moray",
+        "geometryRef": "S16000132",
+        "seats": [
+          {
+            "regionId": "S16000132",
+            "party": "snp",
+            "memberName": "Richard Lochhead",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000133",
+        "tier": "holyrood",
+        "name": "Motherwell and Wishaw",
+        "geometryRef": "S16000133",
+        "seats": [
+          {
+            "regionId": "S16000133",
+            "party": "snp",
+            "memberName": "Clare Adamson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000134",
+        "tier": "holyrood",
+        "name": "North East Fife",
+        "geometryRef": "S16000134",
+        "seats": [
+          {
+            "regionId": "S16000134",
+            "party": "liberal_democrat",
+            "memberName": "Willie Rennie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000135",
+        "tier": "holyrood",
+        "name": "Orkney Islands",
+        "geometryRef": "S16000135",
+        "seats": [
+          {
+            "regionId": "S16000135",
+            "party": "liberal_democrat",
+            "memberName": "Liam McArthur",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000136",
+        "tier": "holyrood",
+        "name": "Paisley",
+        "geometryRef": "S16000136",
+        "seats": [
+          {
+            "regionId": "S16000136",
+            "party": "snp",
+            "memberName": "George Adam",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000137",
+        "tier": "holyrood",
+        "name": "Perthshire North",
+        "geometryRef": "S16000137",
+        "seats": [
+          {
+            "regionId": "S16000137",
+            "party": "snp",
+            "memberName": "John Swinney",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000138",
+        "tier": "holyrood",
+        "name": "Perthshire South and Kinross-shire",
+        "geometryRef": "S16000138",
+        "seats": [
+          {
+            "regionId": "S16000138",
+            "party": "snp",
+            "memberName": "Jim Fairlie",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000139",
+        "tier": "holyrood",
+        "name": "Renfrewshire North and West",
+        "geometryRef": "S16000139",
+        "seats": [
+          {
+            "regionId": "S16000139",
+            "party": "snp",
+            "memberName": "Natalie Don",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000140",
+        "tier": "holyrood",
+        "name": "Renfrewshire South",
+        "geometryRef": "S16000140",
+        "seats": [
+          {
+            "regionId": "S16000140",
+            "party": "snp",
+            "memberName": "Tom Arthur",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000141",
+        "tier": "holyrood",
+        "name": "Rutherglen",
+        "geometryRef": "S16000141",
+        "seats": [
+          {
+            "regionId": "S16000141",
+            "party": "snp",
+            "memberName": "Clare Haughey",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000142",
+        "tier": "holyrood",
+        "name": "Shetland Islands",
+        "geometryRef": "S16000142",
+        "seats": [
+          {
+            "regionId": "S16000142",
+            "party": "liberal_democrat",
+            "memberName": "Beatrice Wishart",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000143",
+        "tier": "holyrood",
+        "name": "Skye, Lochaber and Badenoch",
+        "geometryRef": "S16000143",
+        "seats": [
+          {
+            "regionId": "S16000143",
+            "party": "snp",
+            "memberName": "Kate Forbes",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000144",
+        "tier": "holyrood",
+        "name": "Stirling",
+        "geometryRef": "S16000144",
+        "seats": [
+          {
+            "regionId": "S16000144",
+            "party": "snp",
+            "memberName": "Evelyn Tweed",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000146",
+        "tier": "holyrood",
+        "name": "Uddingston and Bellshill",
+        "geometryRef": "S16000146",
+        "seats": [
+          {
+            "regionId": "S16000146",
+            "party": "snp",
+            "memberName": "Stephanie Callaghan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000148",
+        "tier": "holyrood",
+        "name": "Strathkelvin and Bearsden",
+        "geometryRef": "S16000148",
+        "seats": [
+          {
+            "regionId": "S16000148",
+            "party": "snp",
+            "memberName": "Rona Mackay",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000149",
+        "tier": "holyrood",
+        "name": "Coatbridge and Chryston",
+        "geometryRef": "S16000149",
+        "seats": [
+          {
+            "regionId": "S16000149",
+            "party": "snp",
+            "memberName": "Fulton MacGregor",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "S16000150",
+        "tier": "holyrood",
+        "name": "Glasgow Provan",
+        "geometryRef": "S16000150",
+        "seats": [
+          {
+            "regionId": "S16000150",
+            "party": "snp",
+            "memberName": "Ivan McKee",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      }
+    ],
+    "senedd": [
+      {
+        "id": "region:mid-and-west-wales",
+        "tier": "senedd",
+        "name": "Mid and West Wales",
+        "geometryRef": "region:mid-and-west-wales",
+        "seats": [
+          {
+            "regionId": "region:mid-and-west-wales",
+            "party": "labour",
+            "memberName": "Eluned Morgan",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid-and-west-wales",
+            "party": "plaid_cymru",
+            "memberName": "Cefin Campbell",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid-and-west-wales",
+            "party": "liberal_democrat",
+            "memberName": "Jane Dodds",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:mid-and-west-wales",
+            "party": "labour",
+            "memberName": "Joyce Watson",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:north-wales",
+        "tier": "senedd",
+        "name": "North Wales",
+        "geometryRef": "region:north-wales",
+        "seats": [
+          {
+            "regionId": "region:north-wales",
+            "party": "plaid_cymru",
+            "memberName": "Llŷr Gruffydd",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north-wales",
+            "party": "conservative",
+            "memberName": "Mark Isherwood",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north-wales",
+            "party": "conservative",
+            "memberName": "Sam Rowlands",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:north-wales",
+            "party": "labour",
+            "memberName": "Carolyn Thomas",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:south-wales-central",
+        "tier": "senedd",
+        "name": "South Wales Central",
+        "geometryRef": "region:south-wales-central",
+        "seats": [
+          {
+            "regionId": "region:south-wales-central",
+            "party": "conservative",
+            "memberName": "Andrew R. T. Davies",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-central",
+            "party": "plaid_cymru",
+            "memberName": "Heledd Fychan",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-central",
+            "party": "conservative",
+            "memberName": "Joel James",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-central",
+            "party": "independent",
+            "memberName": "Rhys ab Owen",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:south-wales-east",
+        "tier": "senedd",
+        "name": "South Wales East",
+        "geometryRef": "region:south-wales-east",
+        "seats": [
+          {
+            "regionId": "region:south-wales-east",
+            "party": "conservative",
+            "memberName": "Natasha Asghar",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-east",
+            "party": "plaid_cymru",
+            "memberName": "Peredur Owen Griffiths",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-east",
+            "party": "plaid_cymru",
+            "memberName": "Delyth Jewell",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-east",
+            "party": "conservative",
+            "memberName": "Laura Anne Jones",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "region:south-wales-west",
+        "tier": "senedd",
+        "name": "South Wales West",
+        "geometryRef": "region:south-wales-west",
+        "seats": [
+          {
+            "regionId": "region:south-wales-west",
+            "party": "plaid_cymru",
+            "memberName": "Luke Fletcher",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-west",
+            "party": "conservative",
+            "memberName": "Tom Giffard",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-west",
+            "party": "conservative",
+            "memberName": "Altaf Hussain",
+            "electedAt": "2021-05-06"
+          },
+          {
+            "regionId": "region:south-wales-west",
+            "party": "plaid_cymru",
+            "memberName": "Sioned Williams",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000001",
+        "tier": "senedd",
+        "name": "Ynys Môn",
+        "geometryRef": "W09000001",
+        "seats": [
+          {
+            "regionId": "W09000001",
+            "party": "plaid_cymru",
+            "memberName": "Rhun ap Iorwerth",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000002",
+        "tier": "senedd",
+        "name": "Arfon",
+        "geometryRef": "W09000002",
+        "seats": [
+          {
+            "regionId": "W09000002",
+            "party": "plaid_cymru",
+            "memberName": "Siân Gwenllian",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000003",
+        "tier": "senedd",
+        "name": "Aberconwy",
+        "geometryRef": "W09000003",
+        "seats": [
+          {
+            "regionId": "W09000003",
+            "party": "conservative",
+            "memberName": "Janet Finch-Saunders",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000004",
+        "tier": "senedd",
+        "name": "Clwyd West",
+        "geometryRef": "W09000004",
+        "seats": [
+          {
+            "regionId": "W09000004",
+            "party": "conservative",
+            "memberName": "Darren Millar",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000005",
+        "tier": "senedd",
+        "name": "Vale of Clwyd",
+        "geometryRef": "W09000005",
+        "seats": [
+          {
+            "regionId": "W09000005",
+            "party": "conservative",
+            "memberName": "Gareth Davies",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000006",
+        "tier": "senedd",
+        "name": "Delyn",
+        "geometryRef": "W09000006",
+        "seats": [
+          {
+            "regionId": "W09000006",
+            "party": "labour",
+            "memberName": "Hannah Blythyn",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000007",
+        "tier": "senedd",
+        "name": "Alyn and Deeside",
+        "geometryRef": "W09000007",
+        "seats": [
+          {
+            "regionId": "W09000007",
+            "party": "labour",
+            "memberName": "Jack Sargeant",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000008",
+        "tier": "senedd",
+        "name": "Wrexham",
+        "geometryRef": "W09000008",
+        "seats": [
+          {
+            "regionId": "W09000008",
+            "party": "labour",
+            "memberName": "Lesley Griffiths",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000009",
+        "tier": "senedd",
+        "name": "Clwyd South",
+        "geometryRef": "W09000009",
+        "seats": [
+          {
+            "regionId": "W09000009",
+            "party": "labour",
+            "memberName": "Ken Skates",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000010",
+        "tier": "senedd",
+        "name": "Dwyfor Meirionnydd",
+        "geometryRef": "W09000010",
+        "seats": [
+          {
+            "regionId": "W09000010",
+            "party": "plaid_cymru",
+            "memberName": "Mabon ap Gwynfor",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000011",
+        "tier": "senedd",
+        "name": "Montgomeryshire",
+        "geometryRef": "W09000011",
+        "seats": [
+          {
+            "regionId": "W09000011",
+            "party": "conservative",
+            "memberName": "Russell George",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000012",
+        "tier": "senedd",
+        "name": "Ceredigion",
+        "geometryRef": "W09000012",
+        "seats": [
+          {
+            "regionId": "W09000012",
+            "party": "plaid_cymru",
+            "memberName": "Elin Jones",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000014",
+        "tier": "senedd",
+        "name": "Preseli Pembrokeshire",
+        "geometryRef": "W09000014",
+        "seats": [
+          {
+            "regionId": "W09000014",
+            "party": "conservative",
+            "memberName": "Paul Davies",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000015",
+        "tier": "senedd",
+        "name": "Carmarthen East and Dinefwr",
+        "geometryRef": "W09000015",
+        "seats": [
+          {
+            "regionId": "W09000015",
+            "party": "plaid_cymru",
+            "memberName": "Adam Price",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000016",
+        "tier": "senedd",
+        "name": "Carmarthen West and South Pembrokeshire",
+        "geometryRef": "W09000016",
+        "seats": [
+          {
+            "regionId": "W09000016",
+            "party": "conservative",
+            "memberName": "Samuel Kurtz",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000017",
+        "tier": "senedd",
+        "name": "Llanelli",
+        "geometryRef": "W09000017",
+        "seats": [
+          {
+            "regionId": "W09000017",
+            "party": "labour",
+            "memberName": "Lee Waters",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000018",
+        "tier": "senedd",
+        "name": "Gower",
+        "geometryRef": "W09000018",
+        "seats": [
+          {
+            "regionId": "W09000018",
+            "party": "labour",
+            "memberName": "Rebecca Evans",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000019",
+        "tier": "senedd",
+        "name": "Swansea West",
+        "geometryRef": "W09000019",
+        "seats": [
+          {
+            "regionId": "W09000019",
+            "party": "labour",
+            "memberName": "Julie James",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000020",
+        "tier": "senedd",
+        "name": "Swansea East",
+        "geometryRef": "W09000020",
+        "seats": [
+          {
+            "regionId": "W09000020",
+            "party": "labour",
+            "memberName": "Mike Hedges",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000021",
+        "tier": "senedd",
+        "name": "Neath",
+        "geometryRef": "W09000021",
+        "seats": [
+          {
+            "regionId": "W09000021",
+            "party": "labour",
+            "memberName": "Jeremy Miles",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000022",
+        "tier": "senedd",
+        "name": "Aberavon",
+        "geometryRef": "W09000022",
+        "seats": [
+          {
+            "regionId": "W09000022",
+            "party": "labour",
+            "memberName": "David Rees",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000023",
+        "tier": "senedd",
+        "name": "Bridgend",
+        "geometryRef": "W09000023",
+        "seats": [
+          {
+            "regionId": "W09000023",
+            "party": "labour",
+            "memberName": "Sarah Murphy",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000025",
+        "tier": "senedd",
+        "name": "Rhondda",
+        "geometryRef": "W09000025",
+        "seats": [
+          {
+            "regionId": "W09000025",
+            "party": "labour",
+            "memberName": "Buffy Williams",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000026",
+        "tier": "senedd",
+        "name": "Cynon Valley",
+        "geometryRef": "W09000026",
+        "seats": [
+          {
+            "regionId": "W09000026",
+            "party": "labour",
+            "memberName": "Vikki Howells",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000029",
+        "tier": "senedd",
+        "name": "Cardiff West",
+        "geometryRef": "W09000029",
+        "seats": [
+          {
+            "regionId": "W09000029",
+            "party": "labour",
+            "memberName": "Mark Drakeford",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000031",
+        "tier": "senedd",
+        "name": "Cardiff Central",
+        "geometryRef": "W09000031",
+        "seats": [
+          {
+            "regionId": "W09000031",
+            "party": "labour",
+            "memberName": "Jenny Rathbone",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000034",
+        "tier": "senedd",
+        "name": "Monmouth",
+        "geometryRef": "W09000034",
+        "seats": [
+          {
+            "regionId": "W09000034",
+            "party": "conservative",
+            "memberName": "Peter Fox",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000035",
+        "tier": "senedd",
+        "name": "Caerphilly",
+        "geometryRef": "W09000035",
+        "seats": [
+          {
+            "regionId": "W09000035",
+            "party": "plaid_cymru",
+            "memberName": "Lindsay Whittle",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000036",
+        "tier": "senedd",
+        "name": "Islwyn",
+        "geometryRef": "W09000036",
+        "seats": [
+          {
+            "regionId": "W09000036",
+            "party": "labour",
+            "memberName": "Rhianon Passmore",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000037",
+        "tier": "senedd",
+        "name": "Torfaen",
+        "geometryRef": "W09000037",
+        "seats": [
+          {
+            "regionId": "W09000037",
+            "party": "labour",
+            "memberName": "Lynne Neagle",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000038",
+        "tier": "senedd",
+        "name": "Blaenau Gwent",
+        "geometryRef": "W09000038",
+        "seats": [
+          {
+            "regionId": "W09000038",
+            "party": "labour",
+            "memberName": "Alun Davies",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000039",
+        "tier": "senedd",
+        "name": "Newport West",
+        "geometryRef": "W09000039",
+        "seats": [
+          {
+            "regionId": "W09000039",
+            "party": "labour",
+            "memberName": "Jayne Bryant",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000040",
+        "tier": "senedd",
+        "name": "Newport East",
+        "geometryRef": "W09000040",
+        "seats": [
+          {
+            "regionId": "W09000040",
+            "party": "labour",
+            "memberName": "John Griffiths",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000041",
+        "tier": "senedd",
+        "name": "Brecon and Radnorshire",
+        "geometryRef": "W09000041",
+        "seats": [
+          {
+            "regionId": "W09000041",
+            "party": "conservative",
+            "memberName": "James Evans",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000042",
+        "tier": "senedd",
+        "name": "Cardiff North",
+        "geometryRef": "W09000042",
+        "seats": [
+          {
+            "regionId": "W09000042",
+            "party": "labour",
+            "memberName": "Julie Morgan",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000043",
+        "tier": "senedd",
+        "name": "Cardiff South and Penarth",
+        "geometryRef": "W09000043",
+        "seats": [
+          {
+            "regionId": "W09000043",
+            "party": "labour",
+            "memberName": "Vaughan Gething",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000044",
+        "tier": "senedd",
+        "name": "Merthyr Tydfil and Rhymney",
+        "geometryRef": "W09000044",
+        "seats": [
+          {
+            "regionId": "W09000044",
+            "party": "labour",
+            "memberName": "Dawn Bowden",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000045",
+        "tier": "senedd",
+        "name": "Ogmore",
+        "geometryRef": "W09000045",
+        "seats": [
+          {
+            "regionId": "W09000045",
+            "party": "labour",
+            "memberName": "Huw Irranca-Davies",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000046",
+        "tier": "senedd",
+        "name": "Pontypridd",
+        "geometryRef": "W09000046",
+        "seats": [
+          {
+            "regionId": "W09000046",
+            "party": "labour",
+            "memberName": "Mick Antoniw",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      },
+      {
+        "id": "W09000047",
+        "tier": "senedd",
+        "name": "Vale of Glamorgan",
+        "geometryRef": "W09000047",
+        "seats": [
+          {
+            "regionId": "W09000047",
+            "party": "labour",
+            "memberName": "Jane Hutt",
+            "electedAt": "2021-05-06"
+          }
+        ]
+      }
+    ],
+    "ni_assembly": [
+      {
+        "id": "N05000001",
+        "tier": "ni_assembly",
+        "name": "Belfast East",
+        "geometryRef": "N05000001",
+        "seats": [
+          {
+            "regionId": "N05000001",
+            "party": "alliance",
+            "memberName": "Naomi Long",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000001",
+            "party": "dup",
+            "memberName": "Joanne Bunting",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000001",
+            "party": "alliance",
+            "memberName": "Peter McReynolds",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000001",
+            "party": "dup",
+            "memberName": "David Brooks",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000001",
+            "party": "uup",
+            "memberName": "Andy Allen",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000002",
+        "tier": "ni_assembly",
+        "name": "Belfast North",
+        "geometryRef": "N05000002",
+        "seats": [
+          {
+            "regionId": "N05000002",
+            "party": "sinn_fein",
+            "memberName": "Gerry Kelly",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000002",
+            "party": "sinn_fein",
+            "memberName": "Carál Ní Chuilín",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000002",
+            "party": "dup",
+            "memberName": "Phillip Brett",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000002",
+            "party": "dup",
+            "memberName": "Brian Kingston",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000002",
+            "party": "alliance",
+            "memberName": "Nuala McAllister",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000003",
+        "tier": "ni_assembly",
+        "name": "Belfast South and Mid Down",
+        "geometryRef": "N05000003",
+        "seats": [
+          {
+            "regionId": "N05000003",
+            "party": "sinn_fein",
+            "memberName": "Deirdre Hargey",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000003",
+            "party": "speaker",
+            "memberName": "Edwin Poots",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000003",
+            "party": "sdlp",
+            "memberName": "Matthew O'Toole",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000003",
+            "party": "alliance",
+            "memberName": "Paula Bradshaw",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000003",
+            "party": "alliance",
+            "memberName": "Kate Nicholl",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000004",
+        "tier": "ni_assembly",
+        "name": "Belfast West",
+        "geometryRef": "N05000004",
+        "seats": [
+          {
+            "regionId": "N05000004",
+            "party": "sinn_fein",
+            "memberName": "Danny Baker",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000004",
+            "party": "sinn_fein",
+            "memberName": "Órlaithí Flynn",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000004",
+            "party": "sinn_fein",
+            "memberName": "Aisling Reilly",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000004",
+            "party": "sinn_fein",
+            "memberName": "Pat Sheehan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000004",
+            "party": "people_before_profit",
+            "memberName": "Gerry Carroll",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000005",
+        "tier": "ni_assembly",
+        "name": "East Antrim",
+        "geometryRef": "N05000005",
+        "seats": [
+          {
+            "regionId": "N05000005",
+            "party": "dup",
+            "memberName": "Gordon Lyons",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000005",
+            "party": "dup",
+            "memberName": "Cheryl Brownlee",
+            "electedAt": "2023-09-08"
+          },
+          {
+            "regionId": "N05000005",
+            "party": "uup",
+            "memberName": "John Stewart",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000005",
+            "party": "alliance",
+            "memberName": "Stewart Dickson",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000005",
+            "party": "alliance",
+            "memberName": "Danny Donnelly",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000006",
+        "tier": "ni_assembly",
+        "name": "East Londonderry",
+        "geometryRef": "N05000006",
+        "seats": [
+          {
+            "regionId": "N05000006",
+            "party": "dup",
+            "memberName": "Maurice Bradley",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000006",
+            "party": "dup",
+            "memberName": "Alan Robinson",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000006",
+            "party": "sinn_fein",
+            "memberName": "Caoimhe Archibald",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000006",
+            "party": "sdlp",
+            "memberName": "Cara Hunter",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000006",
+            "party": "independent",
+            "memberName": "Claire Sugden",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000007",
+        "tier": "ni_assembly",
+        "name": "Fermanagh and South Tyrone",
+        "geometryRef": "N05000007",
+        "seats": [
+          {
+            "regionId": "N05000007",
+            "party": "dup",
+            "memberName": "Deborah Erskine",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000007",
+            "party": "sinn_fein",
+            "memberName": "Jemma Dolan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000007",
+            "party": "sinn_fein",
+            "memberName": "Colm Gildernew",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000007",
+            "party": "sinn_fein",
+            "memberName": "Áine Murphy",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000007",
+            "party": "uup",
+            "memberName": "Tom Elliott",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000008",
+        "tier": "ni_assembly",
+        "name": "Foyle",
+        "geometryRef": "N05000008",
+        "seats": [
+          {
+            "regionId": "N05000008",
+            "party": "dup",
+            "memberName": "Gary Middleton",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000008",
+            "party": "sinn_fein",
+            "memberName": "Pádraig Delargy",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000008",
+            "party": "sinn_fein",
+            "memberName": "Ciara Ferguson",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000008",
+            "party": "sdlp",
+            "memberName": "Mark H. Durkan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000008",
+            "party": "sdlp",
+            "memberName": "Sinéad McLaughlin",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000009",
+        "tier": "ni_assembly",
+        "name": "Lagan Valley",
+        "geometryRef": "N05000009",
+        "seats": [
+          {
+            "regionId": "N05000009",
+            "party": "dup",
+            "memberName": "Emma Little-Pengelly",
+            "electedAt": "2022-05-12"
+          },
+          {
+            "regionId": "N05000009",
+            "party": "dup",
+            "memberName": "Paul Givan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000009",
+            "party": "uup",
+            "memberName": "Robbie Butler",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000009",
+            "party": "alliance",
+            "memberName": "Sorcha Eastwood",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000009",
+            "party": "alliance",
+            "memberName": "David Honeyford",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000010",
+        "tier": "ni_assembly",
+        "name": "Mid Ulster",
+        "geometryRef": "N05000010",
+        "seats": [
+          {
+            "regionId": "N05000010",
+            "party": "sinn_fein",
+            "memberName": "Michelle O’Neill",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000010",
+            "party": "sinn_fein",
+            "memberName": "Linda Dillon",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000010",
+            "party": "sinn_fein",
+            "memberName": "Emma Sheerin",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000010",
+            "party": "dup",
+            "memberName": "Keith Buchanan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000010",
+            "party": "sdlp",
+            "memberName": "Patsy McGlone",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000011",
+        "tier": "ni_assembly",
+        "name": "Newry and Armagh",
+        "geometryRef": "N05000011",
+        "seats": [
+          {
+            "regionId": "N05000011",
+            "party": "sinn_fein",
+            "memberName": "Cathal Boylan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000011",
+            "party": "sinn_fein",
+            "memberName": "Liz Kimmins",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000011",
+            "party": "sinn_fein",
+            "memberName": "Conor Murphy",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000011",
+            "party": "dup",
+            "memberName": "William Irwin",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000011",
+            "party": "sdlp",
+            "memberName": "Justin McNulty",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000012",
+        "tier": "ni_assembly",
+        "name": "North Antrim",
+        "geometryRef": "N05000012",
+        "seats": [
+          {
+            "regionId": "N05000012",
+            "party": "dup",
+            "memberName": "Paul Frew",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000012",
+            "party": "sinn_fein",
+            "memberName": "Philip McGuigan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000012",
+            "party": "uup",
+            "memberName": "Robin Swann",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000012",
+            "party": "tuv",
+            "memberName": "Jim Allister",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000012",
+            "party": "alliance",
+            "memberName": "Sian Mulholland",
+            "electedAt": "2023-03-31"
+          }
+        ]
+      },
+      {
+        "id": "N05000013",
+        "tier": "ni_assembly",
+        "name": "North Down",
+        "geometryRef": "N05000013",
+        "seats": [
+          {
+            "regionId": "N05000013",
+            "party": "dup",
+            "memberName": "Stephen Dunne",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000013",
+            "party": "uup",
+            "memberName": "Alan Chambers",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000013",
+            "party": "alliance",
+            "memberName": "Connie Egan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000013",
+            "party": "alliance",
+            "memberName": "Andrew Muir",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000013",
+            "party": "independent",
+            "memberName": "Alex Easton",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000014",
+        "tier": "ni_assembly",
+        "name": "South Antrim",
+        "geometryRef": "N05000014",
+        "seats": [
+          {
+            "regionId": "N05000014",
+            "party": "dup",
+            "memberName": "Pam Cameron",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000014",
+            "party": "dup",
+            "memberName": "Trevor Clarke",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000014",
+            "party": "sinn_fein",
+            "memberName": "Declan Kearney",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000014",
+            "party": "uup",
+            "memberName": "Steve Aiken",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000014",
+            "party": "alliance",
+            "memberName": "John Blair",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000015",
+        "tier": "ni_assembly",
+        "name": "South Down",
+        "geometryRef": "N05000015",
+        "seats": [
+          {
+            "regionId": "N05000015",
+            "party": "sinn_fein",
+            "memberName": "Sinéad Ennis",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000015",
+            "party": "sinn_fein",
+            "memberName": "Cathy Mason",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000015",
+            "party": "dup",
+            "memberName": "Diane Forsythe",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000015",
+            "party": "sdlp",
+            "memberName": "Colin McGrath",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000015",
+            "party": "alliance",
+            "memberName": "Andrew McMurray",
+            "electedAt": "2024-04-01"
+          }
+        ]
+      },
+      {
+        "id": "N05000016",
+        "tier": "ni_assembly",
+        "name": "Strangford",
+        "geometryRef": "N05000016",
+        "seats": [
+          {
+            "regionId": "N05000016",
+            "party": "alliance",
+            "memberName": "Kellie Armstrong",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000016",
+            "party": "alliance",
+            "memberName": "Nick Mathison",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000016",
+            "party": "dup",
+            "memberName": "Harry Harvey",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000016",
+            "party": "dup",
+            "memberName": "Michelle McIlveen",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000016",
+            "party": "uup",
+            "memberName": "Mike Nesbitt",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000017",
+        "tier": "ni_assembly",
+        "name": "Upper Bann",
+        "geometryRef": "N05000017",
+        "seats": [
+          {
+            "regionId": "N05000017",
+            "party": "dup",
+            "memberName": "Jonathan Buckley",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000017",
+            "party": "dup",
+            "memberName": "Diane Dodds",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000017",
+            "party": "sinn_fein",
+            "memberName": "John O'Dowd",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000017",
+            "party": "uup",
+            "memberName": "Doug Beattie",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000017",
+            "party": "alliance",
+            "memberName": "Eóin Tennyson",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      },
+      {
+        "id": "N05000018",
+        "tier": "ni_assembly",
+        "name": "West Tyrone",
+        "geometryRef": "N05000018",
+        "seats": [
+          {
+            "regionId": "N05000018",
+            "party": "sinn_fein",
+            "memberName": "Nicola Brogan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000018",
+            "party": "sinn_fein",
+            "memberName": "Declan McAleer",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000018",
+            "party": "sinn_fein",
+            "memberName": "Maolíosa McHugh",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000018",
+            "party": "dup",
+            "memberName": "Tom Buchanan",
+            "electedAt": "2022-05-05"
+          },
+          {
+            "regionId": "N05000018",
+            "party": "sdlp",
+            "memberName": "Daniel McCrossan",
+            "electedAt": "2022-05-05"
+          }
+        ]
+      }
+    ],
+    "london_assembly": [
+      {
+        "id": "E32000001",
+        "tier": "london_assembly",
+        "name": "Barnet and Camden",
+        "geometryRef": "E32000001",
+        "seats": [
+          {
+            "regionId": "E32000001",
+            "party": "labour",
+            "memberName": "Anne Clarke",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000002",
+        "tier": "london_assembly",
+        "name": "Bexley and Bromley",
+        "geometryRef": "E32000002",
+        "seats": [
+          {
+            "regionId": "E32000002",
+            "party": "conservative",
+            "memberName": "Thomas Turrell",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000003",
+        "tier": "london_assembly",
+        "name": "Brent and Harrow",
+        "geometryRef": "E32000003",
+        "seats": [
+          {
+            "regionId": "E32000003",
+            "party": "labour",
+            "memberName": "Krupesh Hirani",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000004",
+        "tier": "london_assembly",
+        "name": "City and East",
+        "geometryRef": "E32000004",
+        "seats": [
+          {
+            "regionId": "E32000004",
+            "party": "labour",
+            "memberName": "Unmesh Desai",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000005",
+        "tier": "london_assembly",
+        "name": "Croydon and Sutton",
+        "geometryRef": "E32000005",
+        "seats": [
+          {
+            "regionId": "E32000005",
+            "party": "conservative",
+            "memberName": "Neil Garratt",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000006",
+        "tier": "london_assembly",
+        "name": "Ealing and Hillingdon",
+        "geometryRef": "E32000006",
+        "seats": [
+          {
+            "regionId": "E32000006",
+            "party": "labour",
+            "memberName": "Bassam Mahfouz",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000007",
+        "tier": "london_assembly",
+        "name": "Enfield and Haringey",
+        "geometryRef": "E32000007",
+        "seats": [
+          {
+            "regionId": "E32000007",
+            "party": "labour",
+            "memberName": "Joanne McCartney",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000008",
+        "tier": "london_assembly",
+        "name": "Greenwich and Lewisham",
+        "geometryRef": "E32000008",
+        "seats": [
+          {
+            "regionId": "E32000008",
+            "party": "labour",
+            "memberName": "Len Duvall",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000009",
+        "tier": "london_assembly",
+        "name": "Havering and Redbridge",
+        "geometryRef": "E32000009",
+        "seats": [
+          {
+            "regionId": "E32000009",
+            "party": "conservative",
+            "memberName": "Keith Prince",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000010",
+        "tier": "london_assembly",
+        "name": "Lambeth and Southwark",
+        "geometryRef": "E32000010",
+        "seats": [
+          {
+            "regionId": "E32000010",
+            "party": "labour",
+            "memberName": "Marina Ahmad",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000011",
+        "tier": "london_assembly",
+        "name": "Merton and Wandsworth",
+        "geometryRef": "E32000011",
+        "seats": [
+          {
+            "regionId": "E32000011",
+            "party": "labour",
+            "memberName": "Leonie Cooper",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000012",
+        "tier": "london_assembly",
+        "name": "North East",
+        "geometryRef": "E32000012",
+        "seats": [
+          {
+            "regionId": "E32000012",
+            "party": "labour",
+            "memberName": "Sem Moema",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000013",
+        "tier": "london_assembly",
+        "name": "South West",
+        "geometryRef": "E32000013",
+        "seats": [
+          {
+            "regionId": "E32000013",
+            "party": "liberal_democrat",
+            "memberName": "Gareth Roberts",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "E32000014",
+        "tier": "london_assembly",
+        "name": "West Central",
+        "geometryRef": "E32000014",
+        "seats": [
+          {
+            "regionId": "E32000014",
+            "party": "labour",
+            "memberName": "James Small-Edwards",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      },
+      {
+        "id": "london-wide",
+        "tier": "london_assembly",
+        "name": "London-wide",
+        "geometryRef": "london-wide",
+        "seats": [
+          {
+            "regionId": "london-wide",
+            "party": "labour",
+            "memberName": "Elly Baker",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "conservative",
+            "memberName": "Susan Hall",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "conservative",
+            "memberName": "Shaun Bailey",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "conservative",
+            "memberName": "Emma Best",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "conservative",
+            "memberName": "Andrew Boff",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "conservative",
+            "memberName": "Alessandro Georgiou",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "green",
+            "memberName": "Zoë Garbett",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "green",
+            "memberName": "Caroline Russell",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "green",
+            "memberName": "Zack Polanski",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "liberal_democrat",
+            "memberName": "Hina Bokhari",
+            "electedAt": "2024-05-02"
+          },
+          {
+            "regionId": "london-wide",
+            "party": "reform_uk",
+            "memberName": "Alex Wilson",
+            "electedAt": "2024-05-02"
+          }
+        ]
+      }
     ]
   },
   "parties": [
@@ -40107,6 +43211,10 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
+      "founded": 1900,
+      "mergedFrom": [
+        "labour_coop"
+      ],
       "leadership": [
         {
           "role": "leader",
@@ -40114,109 +43222,6 @@
           "since": "2020-04-04"
         }
       ],
-      "founded": 1900,
-      "mergedFrom": [
-        "labour_coop"
-      ],
-      "compass": {
-        "position": {
-          "economic": -0.25,
-          "social": -0.05
-        },
-        "consistency": 0.55
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": 0.05,
-            "social": 0.25
-          },
-          "consistency": 0.5,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": -0.15,
-            "social": 0
-          },
-          "consistency": 0.55,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": -0.3,
-            "social": 0
-          },
-          "consistency": 0.6,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": -0.35,
-            "social": -0.05
-          },
-          "consistency": 0.75,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": -0.2,
-            "social": -0.3
-          },
-          "consistency": 0.6,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": -0.05,
-            "social": -0.15
-          },
-          "consistency": 0.45,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": 0.05,
-            "social": 0.3
-          },
-          "consistency": 0.55,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": -0.25,
-            "social": -0.2
-          },
-          "consistency": 0.65,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": 0.05,
-            "social": 0.3
-          },
-          "consistency": 0.7,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": -0.1,
-            "social": -0.2
-          },
-          "consistency": 0.55,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40241,6 +43246,7 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
+      "founded": 1834,
       "leadership": [
         {
           "role": "leader",
@@ -40248,106 +43254,6 @@
           "since": "2024-11-02"
         }
       ],
-      "founded": 1834,
-      "compass": {
-        "position": {
-          "economic": 0.4,
-          "social": 0.35
-        },
-        "consistency": 0.5
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.7
-          },
-          "consistency": 0.6,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": 0.55,
-            "social": 0.05
-          },
-          "consistency": 0.6,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": 0.45,
-            "social": 0
-          },
-          "consistency": 0.55,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.1
-          },
-          "consistency": 0.4,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": 0.3,
-            "social": 0.35
-          },
-          "consistency": 0.45,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": 0.3,
-            "social": 0.4
-          },
-          "consistency": 0.6,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": 0.15,
-            "social": 0.65
-          },
-          "consistency": 0.7,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": 0.25,
-            "social": 0.3
-          },
-          "consistency": 0.45,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.55
-          },
-          "consistency": 0.7,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.4
-          },
-          "consistency": 0.55,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40372,6 +43278,7 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
+      "founded": 1988,
       "leadership": [
         {
           "role": "leader",
@@ -40379,106 +43286,6 @@
           "since": "2020-08-27"
         }
       ],
-      "founded": 1988,
-      "compass": {
-        "position": {
-          "economic": -0.1,
-          "social": -0.55
-        },
-        "consistency": 0.7
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": -0.1,
-            "social": -0.5
-          },
-          "consistency": 0.65,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": -0.05,
-            "social": -0.1
-          },
-          "consistency": 0.55,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": -0.2,
-            "social": -0.1
-          },
-          "consistency": 0.55,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": -0.3,
-            "social": -0.2
-          },
-          "consistency": 0.7,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": -0.35,
-            "social": -0.45
-          },
-          "consistency": 0.7,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": -0.3,
-            "social": -0.55
-          },
-          "consistency": 0.85,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": -0.1,
-            "social": -0.3
-          },
-          "consistency": 0.55,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": -0.15,
-            "social": -0.3
-          },
-          "consistency": 0.55,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": -0.05,
-            "social": -0.1
-          },
-          "consistency": 0.5,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": -0.2,
-            "social": -0.55
-          },
-          "consistency": 0.75,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40503,6 +43310,7 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
+      "founded": 2018,
       "leadership": [
         {
           "role": "leader",
@@ -40510,106 +43318,6 @@
           "since": "2024-06-03"
         }
       ],
-      "founded": 2018,
-      "compass": {
-        "position": {
-          "economic": 0.35,
-          "social": 0.75
-        },
-        "consistency": 0.55
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": 0.3,
-            "social": 0.9
-          },
-          "consistency": 0.85,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": 0.5,
-            "social": 0.2
-          },
-          "consistency": 0.5,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": 0.25,
-            "social": 0.1
-          },
-          "consistency": 0.4,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": 0.15,
-            "social": 0.2
-          },
-          "consistency": 0.35,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": 0.4,
-            "social": 0.5
-          },
-          "consistency": 0.8,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": 0.35,
-            "social": 0.6
-          },
-          "consistency": 0.85,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.75
-          },
-          "consistency": 0.75,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.35
-          },
-          "consistency": 0.4,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": 0.15,
-            "social": 0.55
-          },
-          "consistency": 0.55,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": 0.15,
-            "social": 0.5
-          },
-          "consistency": 0.5,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40634,6 +43342,10 @@
         "onPrimary": "#000000"
       },
       "scope": "national",
+      "founded": 1990,
+      "mergedFrom": [
+        "scottish_greens"
+      ],
       "leadership": [
         {
           "role": "leader",
@@ -40646,109 +43358,6 @@
           "since": "2024-09-06"
         }
       ],
-      "founded": 1990,
-      "mergedFrom": [
-        "scottish_greens"
-      ],
-      "compass": {
-        "position": {
-          "economic": -0.7,
-          "social": -0.6
-        },
-        "consistency": 0.75
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": -0.4,
-            "social": -0.6
-          },
-          "consistency": 0.65,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": -0.7,
-            "social": -0.2
-          },
-          "consistency": 0.7,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": -0.75,
-            "social": -0.1
-          },
-          "consistency": 0.75,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": -0.65,
-            "social": -0.2
-          },
-          "consistency": 0.7,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": -0.7,
-            "social": -0.55
-          },
-          "consistency": 0.9,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": -0.5,
-            "social": -0.6
-          },
-          "consistency": 0.75,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": -0.4,
-            "social": -0.55
-          },
-          "consistency": 0.6,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": -0.55,
-            "social": -0.3
-          },
-          "consistency": 0.6,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": -0.45,
-            "social": -0.5
-          },
-          "consistency": 0.55,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": -0.5,
-            "social": -0.6
-          },
-          "consistency": 0.65,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40773,6 +43382,7 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
+      "founded": 2019,
       "leadership": [
         {
           "role": "leader",
@@ -40780,106 +43390,6 @@
           "since": "2019-01-30"
         }
       ],
-      "founded": 2019,
-      "compass": {
-        "position": {
-          "economic": -0.6,
-          "social": 0.3
-        },
-        "consistency": 0.45
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": -0.1,
-            "social": 0.35
-          },
-          "consistency": 0.4,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": -0.8,
-            "social": 0.1
-          },
-          "consistency": 0.7,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": -0.8,
-            "social": 0.1
-          },
-          "consistency": 0.7,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": -0.75,
-            "social": 0.05
-          },
-          "consistency": 0.7,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": -0.3,
-            "social": 0.1
-          },
-          "consistency": 0.3,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": -0.4,
-            "social": 0.4
-          },
-          "consistency": 0.55,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": -0.2,
-            "social": 0.3
-          },
-          "consistency": 0.45,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": -0.6,
-            "social": 0.05
-          },
-          "consistency": 0.55,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": -0.3,
-            "social": -0.2
-          },
-          "consistency": 0.6,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": -0.4,
-            "social": 0.15
-          },
-          "consistency": 0.4,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -40904,6 +43414,7 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "national",
+      "founded": 1993,
       "leadership": [
         {
           "role": "leader",
@@ -40911,106 +43422,6 @@
           "since": "2024-09-21"
         }
       ],
-      "founded": 1993,
-      "compass": {
-        "position": {
-          "economic": 0.3,
-          "social": 0.85
-        },
-        "consistency": 0.6
-      },
-      "stances": {
-        "immigration": {
-          "position": {
-            "economic": 0.25,
-            "social": 0.95
-          },
-          "consistency": 0.85,
-          "salience": 0.9,
-          "source": "estimated"
-        },
-        "economy_tax": {
-          "position": {
-            "economic": 0.45,
-            "social": 0.3
-          },
-          "consistency": 0.5,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "public_spending": {
-          "position": {
-            "economic": 0.3,
-            "social": 0.2
-          },
-          "consistency": 0.4,
-          "salience": 0.7,
-          "source": "estimated"
-        },
-        "health_nhs": {
-          "position": {
-            "economic": 0.1,
-            "social": 0.25
-          },
-          "consistency": 0.35,
-          "salience": 0.85,
-          "source": "estimated"
-        },
-        "environment_net_zero": {
-          "position": {
-            "economic": 0.35,
-            "social": 0.55
-          },
-          "consistency": 0.75,
-          "salience": 0.5,
-          "source": "estimated"
-        },
-        "europe_brexit": {
-          "position": {
-            "economic": 0.4,
-            "social": 0.7
-          },
-          "consistency": 0.85,
-          "salience": 0.4,
-          "source": "estimated"
-        },
-        "law_order": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.85
-          },
-          "consistency": 0.75,
-          "salience": 0.55,
-          "source": "estimated"
-        },
-        "housing": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.4
-          },
-          "consistency": 0.4,
-          "salience": 0.6,
-          "source": "estimated"
-        },
-        "defence_foreign": {
-          "position": {
-            "economic": 0.15,
-            "social": 0.6
-          },
-          "consistency": 0.55,
-          "salience": 0.45,
-          "source": "estimated"
-        },
-        "constitution_devolution": {
-          "position": {
-            "economic": 0.2,
-            "social": 0.55
-          },
-          "consistency": 0.5,
-          "salience": 0.25,
-          "source": "estimated"
-        }
-      },
       "history": [
         {
           "date": "2024-12-01",
@@ -41035,6 +43446,7 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
+      "founded": 1934,
       "leadership": [
         {
           "role": "leader",
@@ -41042,7 +43454,6 @@
           "since": "2024-05-05"
         }
       ],
-      "founded": 1934,
       "history": [
         {
           "date": "2024-12-01",
@@ -41067,6 +43478,7 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
+      "founded": 1925,
       "leadership": [
         {
           "role": "leader",
@@ -41074,7 +43486,6 @@
           "since": "2023-08-19"
         }
       ],
-      "founded": 1925,
       "history": [
         {
           "date": "2024-12-01",
@@ -41099,6 +43510,7 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
+      "founded": 1971,
       "leadership": [
         {
           "role": "leader",
@@ -41106,7 +43518,6 @@
           "since": "2024-06-29"
         }
       ],
-      "founded": 1971,
       "history": [
         {
           "date": "2024-12-01",
@@ -41131,6 +43542,7 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
+      "founded": 1905,
       "leadership": [
         {
           "role": "leader",
@@ -41138,7 +43550,6 @@
           "since": "2018-02-10"
         }
       ],
-      "founded": 1905,
       "history": [
         {
           "date": "2024-12-01",
@@ -41163,6 +43574,7 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
+      "founded": 1970,
       "leadership": [
         {
           "role": "leader",
@@ -41170,7 +43582,6 @@
           "since": "2024-02-05"
         }
       ],
-      "founded": 1970,
       "history": [
         {
           "date": "2024-12-01",
@@ -41195,6 +43606,7 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
+      "founded": 1970,
       "leadership": [
         {
           "role": "leader",
@@ -41202,7 +43614,6 @@
           "since": "2016-10-29"
         }
       ],
-      "founded": 1970,
       "history": [
         {
           "date": "2024-12-01",
@@ -41227,6 +43638,7 @@
         "onPrimary": "#000000"
       },
       "scope": "regional",
+      "founded": 1905,
       "leadership": [
         {
           "role": "leader",
@@ -41234,7 +43646,6 @@
           "since": "2024-04-08"
         }
       ],
-      "founded": 1905,
       "history": [
         {
           "date": "2024-12-01",
@@ -41259,6 +43670,7 @@
         "onPrimary": "#FFFFFF"
       },
       "scope": "regional",
+      "founded": 2007,
       "leadership": [
         {
           "role": "leader",
@@ -41266,7 +43678,6 @@
           "since": "2007-12-07"
         }
       ],
-      "founded": 2007,
       "history": [
         {
           "date": "2024-12-01",
@@ -41334,6 +43745,64 @@
           },
           "membership": 0,
           "commonsSeats": 15,
+          "otherSeats": 0
+        }
+      ]
+    },
+    {
+      "id": "alba_party",
+      "name": "Alba Party",
+      "shortName": "Alba",
+      "colours": {
+        "primary": "#001489",
+        "onPrimary": "#FFFFFF"
+      },
+      "scope": "regional",
+      "founded": 2021,
+      "leadership": [
+        {
+          "role": "leader",
+          "personName": "Alex Salmond",
+          "since": "2021-03-26"
+        }
+      ],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 10000,
+            "annualIncome": 50000,
+            "source": "estimated"
+          },
+          "membership": 3000,
+          "commonsSeats": 0,
+          "otherSeats": 0
+        }
+      ]
+    },
+    {
+      "id": "people_before_profit",
+      "name": "People Before Profit",
+      "shortName": "PBP",
+      "colours": {
+        "primary": "#A6132B",
+        "onPrimary": "#FFFFFF"
+      },
+      "scope": "regional",
+      "founded": 2005,
+      "leadership": [],
+      "history": [
+        {
+          "date": "2024-12-01",
+          "polling": 0,
+          "finance": {
+            "estimatedCashOnHand": 8000,
+            "annualIncome": 40000,
+            "source": "estimated"
+          },
+          "membership": 1000,
+          "commonsSeats": 0,
           "otherSeats": 0
         }
       ]

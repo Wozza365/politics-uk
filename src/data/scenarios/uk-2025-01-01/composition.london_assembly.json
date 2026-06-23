@@ -1,0 +1,272 @@
+[
+  {
+    "id": "E32000001",
+    "tier": "london_assembly",
+    "name": "Barnet and Camden",
+    "geometryRef": "E32000001",
+    "seats": [
+      {
+        "regionId": "E32000001",
+        "party": "labour",
+        "memberName": "Anne Clarke",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000002",
+    "tier": "london_assembly",
+    "name": "Bexley and Bromley",
+    "geometryRef": "E32000002",
+    "seats": [
+      {
+        "regionId": "E32000002",
+        "party": "conservative",
+        "memberName": "Thomas Turrell",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000003",
+    "tier": "london_assembly",
+    "name": "Brent and Harrow",
+    "geometryRef": "E32000003",
+    "seats": [
+      {
+        "regionId": "E32000003",
+        "party": "labour",
+        "memberName": "Krupesh Hirani",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000004",
+    "tier": "london_assembly",
+    "name": "City and East",
+    "geometryRef": "E32000004",
+    "seats": [
+      {
+        "regionId": "E32000004",
+        "party": "labour",
+        "memberName": "Unmesh Desai",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000005",
+    "tier": "london_assembly",
+    "name": "Croydon and Sutton",
+    "geometryRef": "E32000005",
+    "seats": [
+      {
+        "regionId": "E32000005",
+        "party": "conservative",
+        "memberName": "Neil Garratt",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000006",
+    "tier": "london_assembly",
+    "name": "Ealing and Hillingdon",
+    "geometryRef": "E32000006",
+    "seats": [
+      {
+        "regionId": "E32000006",
+        "party": "labour",
+        "memberName": "Bassam Mahfouz",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000007",
+    "tier": "london_assembly",
+    "name": "Enfield and Haringey",
+    "geometryRef": "E32000007",
+    "seats": [
+      {
+        "regionId": "E32000007",
+        "party": "labour",
+        "memberName": "Joanne McCartney",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000008",
+    "tier": "london_assembly",
+    "name": "Greenwich and Lewisham",
+    "geometryRef": "E32000008",
+    "seats": [
+      {
+        "regionId": "E32000008",
+        "party": "labour",
+        "memberName": "Len Duvall",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000009",
+    "tier": "london_assembly",
+    "name": "Havering and Redbridge",
+    "geometryRef": "E32000009",
+    "seats": [
+      {
+        "regionId": "E32000009",
+        "party": "conservative",
+        "memberName": "Keith Prince",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000010",
+    "tier": "london_assembly",
+    "name": "Lambeth and Southwark",
+    "geometryRef": "E32000010",
+    "seats": [
+      {
+        "regionId": "E32000010",
+        "party": "labour",
+        "memberName": "Marina Ahmad",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000011",
+    "tier": "london_assembly",
+    "name": "Merton and Wandsworth",
+    "geometryRef": "E32000011",
+    "seats": [
+      {
+        "regionId": "E32000011",
+        "party": "labour",
+        "memberName": "Leonie Cooper",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000012",
+    "tier": "london_assembly",
+    "name": "North East",
+    "geometryRef": "E32000012",
+    "seats": [
+      {
+        "regionId": "E32000012",
+        "party": "labour",
+        "memberName": "Sem Moema",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000013",
+    "tier": "london_assembly",
+    "name": "South West",
+    "geometryRef": "E32000013",
+    "seats": [
+      {
+        "regionId": "E32000013",
+        "party": "liberal_democrat",
+        "memberName": "Gareth Roberts",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "E32000014",
+    "tier": "london_assembly",
+    "name": "West Central",
+    "geometryRef": "E32000014",
+    "seats": [
+      {
+        "regionId": "E32000014",
+        "party": "labour",
+        "memberName": "James Small-Edwards",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "london-wide",
+    "tier": "london_assembly",
+    "name": "London-wide",
+    "geometryRef": "london-wide",
+    "seats": [
+      {
+        "regionId": "london-wide",
+        "party": "labour",
+        "memberName": "Elly Baker",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "conservative",
+        "memberName": "Susan Hall",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "conservative",
+        "memberName": "Shaun Bailey",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "conservative",
+        "memberName": "Emma Best",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "conservative",
+        "memberName": "Andrew Boff",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "conservative",
+        "memberName": "Alessandro Georgiou",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "green",
+        "memberName": "Zoë Garbett",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "green",
+        "memberName": "Caroline Russell",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "green",
+        "memberName": "Zack Polanski",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "liberal_democrat",
+        "memberName": "Hina Bokhari",
+        "electedAt": "2024-05-02"
+      },
+      {
+        "regionId": "london-wide",
+        "party": "reform_uk",
+        "memberName": "Alex Wilson",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  }
+]

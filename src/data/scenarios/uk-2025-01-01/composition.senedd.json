@@ -1,0 +1,722 @@
+[
+  {
+    "id": "region:mid-and-west-wales",
+    "tier": "senedd",
+    "name": "Mid and West Wales",
+    "geometryRef": "region:mid-and-west-wales",
+    "seats": [
+      {
+        "regionId": "region:mid-and-west-wales",
+        "party": "labour",
+        "memberName": "Eluned Morgan",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid-and-west-wales",
+        "party": "plaid_cymru",
+        "memberName": "Cefin Campbell",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid-and-west-wales",
+        "party": "liberal_democrat",
+        "memberName": "Jane Dodds",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:mid-and-west-wales",
+        "party": "labour",
+        "memberName": "Joyce Watson",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:north-wales",
+    "tier": "senedd",
+    "name": "North Wales",
+    "geometryRef": "region:north-wales",
+    "seats": [
+      {
+        "regionId": "region:north-wales",
+        "party": "plaid_cymru",
+        "memberName": "Llŷr Gruffydd",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north-wales",
+        "party": "conservative",
+        "memberName": "Mark Isherwood",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north-wales",
+        "party": "conservative",
+        "memberName": "Sam Rowlands",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:north-wales",
+        "party": "labour",
+        "memberName": "Carolyn Thomas",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:south-wales-central",
+    "tier": "senedd",
+    "name": "South Wales Central",
+    "geometryRef": "region:south-wales-central",
+    "seats": [
+      {
+        "regionId": "region:south-wales-central",
+        "party": "conservative",
+        "memberName": "Andrew R. T. Davies",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-central",
+        "party": "plaid_cymru",
+        "memberName": "Heledd Fychan",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-central",
+        "party": "conservative",
+        "memberName": "Joel James",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-central",
+        "party": "independent",
+        "memberName": "Rhys ab Owen",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:south-wales-east",
+    "tier": "senedd",
+    "name": "South Wales East",
+    "geometryRef": "region:south-wales-east",
+    "seats": [
+      {
+        "regionId": "region:south-wales-east",
+        "party": "conservative",
+        "memberName": "Natasha Asghar",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-east",
+        "party": "plaid_cymru",
+        "memberName": "Peredur Owen Griffiths",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-east",
+        "party": "plaid_cymru",
+        "memberName": "Delyth Jewell",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-east",
+        "party": "conservative",
+        "memberName": "Laura Anne Jones",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "region:south-wales-west",
+    "tier": "senedd",
+    "name": "South Wales West",
+    "geometryRef": "region:south-wales-west",
+    "seats": [
+      {
+        "regionId": "region:south-wales-west",
+        "party": "plaid_cymru",
+        "memberName": "Luke Fletcher",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-west",
+        "party": "conservative",
+        "memberName": "Tom Giffard",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-west",
+        "party": "conservative",
+        "memberName": "Altaf Hussain",
+        "electedAt": "2021-05-06"
+      },
+      {
+        "regionId": "region:south-wales-west",
+        "party": "plaid_cymru",
+        "memberName": "Sioned Williams",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000001",
+    "tier": "senedd",
+    "name": "Ynys Môn",
+    "geometryRef": "W09000001",
+    "seats": [
+      {
+        "regionId": "W09000001",
+        "party": "plaid_cymru",
+        "memberName": "Rhun ap Iorwerth",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000002",
+    "tier": "senedd",
+    "name": "Arfon",
+    "geometryRef": "W09000002",
+    "seats": [
+      {
+        "regionId": "W09000002",
+        "party": "plaid_cymru",
+        "memberName": "Siân Gwenllian",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000003",
+    "tier": "senedd",
+    "name": "Aberconwy",
+    "geometryRef": "W09000003",
+    "seats": [
+      {
+        "regionId": "W09000003",
+        "party": "conservative",
+        "memberName": "Janet Finch-Saunders",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000004",
+    "tier": "senedd",
+    "name": "Clwyd West",
+    "geometryRef": "W09000004",
+    "seats": [
+      {
+        "regionId": "W09000004",
+        "party": "conservative",
+        "memberName": "Darren Millar",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000005",
+    "tier": "senedd",
+    "name": "Vale of Clwyd",
+    "geometryRef": "W09000005",
+    "seats": [
+      {
+        "regionId": "W09000005",
+        "party": "conservative",
+        "memberName": "Gareth Davies",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000006",
+    "tier": "senedd",
+    "name": "Delyn",
+    "geometryRef": "W09000006",
+    "seats": [
+      {
+        "regionId": "W09000006",
+        "party": "labour",
+        "memberName": "Hannah Blythyn",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000007",
+    "tier": "senedd",
+    "name": "Alyn and Deeside",
+    "geometryRef": "W09000007",
+    "seats": [
+      {
+        "regionId": "W09000007",
+        "party": "labour",
+        "memberName": "Jack Sargeant",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000008",
+    "tier": "senedd",
+    "name": "Wrexham",
+    "geometryRef": "W09000008",
+    "seats": [
+      {
+        "regionId": "W09000008",
+        "party": "labour",
+        "memberName": "Lesley Griffiths",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000009",
+    "tier": "senedd",
+    "name": "Clwyd South",
+    "geometryRef": "W09000009",
+    "seats": [
+      {
+        "regionId": "W09000009",
+        "party": "labour",
+        "memberName": "Ken Skates",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000010",
+    "tier": "senedd",
+    "name": "Dwyfor Meirionnydd",
+    "geometryRef": "W09000010",
+    "seats": [
+      {
+        "regionId": "W09000010",
+        "party": "plaid_cymru",
+        "memberName": "Mabon ap Gwynfor",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000011",
+    "tier": "senedd",
+    "name": "Montgomeryshire",
+    "geometryRef": "W09000011",
+    "seats": [
+      {
+        "regionId": "W09000011",
+        "party": "conservative",
+        "memberName": "Russell George",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000012",
+    "tier": "senedd",
+    "name": "Ceredigion",
+    "geometryRef": "W09000012",
+    "seats": [
+      {
+        "regionId": "W09000012",
+        "party": "plaid_cymru",
+        "memberName": "Elin Jones",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000014",
+    "tier": "senedd",
+    "name": "Preseli Pembrokeshire",
+    "geometryRef": "W09000014",
+    "seats": [
+      {
+        "regionId": "W09000014",
+        "party": "conservative",
+        "memberName": "Paul Davies",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000015",
+    "tier": "senedd",
+    "name": "Carmarthen East and Dinefwr",
+    "geometryRef": "W09000015",
+    "seats": [
+      {
+        "regionId": "W09000015",
+        "party": "plaid_cymru",
+        "memberName": "Adam Price",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000016",
+    "tier": "senedd",
+    "name": "Carmarthen West and South Pembrokeshire",
+    "geometryRef": "W09000016",
+    "seats": [
+      {
+        "regionId": "W09000016",
+        "party": "conservative",
+        "memberName": "Samuel Kurtz",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000017",
+    "tier": "senedd",
+    "name": "Llanelli",
+    "geometryRef": "W09000017",
+    "seats": [
+      {
+        "regionId": "W09000017",
+        "party": "labour",
+        "memberName": "Lee Waters",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000018",
+    "tier": "senedd",
+    "name": "Gower",
+    "geometryRef": "W09000018",
+    "seats": [
+      {
+        "regionId": "W09000018",
+        "party": "labour",
+        "memberName": "Rebecca Evans",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000019",
+    "tier": "senedd",
+    "name": "Swansea West",
+    "geometryRef": "W09000019",
+    "seats": [
+      {
+        "regionId": "W09000019",
+        "party": "labour",
+        "memberName": "Julie James",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000020",
+    "tier": "senedd",
+    "name": "Swansea East",
+    "geometryRef": "W09000020",
+    "seats": [
+      {
+        "regionId": "W09000020",
+        "party": "labour",
+        "memberName": "Mike Hedges",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000021",
+    "tier": "senedd",
+    "name": "Neath",
+    "geometryRef": "W09000021",
+    "seats": [
+      {
+        "regionId": "W09000021",
+        "party": "labour",
+        "memberName": "Jeremy Miles",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000022",
+    "tier": "senedd",
+    "name": "Aberavon",
+    "geometryRef": "W09000022",
+    "seats": [
+      {
+        "regionId": "W09000022",
+        "party": "labour",
+        "memberName": "David Rees",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000023",
+    "tier": "senedd",
+    "name": "Bridgend",
+    "geometryRef": "W09000023",
+    "seats": [
+      {
+        "regionId": "W09000023",
+        "party": "labour",
+        "memberName": "Sarah Murphy",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000025",
+    "tier": "senedd",
+    "name": "Rhondda",
+    "geometryRef": "W09000025",
+    "seats": [
+      {
+        "regionId": "W09000025",
+        "party": "labour",
+        "memberName": "Buffy Williams",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000026",
+    "tier": "senedd",
+    "name": "Cynon Valley",
+    "geometryRef": "W09000026",
+    "seats": [
+      {
+        "regionId": "W09000026",
+        "party": "labour",
+        "memberName": "Vikki Howells",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000029",
+    "tier": "senedd",
+    "name": "Cardiff West",
+    "geometryRef": "W09000029",
+    "seats": [
+      {
+        "regionId": "W09000029",
+        "party": "labour",
+        "memberName": "Mark Drakeford",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000031",
+    "tier": "senedd",
+    "name": "Cardiff Central",
+    "geometryRef": "W09000031",
+    "seats": [
+      {
+        "regionId": "W09000031",
+        "party": "labour",
+        "memberName": "Jenny Rathbone",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000034",
+    "tier": "senedd",
+    "name": "Monmouth",
+    "geometryRef": "W09000034",
+    "seats": [
+      {
+        "regionId": "W09000034",
+        "party": "conservative",
+        "memberName": "Peter Fox",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000035",
+    "tier": "senedd",
+    "name": "Caerphilly",
+    "geometryRef": "W09000035",
+    "seats": [
+      {
+        "regionId": "W09000035",
+        "party": "plaid_cymru",
+        "memberName": "Lindsay Whittle",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000036",
+    "tier": "senedd",
+    "name": "Islwyn",
+    "geometryRef": "W09000036",
+    "seats": [
+      {
+        "regionId": "W09000036",
+        "party": "labour",
+        "memberName": "Rhianon Passmore",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000037",
+    "tier": "senedd",
+    "name": "Torfaen",
+    "geometryRef": "W09000037",
+    "seats": [
+      {
+        "regionId": "W09000037",
+        "party": "labour",
+        "memberName": "Lynne Neagle",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000038",
+    "tier": "senedd",
+    "name": "Blaenau Gwent",
+    "geometryRef": "W09000038",
+    "seats": [
+      {
+        "regionId": "W09000038",
+        "party": "labour",
+        "memberName": "Alun Davies",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000039",
+    "tier": "senedd",
+    "name": "Newport West",
+    "geometryRef": "W09000039",
+    "seats": [
+      {
+        "regionId": "W09000039",
+        "party": "labour",
+        "memberName": "Jayne Bryant",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000040",
+    "tier": "senedd",
+    "name": "Newport East",
+    "geometryRef": "W09000040",
+    "seats": [
+      {
+        "regionId": "W09000040",
+        "party": "labour",
+        "memberName": "John Griffiths",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000041",
+    "tier": "senedd",
+    "name": "Brecon and Radnorshire",
+    "geometryRef": "W09000041",
+    "seats": [
+      {
+        "regionId": "W09000041",
+        "party": "conservative",
+        "memberName": "James Evans",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000042",
+    "tier": "senedd",
+    "name": "Cardiff North",
+    "geometryRef": "W09000042",
+    "seats": [
+      {
+        "regionId": "W09000042",
+        "party": "labour",
+        "memberName": "Julie Morgan",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000043",
+    "tier": "senedd",
+    "name": "Cardiff South and Penarth",
+    "geometryRef": "W09000043",
+    "seats": [
+      {
+        "regionId": "W09000043",
+        "party": "labour",
+        "memberName": "Vaughan Gething",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000044",
+    "tier": "senedd",
+    "name": "Merthyr Tydfil and Rhymney",
+    "geometryRef": "W09000044",
+    "seats": [
+      {
+        "regionId": "W09000044",
+        "party": "labour",
+        "memberName": "Dawn Bowden",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000045",
+    "tier": "senedd",
+    "name": "Ogmore",
+    "geometryRef": "W09000045",
+    "seats": [
+      {
+        "regionId": "W09000045",
+        "party": "labour",
+        "memberName": "Huw Irranca-Davies",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000046",
+    "tier": "senedd",
+    "name": "Pontypridd",
+    "geometryRef": "W09000046",
+    "seats": [
+      {
+        "regionId": "W09000046",
+        "party": "labour",
+        "memberName": "Mick Antoniw",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  },
+  {
+    "id": "W09000047",
+    "tier": "senedd",
+    "name": "Vale of Glamorgan",
+    "geometryRef": "W09000047",
+    "seats": [
+      {
+        "regionId": "W09000047",
+        "party": "labour",
+        "memberName": "Jane Hutt",
+        "electedAt": "2021-05-06"
+      }
+    ]
+  }
+]

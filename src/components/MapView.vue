@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { feature } from 'topojson-client'
+import type { FeatureCollection, Geometry } from 'geojson'
 import { useScenarioStore } from '@/stores/scenario'
+import { useUiStore } from '@/stores/ui'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
 import type { BoundarySet, RegionState } from '@/map/MapRenderer'
 
 const scenario = useScenarioStore()
+const ui = useUiStore()
 
 const partyColour = (partyId: string) => scenario.party(partyId)?.colours.primary ?? '#9ca3af'
 
@@ -17,7 +21,7 @@ const activeRegion = ref<string | null>(null)
 const isActive = computed(() => activeRegion.value !== null)
 const LIFT_PX = 3
 
-function buildRegionState(): RegionState {
+function buildCommonsRegionState(): RegionState {
   const state: RegionState = {}
   for (const region of scenario.commonsRegions) {
     const holder = region.seats[0]
@@ -37,13 +41,48 @@ function buildRegionState(): RegionState {
   return state
 }
 
-function draw() {
-  const boundarySet: BoundarySet = {
-    id: 'commons',
-    topology: scenario.boundaries,
-    objectKey: 'regions',
+// Regional view (P2.1): every geometryRef on boundaries.regional.json is
+// either a real constituency from one of the four bodies (Holyrood/Senedd/
+// NI Assembly/London Assembly) or England-outside-London filler with no
+// matching region — filler renders disabled (greyed out, non-interactive)
+// per the design decision recorded in docs/PHASE_2_PLAN.md's P2.1.
+function buildRegionalRegionState(): RegionState {
+  const state: RegionState = {}
+  const collection = feature(
+    scenario.regionalBoundaries,
+    scenario.regionalBoundaries.objects.regions,
+  ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>
+  for (const feat of collection.features) {
+    const geometryRef = feat.properties.geometryRef
+    const region = scenario.regionalRegionsByGeometryRef.get(geometryRef)
+    if (!region) {
+      state[geometryRef] = { fill: '#d4d4d8', disabled: true }
+      continue
+    }
+    const holder = region.seats[0]
+    const isActiveRegion = activeRegion.value === geometryRef
+    state[geometryRef] = {
+      fill: holder ? partyColour(holder.party) : '#9ca3af',
+      selected: hovered.value === geometryRef,
+      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
+      liftPx: isActiveRegion ? LIFT_PX : undefined,
+      tooltip: {
+        name: region.name,
+        party: holder ? scenario.party(holder.party)?.name : undefined,
+        member: holder?.memberName,
+      },
+    }
   }
-  renderer.render(boundarySet, buildRegionState())
+  return state
+}
+
+function draw() {
+  const boundarySet: BoundarySet =
+    ui.activeView === 'regional'
+      ? { id: 'regional', topology: scenario.regionalBoundaries, objectKey: 'regions' }
+      : { id: 'commons', topology: scenario.boundaries, objectKey: 'regions' }
+  const regionState = ui.activeView === 'regional' ? buildRegionalRegionState() : buildCommonsRegionState()
+  renderer.render(boundarySet, regionState)
 }
 
 // --- Independent zoom/pan ---------------------------------------------
@@ -296,6 +335,7 @@ onMounted(() => {
 
 watch(hovered, draw)
 watch(activeRegion, draw)
+watch(() => ui.activeView, draw)
 onUnmounted(() => {
   renderer.unmount()
   window.removeEventListener('mousemove', onMouseMove)
@@ -304,7 +344,9 @@ onUnmounted(() => {
 })
 
 const hoveredRegion = () =>
-  scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
+  ui.activeView === 'regional'
+    ? scenario.regionalRegionsByGeometryRef.get(hovered.value ?? '')
+    : scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
 
 const hoveredSeat = computed(() => hoveredRegion()?.seats[0])
 const hoveredDemographics = computed(() => {

@@ -89,8 +89,14 @@ function validate(scenario, boundariesByTier, demographics = null) {
   // Per-tier seat/region/geometry reconciliation.
   for (const [tierId, regions] of Object.entries(scenario.tiers)) {
     const expectedTotal = KNOWN_TIER_SEAT_TOTALS[tierId]
-    if (expectedTotal !== undefined && regions.length !== expectedTotal) {
-      errors.push(`tier "${tierId}" has ${regions.length} regions, expected ${expectedTotal}`)
+    if (expectedTotal !== undefined) {
+      // Total seats, not region count: AMS/STV tiers (holyrood/senedd/
+      // ni_assembly/london_assembly) have multiple seats per region, unlike
+      // Commons' one-seat-per-region shape.
+      const seatTotal = regions.reduce((sum, r) => sum + (r.seats?.length ?? 0), 0)
+      if (seatTotal !== expectedTotal) {
+        errors.push(`tier "${tierId}" has ${seatTotal} seats across ${regions.length} regions, expected ${expectedTotal}`)
+      }
     }
 
     const boundaryRefs = boundariesByTier[tierId]
@@ -217,6 +223,19 @@ function main() {
     : readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.commons.json')
 
   const boundariesByTier = { commons: boundaryRefsFromTopology(boundariesTopology, 'regions') }
+
+  if (!usePlaceholder) {
+    // NI Assembly's 18 regions map 1:1 onto the 18 Westminster-coincident
+    // constituency boundaries, so it gets full boundary cross-checking.
+    // Holyrood/Senedd/London Assembly are deliberately omitted here: each has
+    // extra multi-seat "region"/"list" composition entries (8/5/1
+    // respectively) that have no boundary geometry of their own — see
+    // fetch-holyrood-boundaries.mjs's header comment — so a geometryRef
+    // cross-check against their boundaries.<tier>.json would always flag
+    // those as errors despite being correct by design.
+    const niAssemblyTopology = readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.ni_assembly.json')
+    boundariesByTier.ni_assembly = boundaryRefsFromTopology(niAssemblyTopology, 'regions')
+  }
 
   const demographics = usePlaceholder
     ? null

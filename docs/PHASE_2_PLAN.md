@@ -62,57 +62,91 @@ rather than repeating the table.
 > pattern (Open Council Data UK) rather than treating each of the seven council types as a
 > separate task.
 
-### P2.1 — Devolved parliaments: Holyrood, Senedd, NI Assembly `🔲`
+### P2.1 — Regional view: Holyrood, Senedd, NI Assembly, London Assembly `🔲`
 
-**Goal.** Three new tiers + views: Scottish Parliament (129 MSPs), Senedd (60 MS on the
-2025-01-01 date — **not** the 96-member 2026 system, see spec §4.1 footnote 1), NI Assembly (90
-MLAs).
+**Goal.** One combined **"Regional"** view (not four separate view-switcher entries) covering all
+four sub-state legislatures: Scottish Parliament (129 MSPs), Senedd (60 MS on the 2025-01-01 date
+— **not** the 96-member 2026 system, see spec §4.1 footnote 1), NI Assembly (90 MLAs), and London
+Assembly (25 AMs across 14 constituencies + a London-wide list). London Assembly was originally
+scoped under P2.3 (spec §4.1 rows 6–8); it's pulled forward into this task because it shares the
+same "devolved/regional body, disjoint geography" shape as the other three and the user
+specifically asked for all four to live under one view rather than Assembly getting a separate
+toggle. P2.3 keeps the mayoralty (single-seat, not a map tier) only — see that section's note.
+
+**Design decision (2026-06-23, user request):** Scotland, Wales, NI, and Greater London are
+geographically disjoint, so all four bodies' constituencies render on **one map** simultaneously
+rather than behind four separate view-switcher buttons. Every other region (England outside
+London — the only part of the UK with no regional/devolved tier) renders **fully greyed out and
+non-interactive** (`RegionDisplayState.disabled`, `src/map/MapRenderer.ts:15` — this field already
+exists for exactly this purpose) while the Regional view is active. `src/stores/ui.ts`'s
+`GameView` union collapses the four separate ids (`holyrood`/`senedd`/`ni-assembly`/`london`) into
+one `'regional'` member; `ViewSwitcher.vue` shows **Westminster / Regional / Councils**, not six
+buttons. The four bodies stay **separate `TierId`s in `Scenario.tiers`** underneath
+(`holyrood`/`senedd`/`ni_assembly`/`london_assembly` — matching the keys already hardcoded in
+`scripts/data/validate-scenario.mjs:14-19`) — only the *view* is merged, not the data model, so
+each tier keeps its own seat-count validation (129/60/90/25) and `Region`/`Seat` shape.
 
 **Depends on:** P2.0 not required, but should land before/alongside it if both are in flight —
 no actual code dependency.
 
 **Steps:**
-1. **Boundaries.** Fetch each parliament's constituency/region boundaries (ONS Open Geography
-   Portal has Scottish Parliament constituencies/regions and Senedd constituencies; NI Assembly
-   uses the 18 Westminster-coincident constituencies per spec §4.1 row 5, so its boundary set may
-   be derivable from the existing Commons boundaries rather than a fresh fetch — confirm before
-   re-fetching). Follow the `fetch-commons-boundaries.mjs` pattern: GeoJSON → TopoJSON → `mapshaper`
-   simplify, output `boundaries.<tier>.json` under `src/data/scenarios/uk-2025-01-01/`.
+1. **Boundaries.** Fetch each body's constituency/region boundaries (ONS Open Geography Portal has
+   Scottish Parliament constituencies/regions and Senedd constituencies; London Datastore/ONS has
+   the 14 Assembly constituencies; NI Assembly uses the 18 Westminster-coincident constituencies
+   per spec §4.1 row 5, so reuse the matching subset of the existing `boundaries.commons.json`
+   rather than re-fetching). Follow the `fetch-commons-boundaries.mjs` pattern: GeoJSON → TopoJSON
+   → `mapshaper` simplify, output `boundaries.<tier>.json` under
+   `src/data/scenarios/uk-2025-01-01/`, `geometryRef` = the body's own official GSS/ONS code (these
+   are globally unique across nations by prefix letter, so no collision risk when merged in step
+   5).
 2. **Composition.** Build `composition.<tier>.json` (one `Region[]` array, keyed the same shape as
-   `composition.commons.json`) as of 2025-01-01: each parliament's own open-data portal or
-   Wikipedia snapshot per spec §5.1. Each region holds `seats: Seat[]` — note constituency *and*
-   list members both being MSPs/MS/MLAs for the same body means some regions are themselves
-   "list" regions with multiple seats, not one-seat-per-region like Commons; model that explicitly
-   rather than forcing the Commons one-seat shape.
+   `composition.commons.json`) as of 2025-01-01: each body's own open-data portal or Wikipedia
+   snapshot per spec §5.1. Each region holds `seats: Seat[]` — note constituency *and* list members
+   both being MSPs/MS/MLAs/AMs for the same body means some regions are themselves "list" regions
+   with multiple seats, not one-seat-per-region like Commons; model that explicitly rather than
+   forcing the Commons one-seat shape. Add any newly-encountered party (e.g. Alba) to
+   `src/data/scenarios/uk-2025-01-01/parties.json` and `scripts/data/party-slugs.mjs` additively.
 3. **Wire into the scenario.** Extend `scripts/data/build-scenario.mjs` to merge each new tier's
-   `Region[]` into `Scenario.tiers` under its `TierId` (`"holyrood"`, `"senedd"`,
-   `"ni-assembly"` — these string literals already exist as `GameView` union members in
-   `src/stores/ui.ts:5`, so reuse them as the `TierId` too for consistency unless a reason emerges
-   not to). Re-run `npm run validate:data` — extend
-   `scripts/data/validate-scenario.mjs` to check each new tier's seat count against the known
-   total (129 / 60 / 90).
-4. **View wiring.** `src/components/MapView.vue` and `src/map/SvgMapRenderer.ts` currently assume
-   one `BoundarySet`/`RegionState` per mount; make the boundary set passed to `MapRenderer.render()`
-   depend on `useUiStore().activeView` rather than always being the Commons one. `ViewSwitcher.vue`
-   already lists all six views (`src/components/ViewSwitcher.vue`) and disables every
-   non-Westminster button — flip `holyrood`/`senedd`/`ni-assembly` to `available` once their data
-   + boundary set exist.
-5. **Hemicycle.** `src/components/HemicycleView.vue` + `src/sim/hemicycle.ts` already key off
-   "current view's tier" composition generically (per spec §9.2) — confirm it reads
-   `scenario.scenario.tiers[uiStore.activeView]` (or equivalent) rather than being hardcoded to
-   `commonsRegions`, and fix that coupling if it's still Commons-only from the P1 build.
+   `Region[]` into `Scenario.tiers` under its `TierId`. Re-run `npm run validate:data` (the known
+   totals for all four are already present in `scripts/data/validate-scenario.mjs:14-19`).
+4. **Build the combined Regional boundary set.** New `scripts/data/build-regional-boundaries.mjs`:
+   merge the four tiers' `boundaries.<tier>.json` topologies into one
+   `boundaries.regional.json`, plus every England-outside-London region from
+   `boundaries.commons.json` as inert filler geometry (no seat data needed for filler — disabled
+   status is a `RegionState` rendering concern, not a `Scenario.tiers` one). London's own Commons
+   constituencies are *not* included as filler (they're covered by the real, interactive London
+   Assembly geometry instead).
+5. **View wiring.** `src/components/MapView.vue` currently always renders the `commons`
+   `BoundarySet`/`RegionState` — branch on `useUiStore().activeView`: `'westminster'` keeps today's
+   behaviour; `'regional'` renders `boundaries.regional.json` with a `RegionState` built by
+   colouring each of the four tiers' regions by their seat-holder's party and marking every filler
+   region `disabled: true` (greyed out, non-interactive, no tooltip). `ViewSwitcher.vue` collapses
+   to three buttons (Westminster / Regional / Councils) per the design decision above; flip
+   `regional` to `available` once its data + boundary set exist.
+6. **Hemicycle.** Out of scope for this task: `HemicycleView.vue` stays Commons-only — four
+   disjoint legislatures don't compose into one hemicycle the way Westminster's single chamber
+   does. Leave the existing Commons-only coupling as-is rather than forcing a generic
+   multi-legislature hemicycle here; that's a separate future task if ever needed.
 
-**Files:** `scripts/data/fetch-{holyrood,senedd,ni-assembly}-boundaries.mjs` (new),
-`scripts/data/fetch-{holyrood,senedd,ni-assembly}-composition.mjs` (new),
-`scripts/data/build-scenario.mjs`, `scripts/data/validate-scenario.mjs`,
-`src/data/scenarios/uk-2025-01-01/{boundaries,composition}.{holyrood,senedd,ni-assembly}.json`
-(new), `src/stores/scenario.ts`, `src/components/MapView.vue`, `src/map/SvgMapRenderer.ts`,
-`src/components/{ViewSwitcher,HemicycleView}.vue`.
+**Future enhancement (2026-06-23, user request, not in this task's scope):** show each body's
+list-seat results as a small hover/tooltip summary anchored near its own region cluster on the
+Regional view — e.g. hovering Scotland surfaces Holyrood's regional-list party breakdown, hovering
+Wales surfaces Senedd's, and likewise for NI Assembly and London Assembly. Needs a UI design pass
+(hover card component, anchor positioning relative to each body's geometry bounds) and isn't
+required for P2.1's base acceptance criteria above — pick up once the base Regional view ships.
 
-**Acceptance:** the view switcher can flip between Westminster/Holyrood/Senedd/NI Assembly, each
-showing its own real boundaries, real composition-derived hemicycle, and (per spec §9.1) areas
-with no representation at that tier render muted/non-interactive where applicable (e.g. England
-has no Holyrood seats); `npm run validate:data` and `npm run build` clean.
+**Files:** `scripts/data/fetch-{holyrood,senedd,london-assembly}-boundaries.mjs` (new),
+`scripts/data/fetch-{holyrood,senedd,london-assembly,ni-assembly}-composition.mjs` (new),
+`scripts/data/build-regional-boundaries.mjs` (new), `scripts/data/build-scenario.mjs`,
+`scripts/data/validate-scenario.mjs`,
+`src/data/scenarios/uk-2025-01-01/{boundaries,composition}.{holyrood,senedd,ni_assembly,london_assembly}.json`
+(new), `src/data/scenarios/uk-2025-01-01/boundaries.regional.json` (new), `src/stores/ui.ts`,
+`src/stores/scenario.ts`, `src/components/MapView.vue`, `src/components/ViewSwitcher.vue`.
+
+**Acceptance:** the view switcher can flip between Westminster and Regional; Regional shows real
+Holyrood/Senedd/NI Assembly/London Assembly boundaries and composition simultaneously, each
+coloured by current seat-holder's party, with England-outside-London fully greyed out and
+non-interactive per spec §9.1; `npm run validate:data` and `npm run build` clean.
 
 ### P2.2 — Lords (stats only, no map) `🔲`
 
@@ -137,35 +171,30 @@ and nothing else picked it up).
 **Acceptance:** the party panel shows a real Lords peer count per party group, not a placeholder;
 `npm run validate:data` and `npm run build` clean.
 
-### P2.3 — London: Assembly, mayoralty, and combined-authority/local mayors `🔲`
+### P2.3 — Mayoralty: London, combined-authority, and other local mayors `🔲`
 
-**Goal.** Spec §4.1 rows 6–8: London Assembly (25 AMs across 14 constituencies + a London-wide
-list), the London mayoralty, ~12 combined-authority metro mayors, and ~15 other directly-elected
-local mayors.
+**Goal.** Spec §4.1 rows 7–8: the London mayoralty, ~12 combined-authority metro mayors, and ~15
+other directly-elected local mayors. (London Assembly itself — row 6 — moved into
+[P2.1](#p21--regional-view-holyrood-senedd-ni-assembly-london-assembly) since it shares that
+task's "regional legislature" shape; this task is mayors only.)
 
 **Steps:**
-1. London Assembly follows the same boundaries→composition→view pattern as P2.1 (ONS boundaries
-   exist for the 14 Assembly constituencies; the London-wide list members need the same
-   multi-seat-per-region modelling called out in P2.1 step 2).
-2. Mayors (London, combined-authority, and other directly-elected local) don't need their own map
+1. Mayors (London, combined-authority, and other directly-elected local) don't need their own map
    tier — they're a single seat each, not a multi-region body — so model them as a lightweight
    `Mayoralty[]` (id, name, regionRef for hover-linking, current `PartyId`, electedAt) rather than
    forcing the `Region`/`Seat` shape designed for multi-seat bodies. Surface them either as a
-   filter/overlay on the existing council or London view, or a small stats list — there's no single
+   filter/overlay on the existing Regional view or a small stats list — there's no single
    obviously-correct map representation for ~27 disjoint single seats, so this is a genuine design
    decision for whoever picks up this task: resolve it pragmatically rather than over-building, and
    record the choice here once made.
-3. Wire London Assembly into the view switcher the same way as P2.1 step 4; the mayoralty
-   stats wherever step 2 lands them (likely the party panel or a small new "mayors" stats card,
-   not a new full-screen view).
+2. Wire mayoral stats wherever step 1 lands them (likely the party panel or a small new "mayors"
+   stats card, not a new full-screen view).
 
-**Files:** `scripts/data/fetch-london-assembly-*.mjs` (new), `scripts/data/fetch-mayors.mjs` (new),
-`src/types/*` (new `Mayoralty` type), `scripts/data/build-scenario.mjs`,
-`src/stores/scenario.ts`, view-switcher/map wiring as in P2.1.
+**Files:** `scripts/data/fetch-mayors.mjs` (new), `src/types/*` (new `Mayoralty` type),
+`scripts/data/build-scenario.mjs`, `src/stores/scenario.ts`.
 
-**Acceptance:** London Assembly is a selectable, real-data view; mayoral data exists in the
-scenario and is surfaced somewhere in the UI (exact location is this task's call); `npm run
-validate:data` and `npm run build` clean.
+**Acceptance:** mayoral data exists in the scenario and is surfaced somewhere in the UI (exact
+location is this task's call); `npm run validate:data` and `npm run build` clean.
 
 ### P2.4 — Council tiers (the long tail) `🔲`
 
@@ -411,10 +440,10 @@ Phase 1 ✅ (done — see PHASE_1_COMPLETED.md, including P1.13)
    │
    ├─ P2.0 polling-driven seat projection ── independent of everything else below
    │
-   ├─ P2.1 devolved parliaments ─┬─ (shares boundaries/composition/view pattern)
-   ├─ P2.2 Lords stats           │
-   ├─ P2.3 London + mayors       │
-   └─ P2.4 councils (long tail) ─┘
+   ├─ P2.1 Regional view (Holyrood/Senedd/NI/London Assembly) ─┬─ (shares boundaries/composition/view pattern)
+   ├─ P2.2 Lords stats                                         │
+   ├─ P2.3 mayors                                              │
+   └─ P2.4 councils (long tail) ───────────────────────────────┘
    │
    ├─ P2.5 hex-map renderer (independent — pure MapRenderer impl, no data dependency)
    ├─ P2.6 event library + authoring tooling (independent — content, not mechanics)
