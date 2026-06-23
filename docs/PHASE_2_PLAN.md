@@ -38,28 +38,9 @@ the map is only ever touched through the `MapRenderer` interface (`src/map/MapRe
 
 ## 1. Phase 2 — additional governance tiers, views, and depth
 
-> **P1.13 (end-to-end loop wire-up) is now done** — see
-> [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p113--end-to-end-loop-wire-up-). `src/stores/
-> game.ts`'s `checkElectionResult()` evaluates `playerSeatCount >= winThresholdSeats` (spec §11.2)
-> against the **static scenario seat composition** once `date >= nextElectionDate`, and
-> `src/screens/ResultScreen.vue` shows the win/lose outcome. That commit's own note is carried
-> forward here rather than re-litigated: there is still **no seat-projection model** — Commons
-> seats never change during play, only `polling` does — so the win check necessarily judges the
-> scenario's starting composition, not a polling-driven outcome. A real seat-swing/projection model
-> (turning the drifting `polling` numbers into a projected GE seat count) is **genuine Phase 2+
-> scope** if a more satisfying win condition is wanted; see P2.0 below.
-
 ### P2.0 — Polling-driven seat projection at the GE `✅ DONE`
 
-See [`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p20--polling-driven-seat-projection-at-the-ge-)
-for the full record of what was built. Headline: `src/sim/projection.ts` projects Commons seats
-under a uniform national swing from scenario-start polling to live polling, `checkElectionResult()`
-judges the win/lose threshold against that projection, and the GE no longer hard-ends the run —
-`ResultScreen.vue` offers a real "Continue playing" path back into live play alongside the existing
-restart. Two notes carried forward for later tasks: non-GE election results (devolved/council/
-mayoral, once P2.1/P2.3/P2.4 land their data) should be a non-blocking "what happened" notice, never
-routed through this win/lose screen; and the clock's "days to GE" countdown has nothing to count
-toward once the GE date passes — left for P2.8's "list all upcoming elections" note to resolve.
+See [`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p20--polling-driven-seat-projection-at-the-ge-).
 
 ---
 
