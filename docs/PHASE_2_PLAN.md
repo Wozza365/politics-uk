@@ -9,7 +9,9 @@
 > Phase 0 (Foundations) and Phase 1 (MVP playable shell) are **complete** — see
 > [`PHASE_0_COMPLETED.md`](./PHASE_0_COMPLETED.md) and
 > [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md) for what was built and how. This document only
-> carries still-relevant, forward-looking work.
+> carries still-relevant, forward-looking work. Phase 2 is **in progress** — completed Phase 2
+> tasks move to [`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md) the same way, leaving only a
+> short pointer behind in each task's place here.
 
 ---
 
@@ -48,57 +50,16 @@ the map is only ever touched through the `MapRenderer` interface (`src/map/MapRe
 > scope** if a more satisfying win condition is wanted; see P2.0 below.
 
 ### P2.0 — Polling-driven seat projection at the GE `✅ DONE`
-**Goal.** Make the GE win check actually reflect how the player's polling moved during play,
-instead of always re-evaluating the scenario's day-one Commons composition (which is fixed,
-regardless of whether the player's polling went up or down across the whole game). **Also:** the
-GE is the most important moment in the game but it is **not the finale** — winning or losing it is
-a headline result, not a game-over screen; the player must be able to dismiss the result and keep
-playing afterward.
 
-**Depends on:** none — builds on the existing `checkElectionResult()` in `src/stores/game.ts`.
-
-**Steps:**
-1. Pick a projection method — e.g. a uniform national swing per party (each seat flips to
-   whichever party's *projected* local share would now win it, approximated from the seat's last
-   `results` breakdown where available per P1.14's `CandidateResult[]` data, shifted by that
-   party's national swing since the scenario start) is the standard psephological approach and
-   the most defensible "MVP-plus" option; a simpler proportional-seats-from-vote-share model is a
-   fallback if seat-level projection proves too heavy for this task's scope.
-2. Implement as a pure function in `src/sim/` (e.g. `src/sim/projection.ts`), unit-tested the same
-   way `src/sim/poll.ts` is, so it stays deterministic and independently testable from the store.
-3. Wire it into `checkElectionResult()` (`src/stores/game.ts`) in place of the current
-   `playerSeatCount` (which reads live `commonsSeatsByParty`, itself static) — and update
-   `ResultScreen.vue`'s seat figures to show the projected count, not the unchanged starting one.
-4. Manual playthrough QA: play a minor party but drive its polling up substantially before the GE
-   date (e.g. via seeded events), confirm the projected seat count actually moves, not just the
-   headline polling number.
-5. **The GE result must not hard-end the run.** `ResultScreen.vue` previously only offered "Play
-   again" (`ui.goToStart()`, a full restart) — give it a **"Continue playing"** action too
-   (`game.continuePlaying()` + `ui.goToGame()`) that resumes the clock and drops the player back
-   into live play with the same party, same date, same polling. `checkElectionResult()`'s existing
-   `if (this.result) return` guard already stops the result re-firing once it's set, so resuming
-   play afterwards needs no further store changes. _(Known follow-on, not fixed by this task: once
-   the GE date has passed, `GameClock.vue`'s countdown has nothing further to count toward and
-   just shows "General Election day" indefinitely — deciding what the clock counts down to next is
-   tied up with P2.8's "list all upcoming elections" note below, so it's deliberately left there
-   rather than patched in isolation here.)_
-6. **Forward groundwork only — do not build the content.** Spec §4.1/§9.5 cover other *regular*
-   elections beyond the GE: devolved-parliament elections (Holyrood/Senedd/NI Assembly, P2.1),
-   council and mayoral/PCC elections (P2.3/P2.4), and by-elections. Once those tiers have real data,
-   each should get its own lightweight **non-blocking** "here's what happened" notice — informational
-   only, never a win/lose gate — that the player simply closes to keep playing, reusing whatever
-   shared "a menu/notice is open" pause flag P2.8 ends up introducing rather than each inventing its
-   own. **Don't generalise `ResultScreen.vue`/`game.result` into a multi-election-type system now** —
-   no other tier's data exists yet (P2.1/P2.3/P2.4 are still `🔲`), and the cross-cutting "no further
-   scope creep" rule (§3 below) applies here too: stub the seam by keeping this distinction explicit
-   in the code/comments, don't build the generic version speculatively.
-
-**Files:** `src/sim/projection.ts` (new), `src/sim/projection.spec.ts` (new), `src/stores/game.ts`,
-`src/screens/ResultScreen.vue`.
-
-**Acceptance:** the GE result reflects in-game polling movement, not just the scenario's starting
-seats; the result screen offers a real "continue playing" path back into the live game (not only a
-restart); `npm run build` and `npm run test` clean.
+See [`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p20--polling-driven-seat-projection-at-the-ge-)
+for the full record of what was built. Headline: `src/sim/projection.ts` projects Commons seats
+under a uniform national swing from scenario-start polling to live polling, `checkElectionResult()`
+judges the win/lose threshold against that projection, and the GE no longer hard-ends the run —
+`ResultScreen.vue` offers a real "Continue playing" path back into live play alongside the existing
+restart. Two notes carried forward for later tasks: non-GE election results (devolved/council/
+mayoral, once P2.1/P2.3/P2.4 land their data) should be a non-blocking "what happened" notice, never
+routed through this win/lose screen; and the clock's "days to GE" countdown has nothing to count
+toward once the GE date passes — left for P2.8's "list all upcoming elections" note to resolve.
 
 ---
 
