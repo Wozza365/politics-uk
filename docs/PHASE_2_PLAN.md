@@ -47,10 +47,13 @@ the map is only ever touched through the `MapRenderer` interface (`src/map/MapRe
 > (turning the drifting `polling` numbers into a projected GE seat count) is **genuine Phase 2+
 > scope** if a more satisfying win condition is wanted; see P2.0 below.
 
-### P2.0 — Polling-driven seat projection at the GE `🔲`
+### P2.0 — Polling-driven seat projection at the GE `✅ DONE`
 **Goal.** Make the GE win check actually reflect how the player's polling moved during play,
 instead of always re-evaluating the scenario's day-one Commons composition (which is fixed,
-regardless of whether the player's polling went up or down across the whole game).
+regardless of whether the player's polling went up or down across the whole game). **Also:** the
+GE is the most important moment in the game but it is **not the finale** — winning or losing it is
+a headline result, not a game-over screen; the player must be able to dismiss the result and keep
+playing afterward.
 
 **Depends on:** none — builds on the existing `checkElectionResult()` in `src/stores/game.ts`.
 
@@ -69,11 +72,33 @@ regardless of whether the player's polling went up or down across the whole game
 4. Manual playthrough QA: play a minor party but drive its polling up substantially before the GE
    date (e.g. via seeded events), confirm the projected seat count actually moves, not just the
    headline polling number.
+5. **The GE result must not hard-end the run.** `ResultScreen.vue` previously only offered "Play
+   again" (`ui.goToStart()`, a full restart) — give it a **"Continue playing"** action too
+   (`game.continuePlaying()` + `ui.goToGame()`) that resumes the clock and drops the player back
+   into live play with the same party, same date, same polling. `checkElectionResult()`'s existing
+   `if (this.result) return` guard already stops the result re-firing once it's set, so resuming
+   play afterwards needs no further store changes. _(Known follow-on, not fixed by this task: once
+   the GE date has passed, `GameClock.vue`'s countdown has nothing further to count toward and
+   just shows "General Election day" indefinitely — deciding what the clock counts down to next is
+   tied up with P2.8's "list all upcoming elections" note below, so it's deliberately left there
+   rather than patched in isolation here.)_
+6. **Forward groundwork only — do not build the content.** Spec §4.1/§9.5 cover other *regular*
+   elections beyond the GE: devolved-parliament elections (Holyrood/Senedd/NI Assembly, P2.1),
+   council and mayoral/PCC elections (P2.3/P2.4), and by-elections. Once those tiers have real data,
+   each should get its own lightweight **non-blocking** "here's what happened" notice — informational
+   only, never a win/lose gate — that the player simply closes to keep playing, reusing whatever
+   shared "a menu/notice is open" pause flag P2.8 ends up introducing rather than each inventing its
+   own. **Don't generalise `ResultScreen.vue`/`game.result` into a multi-election-type system now** —
+   no other tier's data exists yet (P2.1/P2.3/P2.4 are still `🔲`), and the cross-cutting "no further
+   scope creep" rule (§3 below) applies here too: stub the seam by keeping this distinction explicit
+   in the code/comments, don't build the generic version speculatively.
 
-**Files:** `src/sim/projection.ts` (new), `src/stores/game.ts`, `src/screens/ResultScreen.vue`.
+**Files:** `src/sim/projection.ts` (new), `src/sim/projection.spec.ts` (new), `src/stores/game.ts`,
+`src/screens/ResultScreen.vue`.
 
 **Acceptance:** the GE result reflects in-game polling movement, not just the scenario's starting
-seats; `npm run build` and `npm run test` clean.
+seats; the result screen offers a real "continue playing" path back into the live game (not only a
+restart); `npm run build` and `npm run test` clean.
 
 ---
 
@@ -329,6 +354,14 @@ a future stub.
    second pause mechanism (e.g. a generic `ui.openMenus` count the clock composable watches
    alongside `pendingEvents.length`, so this and P2.9's expanded party panel can share one pause
    gate cleanly instead of each owning its own).
+3. **Note for whoever picks this up (flagged by the user, 2026-06-23 — details TBC, to be
+   expanded later):** the expanded panel should list details of **all** upcoming elections the
+   player can see coming, not just the next by-election — i.e. the next GE (P2.0), and once their
+   data exists, the next devolved-parliament election (P2.1), council/mayoral/PCC elections
+   (P2.3/P2.4), in addition to by-elections. Exact level of detail (dates only? seats at stake?
+   per-election countdown?) and exact layout are **not yet specified** — treat this bullet as a
+   placeholder requirement to flesh out with the user before building against it, not a spec to
+   implement from as-is.
 
 **Files:** `src/components/GameClock.vue`, `src/composables/useGameClock.ts`, possibly
 `src/stores/ui.ts` (a shared "any menu open" flag).
