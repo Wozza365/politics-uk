@@ -34,52 +34,50 @@ the map is only ever touched through the `MapRenderer` interface (`src/map/MapRe
 
 ---
 
-## 1. Outstanding from Phase 1 — do this first
+## 1. Phase 2 — additional governance tiers, views, and depth
 
-**P1.13 — End-to-end loop wire-up is still `🔲 TODO`.** `PHASE_1_PLAN.md` lists it last but the
-codebase confirms it was never finished: `src/stores/game.ts` has `winThresholdSeats` and
-`daysUntilElection` getters but nothing ever *checks* the win condition, there is no GE
-resolution, and no win/lose UI exists anywhere in `src/screens/` or `src/components/`. Building
-devolved/council tiers (this document's whole point) on top of an election loop that never
-actually concludes would compound the gap, so:
+> **P1.13 (end-to-end loop wire-up) is now done** — see
+> [`PHASE_1_COMPLETED.md`](./PHASE_1_COMPLETED.md#p113--end-to-end-loop-wire-up-). `src/stores/
+> game.ts`'s `checkElectionResult()` evaluates `playerSeatCount >= winThresholdSeats` (spec §11.2)
+> against the **static scenario seat composition** once `date >= nextElectionDate`, and
+> `src/screens/ResultScreen.vue` shows the win/lose outcome. That commit's own note is carried
+> forward here rather than re-litigated: there is still **no seat-projection model** — Commons
+> seats never change during play, only `polling` does — so the win check necessarily judges the
+> scenario's starting composition, not a polling-driven outcome. A real seat-swing/projection model
+> (turning the drifting `polling` numbers into a projected GE seat count) is **genuine Phase 2+
+> scope** if a more satisfying win condition is wanted; see P2.0 below.
 
-### P2.0 — Finish P1.13: GE resolution + win/lose screen `🔲`
-**Goal.** When `game.date` reaches `scenario.nextElectionDate`, stop the clock, run the Commons
-seat tally, evaluate `playerSeats > totalSeats / 2` (spec §11.2, already expressed correctly as
-`winThresholdSeats` in `src/stores/game.ts:87-91` — **do not** hard-code 326), and show a minimal
-result screen.
+### P2.0 — Polling-driven seat projection at the GE `🔲`
+**Goal.** Make the GE win check actually reflect how the player's polling moved during play,
+instead of always re-evaluating the scenario's day-one Commons composition (which is fixed,
+regardless of whether the player's polling went up or down across the whole game).
 
-**Depends on:** nothing new — all the pieces (`tickDay`, `winThresholdSeats`,
-`commonsSeatsByParty`) already exist in `src/stores/game.ts`.
+**Depends on:** none — builds on the existing `checkElectionResult()` in `src/stores/game.ts`.
 
 **Steps:**
-1. In `tickDay()` (`src/stores/game.ts:147`), after advancing the date, check
-   `this.date === scenario.scenario.nextElectionDate`. On match: stop rolling events for the day,
-   pause the clock, and set a new `electionResult` state field (winner, player seat count,
-   `winThresholdSeats`, win/lose bool).
-2. Add a results screen (`src/screens/ResultsScreen.vue`, wired into `useUiStore`'s `Screen` union
-   alongside `'start' | 'loading' | 'game'`) shown when `game.electionResult` is set — headline
-   win/lose, final seat count vs threshold, a button back to the start screen.
-3. Seat tally only needs to reconcile Commons seats *held* at the GE date, which currently never
-   changes during play (events only move `polling`, not `Region.seats`) — note this gap rather
-   than hiding it: an MVP win check legitimately judges on **polling-projected** seats, not actual
-   simulated seat changes, until P2.x's deeper sim (out of scope here) redistributes seats. Decide
-   and document which one this resolves against; the spec (§11.2) just says "seats", and projecting
-   from final polling via a uniform swing or similar is an acceptable MVP interpretation — state
-   the choice in the commit message and in this file once decided.
-4. Manual playthrough QA: fast-forward (the dev-added skip-day button) to the GE date, confirm the
-   result screen appears and the win/lose call matches the numbers shown.
+1. Pick a projection method — e.g. a uniform national swing per party (each seat flips to
+   whichever party's *projected* local share would now win it, approximated from the seat's last
+   `results` breakdown where available per P1.14's `CandidateResult[]` data, shifted by that
+   party's national swing since the scenario start) is the standard psephological approach and
+   the most defensible "MVP-plus" option; a simpler proportional-seats-from-vote-share model is a
+   fallback if seat-level projection proves too heavy for this task's scope.
+2. Implement as a pure function in `src/sim/` (e.g. `src/sim/projection.ts`), unit-tested the same
+   way `src/sim/poll.ts` is, so it stays deterministic and independently testable from the store.
+3. Wire it into `checkElectionResult()` (`src/stores/game.ts`) in place of the current
+   `playerSeatCount` (which reads live `commonsSeatsByParty`, itself static) — and update
+   `ResultScreen.vue`'s seat figures to show the projected count, not the unchanged starting one.
+4. Manual playthrough QA: play a minor party but drive its polling up substantially before the GE
+   date (e.g. via seeded events), confirm the projected seat count actually moves, not just the
+   headline polling number.
 
-**Files:** `src/stores/game.ts`, `src/screens/ResultsScreen.vue` (new), `src/stores/ui.ts`,
-`src/types/*` if a new result type is needed.
+**Files:** `src/sim/projection.ts` (new), `src/stores/game.ts`, `src/screens/ResultScreen.vue`.
 
-**Acceptance:** playing to the GE date always produces a result screen; `npm run build` clean;
-the win/lose boolean matches `playerSeats > totalSeats / 2` against whatever seat figure step 3
-settles on.
+**Acceptance:** the GE result reflects in-game polling movement, not just the scenario's starting
+seats; `npm run build` and `npm run test` clean.
 
 ---
 
-## 2. Phase 2 — additional governance tiers, views, and depth
+## 2. Additional governance tiers, views, and depth
 
 Per spec §4.1, **every tier is already in the data model's scope** — Phase 1 only shipped the
 *view* (map + composition data) for tier 1 (Commons). Phase 2's job is the remaining tiers' data
@@ -434,9 +432,9 @@ extended to check whichever scenario id is passed, if it isn't already parameter
 ## A. Dependency graph & suggested execution order
 
 ```
-Phase 1 ✅ (done — see PHASE_1_COMPLETED.md), except P1.13 outstanding
+Phase 1 ✅ (done — see PHASE_1_COMPLETED.md, including P1.13)
    │
-   └─ P2.0 finish P1.13 (win/lose) ── independent of everything else below
+   ├─ P2.0 polling-driven seat projection ── independent of everything else below
    │
    ├─ P2.1 devolved parliaments ─┬─ (shares boundaries/composition/view pattern)
    ├─ P2.2 Lords stats           │
@@ -451,11 +449,10 @@ Phase 1 ✅ (done — see PHASE_1_COMPLETED.md), except P1.13 outstanding
    └─ P2.10 additional scenarios (independent; re-runs the existing data pipeline)
 ```
 
-**Critical path:** none, strictly — P2.0 is small and should land first since it closes a Phase 1
-gap, but P2.1–P2.10 are all parallelisable once it's done. P2.1–P2.4 (tier data + views) are the
+**Critical path:** none — P2.0–P2.10 are all parallelisable. P2.1–P2.4 (tier data + views) are the
 natural first wave since they share one acquisition pattern and unblock P2.7's real drill-down
-data; P2.5/P2.6/P2.9/P2.10 have no data dependency on the others and can proceed concurrently from
-day one.
+data; P2.0/P2.5/P2.6/P2.9/P2.10 have no data dependency on the others and can proceed concurrently
+from day one.
 
 **Good sub-agent delegation boundaries:** each of P2.1–P2.4 owns its own `scripts/data/fetch-*.mjs`
 files and only touches shared files (`build-scenario.mjs`, `validate-scenario.mjs`,
@@ -470,11 +467,10 @@ self-contained slice of `src/map/`, `src/data/scenarios/*/events.*.json`, and
 These aren't blocking — they're flagged inline in the relevant task above, repeated here for
 visibility:
 
-1. **P2.0** — does the GE win check resolve against seats *projected from final polling* (a
-   uniform-swing-style model) or actual simulated seat changes? Phase 1 never redistributes
-   `Region.seats` during play, so a literal "tally current seats" check would always return the
-   scenario's starting result regardless of how polling moved — this needs resolving before P2.0
-   is "done", not just implemented against whichever interpretation is fastest to type.
+1. **P2.0** — does the seat-projection model use a uniform-national-swing approach (per-seat,
+   using each seat's last `results` breakdown from P1.14) or a simpler proportional-from-vote-share
+   model? Left to whoever picks up the task; the uniform-swing approach is the more defensible
+   psephological default if the per-task effort allows it.
 2. **P2.3** — how should mayors (no natural multi-region map tier) be represented? A stats list is
    the pragmatic default; a dedicated overlay is the richer option. Left to whoever picks up the
    task.
