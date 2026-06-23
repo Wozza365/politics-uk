@@ -5,6 +5,7 @@ import { nextPollingSnapshot, type PollingImpact } from '@/sim/poll'
 import { resolvePollingEffects, rollEventForDay } from '@/sim/events'
 import { runEventCallback } from '@/sim/eventCallbacks'
 import { WORLD_SALIENCE } from '@/sim/policies'
+import { projectSeatsByParty } from '@/sim/projection'
 
 /** Adds `days` whole days to an ISO date string ("2025-01-01" + 1 -> "2025-01-02"). */
 function addDays(date: ISODate, days: number): ISODate {
@@ -82,6 +83,17 @@ export const useGameStore = defineStore('game', {
     playerSeatCount(state): number {
       if (!state.selectedPartyId) return 0
       return this.commonsSeatsByParty[state.selectedPartyId] ?? 0
+    },
+    /** Projected Commons seats per party at the GE date under a uniform national swing from the
+     * scenario's day-one polling to the live polling (P2.0) — distinct from `commonsSeatsByParty`,
+     * which is the unchanged starting composition. */
+    projectedCommonsSeatsByParty(state): Record<PartyId, number> {
+      const scenario = useScenarioStore()
+      return projectSeatsByParty(scenario.commonsRegions, scenario.scenario.polling, state.polling)
+    },
+    projectedPlayerSeatCount(state): number {
+      if (!state.selectedPartyId) return 0
+      return this.projectedCommonsSeatsByParty[state.selectedPartyId] ?? 0
     },
     playerPollingPct(state): number {
       if (!state.selectedPartyId) return 0
@@ -186,18 +198,26 @@ export const useGameStore = defineStore('game', {
 
       this.checkElectionResult()
     },
-    /** Win check (spec §11.2): once the GE date is reached, evaluate `playerSeats >
-     * totalSeats / 2` against the current Commons seat composition and record the result.
-     * Action events still take priority that same day — the clock stays paused on whichever
-     * came first, and the result stands once the queue drains. A full seat-projection model
-     * (polling-driven seat changes) is Phase 2; MVP evaluates the static seat composition. */
+    /** Win check (spec §11.2): once the GE date is reached, evaluate `projectedSeats >
+     * totalSeats / 2` against a uniform-national-swing seat projection (P2.0, `sim/projection.ts`)
+     * rather than the unchanged starting Commons composition, so polling movement during play
+     * actually lands in the result. Action events still take priority that same day — the clock
+     * stays paused on whichever came first, and the result stands once the queue drains. The GE
+     * is the headline moment, not the end of the playthrough — see `continuePlaying`. */
     checkElectionResult() {
       if (this.result) return
       const scenario = useScenarioStore()
       const electionDate = scenario.scenario.nextElectionDate
       if (!electionDate || this.date < electionDate) return
-      this.result = this.playerSeatCount >= this.winThresholdSeats ? 'won' : 'lost'
+      this.result = this.projectedPlayerSeatCount >= this.winThresholdSeats ? 'won' : 'lost'
       this.pauseClock()
+    },
+    /** The GE result is a headline moment, not a finale (spec §11.2 doesn't define what happens
+     * after) — `ResultScreen.vue` calls this to drop the player back into live play with the
+     * clock running again, rather than only offering a full restart. `result` is left set so
+     * `checkElectionResult`'s guard above keeps it from re-firing for the same election. */
+    continuePlaying() {
+      this.resumeClock()
     },
     /** Folds every impact accumulated since the last release (plus this release's own
      * alignment/variance/trend) into a new polling snapshot, makes it the live number, and

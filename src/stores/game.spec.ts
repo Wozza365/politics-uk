@@ -1,6 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useGameStore } from './game'
+import { useScenarioStore } from './scenario'
 import type { FeedEntry, GameEvent } from '@/types'
 
 describe('useGameStore.resolveFeedAction', () => {
@@ -159,5 +160,55 @@ describe('useGameStore.resolveFeedAction', () => {
     expect(game.pollingHistory).toHaveLength(2)
     expect(game.pollingHistory.at(-1)?.polling).toEqual(game.polling)
     expect(game.pendingPollImpacts).toEqual([])
+  })
+})
+
+describe('useGameStore.checkElectionResult — P2.0', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('judges the win against the projected seat count, not the static starting one', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date // election is "today"
+
+    // Crash Labour's live polling relative to its scenario-start polling so the uniform-swing
+    // projection should cost it seats versus the unprojected starting composition.
+    game.polling.labour = Math.max(0.1, (scenario.scenario.polling.labour ?? 0) - 30)
+
+    game.checkElectionResult()
+
+    expect(game.result).not.toBeNull()
+    expect(game.projectedPlayerSeatCount).toBeLessThan(game.playerSeatCount)
+  })
+
+  it('does not re-evaluate once a result is already recorded', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date
+    game.checkElectionResult()
+    const firstResult = game.result
+
+    game.polling.labour = 0.1 // would flip the outcome if re-evaluated
+    game.checkElectionResult()
+
+    expect(game.result).toBe(firstResult)
+  })
+
+  it('continuePlaying resumes the clock without clearing the recorded result', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date
+    game.checkElectionResult()
+    expect(game.clock.running).toBe(false)
+
+    game.continuePlaying()
+
+    expect(game.clock.running).toBe(true)
+    expect(game.result).not.toBeNull()
   })
 })
