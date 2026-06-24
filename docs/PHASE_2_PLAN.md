@@ -38,9 +38,9 @@ the map is only ever touched through the `MapRenderer` interface (`src/map/MapRe
 
 ## 1. Phase 2 — additional governance tiers, views, and depth
 
-### P2.0 — Polling-driven seat projection at the GE `✅ DONE`
+### P2.0 — Polling-driven seat projection at the GE
 
-See [`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p20--polling-driven-seat-projection-at-the-ge-).
+See [`phase2/P2.0-seat-projection.md`](./phase2/P2.0-seat-projection.md).
 
 ---
 
@@ -62,268 +62,45 @@ rather than repeating the table.
 > pattern (Open Council Data UK) rather than treating each of the seven council types as a
 > separate task.
 
-### P2.1 — Regional view: Holyrood, Senedd, NI Assembly, London Assembly `✅ DONE`
+### P2.1 — Regional view: Holyrood, Senedd, NI Assembly, London Assembly
 
-See
-[`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p21--regional-view-holyrood-senedd-ni-assembly-london-assembly-)
-for the full record of what was built.
+See [`phase2/P2.1-regional-view.md`](./phase2/P2.1-regional-view.md).
 
-**Still open — future enhancement (2026-06-23, user request, not in P2.1's scope):** show each
-body's list-seat results as a small hover/tooltip summary anchored near its own region cluster on
-the Regional view — e.g. hovering Scotland surfaces Holyrood's regional-list party breakdown,
-hovering Wales surfaces Senedd's, and likewise for NI Assembly and London Assembly. Needs a UI
-design pass (hover card component, anchor positioning relative to each body's geometry bounds).
+### P2.2 — Lords (stats only, no map)
 
-### P2.2 — Lords (stats only, no map) `🔲`
+See [`phase2/P2.2-lords.md`](./phase2/P2.2-lords.md).
 
-**Goal.** Per `PHASE_0_COMPLETED.md`'s own note ("Lords… not yet started… would need its own
-small acquisition step"), get real Lords-by-party-group figures into the party panel instead of
-the current "—" placeholder (spec §4.1 row 2 — Phase column says **P1**, so this is genuinely
-overdue, not new Phase 2 scope; included here since it never got its own task in `PHASE_1_PLAN.md`
-and nothing else picked it up).
+### P2.3 — Mayoralty: London, combined-authority, and other local mayors
 
-**Steps:**
-1. Fetch current Lords-by-party-group counts (UK Parliament data, per spec §5.1) as of
-   2025-01-01.
-2. Add a `lords: Record<PartyId, number>` (or similar) field to `Scenario` (`src/types/scenario.ts`)
-   — no map geometry needed, it's a chamber not a constituency map (spec §4.1 row 2: "n/a
-   (chamber)").
-3. Wire into `src/components/PartyPanel.vue`, replacing its existing "—" placeholder for Lords
-   (P1.7 in `PHASE_1_COMPLETED.md` already reserves layout space for this).
+See [`phase2/P2.3-mayoralty.md`](./phase2/P2.3-mayoralty.md).
 
-**Files:** `scripts/data/fetch-lords-composition.mjs` (new), `src/types/scenario.ts`,
-`scripts/data/build-scenario.mjs`, `src/components/PartyPanel.vue`.
+### P2.4 — Council tiers (the long tail)
 
-**Acceptance:** the party panel shows a real Lords peer count per party group, not a placeholder;
-`npm run validate:data` and `npm run build` clean.
+See [`phase2/P2.4-council-tiers.md`](./phase2/P2.4-council-tiers.md).
 
-### P2.3 — Mayoralty: London, combined-authority, and other local mayors `🔲`
+### P2.5 — Hex-map renderer
 
-**Goal.** Spec §4.1 rows 7–8: the London mayoralty, ~12 combined-authority metro mayors, and ~15
-other directly-elected local mayors. (London Assembly itself — row 6 — moved into
-[P2.1](#p21--regional-view-holyrood-senedd-ni-assembly-london-assembly) since it shares that
-task's "regional legislature" shape; this task is mayors only.)
+See [`phase2/P2.5-hex-map-renderer.md`](./phase2/P2.5-hex-map-renderer.md).
 
-**Steps:**
-1. Mayors (London, combined-authority, and other directly-elected local) don't need their own map
-   tier — they're a single seat each, not a multi-region body — so model them as a lightweight
-   `Mayoralty[]` (id, name, regionRef for hover-linking, current `PartyId`, electedAt) rather than
-   forcing the `Region`/`Seat` shape designed for multi-seat bodies. Surface them either as a
-   filter/overlay on the existing Regional view or a small stats list — there's no single
-   obviously-correct map representation for ~27 disjoint single seats, so this is a genuine design
-   decision for whoever picks up this task: resolve it pragmatically rather than over-building, and
-   record the choice here once made.
-2. Wire mayoral stats wherever step 1 lands them (likely the party panel or a small new "mayors"
-   stats card, not a new full-screen view).
+### P2.6 — Full event library + authoring tooling
 
-**Files:** `scripts/data/fetch-mayors.mjs` (new), `src/types/*` (new `Mayoralty` type),
-`scripts/data/build-scenario.mjs`, `src/stores/scenario.ts`.
+See [`phase2/P2.6-event-library.md`](./phase2/P2.6-event-library.md).
 
-**Acceptance:** mayoral data exists in the scenario and is surfaced somewhere in the UI (exact
-location is this task's call); `npm run validate:data` and `npm run build` clean.
+### P2.7 — Clickable hemicycle drill-down
 
-### P2.4 — Council tiers (the long tail) `🔲`
+See [`phase2/P2.7-hemicycle-drilldown.md`](./phase2/P2.7-hemicycle-drilldown.md).
 
-**Goal.** Spec §4.1 rows 9–17: Police & Crime Commissioners, county councils, district/borough
-councils, unitary authorities, metropolitan boroughs, London boroughs, Scottish/Welsh/NI councils
-— ~370 principal authorities in total (parish/town/community councils are explicitly **cut**, see
-spec §4.1's decision note — do not build these). A single "councils" view per spec §9.6's nav bar
-(`src/components/ViewSwitcher.vue` already has one `councils` entry, not nine).
+### P2.8 — Expandable clock / by-elections panel
 
-**Steps:**
-1. Source from **Open Council Data UK** (opencouncildata.co.uk) per spec §5.1 — this is the one
-   acquisition pattern that covers all nine council-ish rows, so build one reusable fetch/parse
-   script rather than nine bespoke ones; PCCs are the exception (Electoral Commission/Wikipedia per
-   spec §5.1) since they're not a council composition dataset.
-2. Decide the "councils" view's actual map granularity: spec §9.6 lists "councils" as one nav
-   entry, but the underlying data spans 9 distinct authority types with overlapping/non-overlapping
-   geography (a county council area contains several district councils, for instance) — a single
-   flat map of ~370 boundaries coloured by controlling party most directly satisfies spec §9.2's
-   "party-makeup dots" hemicycle for an aggregate "councils" tier; whether the *map* also needs a
-   sub-switcher between authority types (rather than a single merged geography) is this task's
-   design call to make and document.
-3. Council composition is by-ward, often dozens of wards per council — `Region.seats: Seat[]`
-   already supports multiple seats per region (constituency = council, seats = ward councillors),
-   so no type changes should be needed; verify rather than assume the model deforms cleanly at
-   this multiplicity before building bespoke scripts.
-4. The combined "councils controlled" figure already shown on `PartyPanel.vue` (P1.7,
-   `PHASE_1_COMPLETED.md`) currently has nothing real to read — once this lands, point it at real
-   per-council majority-control data.
+See [`phase2/P2.8-clock-panel.md`](./phase2/P2.8-clock-panel.md).
 
-**Files:** `scripts/data/fetch-council-composition.mjs` (new, reusable across council types),
-`scripts/data/fetch-pcc-composition.mjs` (new), `src/data/scenarios/uk-2025-01-01/composition.councils.json`
-(new — or split per-type if step 2's design call goes that way), `scripts/data/build-scenario.mjs`,
-view-switcher/map wiring, `src/components/PartyPanel.vue` (real "councils controlled" figure).
+### P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel)
 
-**Acceptance:** a "councils" view exists with real composition data across the principal-authority
-tiers in scope; `PartyPanel.vue`'s "councils controlled" stat is real, not a placeholder;
-`npm run validate:data` and `npm run build` clean.
+See [`phase2/P2.9-party-panel-levers.md`](./phase2/P2.9-party-panel-levers.md).
 
-### P2.5 — Hex-map renderer `🔲`
+### P2.10 — Additional scenarios
 
-**Goal.** Spec §12 lists "hex-map renderer" explicitly as Phase 2+ scope, and spec §5.1 already
-names a source (House of Commons Library / Open Innovations constituency hexmaps).
-
-**Depends on:** none of P2.1–P2.4 — purely a `MapRenderer` implementation, same interface contract
-as `SvgMapRenderer.ts`.
-
-**Steps:**
-1. Fetch the Commons Library/Open Innovations hexmap layout data (a fixed q/r or x/y hex
-   coordinate per constituency, not a TopoJSON boundary — this is a *different* `BoundarySet`
-   shape conceptually, so check whether `BoundarySet`'s `topology`/`objectKey` contract
-   (`src/map/MapRenderer.ts:7-11`) actually fits a hex grid or needs a sibling type; don't force a
-   geographic topology abstraction onto a schematic layout if it doesn't fit.
-2. Implement `HexMapRenderer` against the existing `MapRenderer` interface — same `mount` /
-   `render` / `setEvents` / `resize` / `unmount` / `getRegionBounds` / `getRegionSizeExtent` /
-   `setBackgroundBlur` contract `SvgMapRenderer.ts` already implements, so `MapView.vue`'s zoom/
-   pan/focus/tooltip logic (P1.5) needs **zero changes** to work with it — that's the entire point
-   of the abstraction (spec §9.1's "single non-negotiable design decision").
-3. Expose a renderer choice (e.g. a small toggle near `ViewSwitcher.vue`, or per-view default) so
-   players can pick geographic vs. hex layout for Westminster at least.
-
-**Files:** `src/map/HexMapRenderer.ts` (new), possibly a new `HexBoundarySet`-like type in
-`src/map/MapRenderer.ts`, a small UI toggle component.
-
-**Acceptance:** the hex map renders all 650 Commons constituencies as same-size hexes coloured by
-party, with the same hover/click/zoom behaviour as the SVG geographic map, swapped in without
-touching `MapView.vue`'s consuming logic beyond which renderer it constructs.
-
-### P2.6 — Full event library + authoring tooling `🔲`
-
-**Goal.** Spec §12 Phase 2+: "Full event library (real + fictional), authoring tooling." Phase 1
-shipped the event *system* (schema, roll logic, callbacks, two seed pools) per P1.12 in
-`PHASE_1_COMPLETED.md` — this task is about **content volume and an authoring workflow**, not
-new mechanics.
-
-**Steps:**
-1. Grow `src/data/scenarios/uk-2025-01-01/events.seed.json` and `events.scripted.json` well beyond
-   the P1.12 starter set — spec §10.5.3 explicitly recommends **authoring-time LLM use** (Claude
-   API, `claude-opus-4-8` per the spec's own naming) to mass-generate first-draft event text +
-   numeric effects, which a human/agent then reviews and bakes into the deterministic JSON files —
-   never have an LLM decide effects at runtime (spec §10.5.3's "no LLM in the core mechanic"
-   decision is **not** revisited by this task).
-2. Build a small authoring script (e.g. `scripts/data/author-events.mjs`) that calls the Claude API
-   to draft candidate `GameEvent` records against the existing schema
-   (`src/types/event.ts`), for a human/reviewing-agent to accept/edit/reject before they're
-   committed to the seed/scripted JSON — keep generation and commit as separate steps, never
-   auto-write straight to the data files.
-3. Cover a wider span of `scope` (local→international) and `severity`, and more `window`-bounded
-   scripted events (the recurring-by-year pattern P1.12 already established for New Year Honours/
-   storms/etc.) so a full playthrough doesn't feel repetitive.
-
-**Files:** `scripts/data/author-events.mjs` (new), `src/data/scenarios/uk-2025-01-01/events.{seed,scripted}.json`.
-
-**Acceptance:** a meaningfully larger and more varied event pool; `rollEventForDay` (`src/sim/events.ts`)
-and its existing tests (`src/sim/events.spec.ts`) still pass unmodified — this task only adds data,
-it shouldn't need engine changes.
-
-### P2.7 — Clickable hemicycle drill-down `🔲`
-
-**Goal.** Spec §9.2: hemicycle dots are "clickable later (drill into that party's seats /
-breakdown)" — `src/components/HemicycleView.vue` (P1.6, `PHASE_1_COMPLETED.md`) already has
-hover-ready, click-stubbed markup for this.
-
-**Steps:**
-1. Add a click handler per dot that opens a small breakdown (party's seat list for the active
-   tier/view, or a per-seat detail akin to the constituency tooltip's enriched data from P1.14).
-2. Respect the existing "view-mode toggle" stub (hemicycle fan ⌒ vs. "house" rows-of-benches =,
-   spec §9.2) if that's been built by the time this lands; if not, this task can also wire that
-   toggle's actual second layout mode, since they're adjacent UI surface.
-
-**Files:** `src/components/HemicycleView.vue`, `src/sim/hemicycle.ts`.
-
-**Acceptance:** clicking a hemicycle dot surfaces real seat-level detail for that party in the
-active view.
-
-### P2.8 — Expandable clock / by-elections panel `🔲`
-
-**Goal.** Spec §9.5: the clock UI is "an interactive element (expandable later to list
-by-elections and other minor elections in detail)" — `src/components/GameClock.vue` (P1.9,
-`PHASE_1_COMPLETED.md`) is currently a `disabled` button with an `aria-label` describing this as
-a future stub.
-
-**Steps:**
-1. Build the expanded panel: upcoming by-elections (sourced from `events.scripted.json`'s
-   by-election-type entries, or a new dedicated data source if those move out of the generic event
-   pool), other minor elections (PCCs, mayors, council elections — once P2.3/P2.4 land their data).
-2. Per spec §9.3/§9.5, opening any menu **pauses the game clock** — `useGameClock.ts`'s existing
-   pause-on-`pendingEvents` watcher (P1.9) establishes the pattern; reuse it rather than building a
-   second pause mechanism (e.g. a generic `ui.openMenus` count the clock composable watches
-   alongside `pendingEvents.length`, so this and P2.9's expanded party panel can share one pause
-   gate cleanly instead of each owning its own).
-3. **Note for whoever picks this up (flagged by the user, 2026-06-23 — details TBC, to be
-   expanded later):** the expanded panel should list details of **all** upcoming elections the
-   player can see coming, not just the next by-election — i.e. the next GE (P2.0), and once their
-   data exists, the next devolved-parliament election (P2.1), council/mayoral/PCC elections
-   (P2.3/P2.4), in addition to by-elections. Exact level of detail (dates only? seats at stake?
-   per-election countdown?) and exact layout are **not yet specified** — treat this bullet as a
-   placeholder requirement to flesh out with the user before building against it, not a spec to
-   implement from as-is.
-
-**Files:** `src/components/GameClock.vue`, `src/composables/useGameClock.ts`, possibly
-`src/stores/ui.ts` (a shared "any menu open" flag).
-
-**Acceptance:** clicking the clock opens a real by-elections/minor-elections panel and pauses the
-clock while open; closing it resumes the clock (consistent with the existing pending-event
-pause/resume behaviour).
-
-### P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel) `🔲`
-
-**Goal.** Spec §9.3 "Expanded (the player's levers) — (Later)": fundraising, social media
-activity, staffing, policy, campaigning, leadership — the actual gameplay levers. This is the
-single largest piece of new Phase 2 *gameplay* (as opposed to data/view) work, and the one most
-likely to need its own sub-plan once scoped.
-
-**Steps:**
-1. `PartyPanel.vue` (P1.7) already wires its "expand" affordance to pause the clock with an empty
-   expanded body — build the actual expanded surface.
-2. Each lever needs: a UI control, a store action that turns the player's choice into
-   `PollingImpact`s / `stances` shifts / finance or membership deltas through the **existing**
-   sim seams (`src/sim/poll.ts`'s generic `PollingImpact` contract, `game.applySalienceShift`,
-   `Party.stances`) rather than inventing parallel mechanics — e.g. "policy" should literally let
-   the player edit their own party's `stances[policyId].position` and feed that into the same
-   alignment model events already drive (spec §10.5.1 step 4: "a player action deliberately shifts
-   the player party's own position").
-3. **Charts** — spec §2 names `vue-echarts` for dashboard charts (not yet a dependency; add it
-   when this task starts) for polling-history trend lines (`game.pollingHistory` already exists
-   and is populated, just not charted anywhere yet) and similar.
-4. Scope this as several sub-tasks (one per lever) once picked up — fundraising and social media
-   are the most self-contained starting points (they only touch finance/membership/polling, not
-   the compass model); policy is the most architecturally significant (touches `stances`, the
-   alignment model, and base-betrayal) and should land after the simpler levers prove the pattern.
-
-**Files:** `src/components/PartyPanel.vue` (expanded body), new lever-specific components/stores,
-`src/sim/poll.ts` (only if a genuinely new impact source doesn't fit the existing
-`PollingImpact`/`extraImpacts` seam — it should).
-
-**Acceptance:** at least fundraising and social media are real, playable levers that move
-finance/membership/polling through the existing sim contract; clock pauses while the panel is
-expanded (reusing P2.8's shared menu-pause flag if that landed first).
-
-### P2.10 — Additional scenarios `🔲`
-
-**Goal.** Spec §12: "More scenarios (real + custom-generated)." `PHASE_1_PLAN.md`'s "Decisions"
-§B.4 already confirms the timeline selector (`StartScreen.vue`, P1.2.1) was built to accept more
-stops without rewrite — this task is about actually producing more dated `Scenario` snapshots,
-not UI work.
-
-**Steps:**
-1. Pick the next historical date(s) — natural candidates given the existing pipeline: an earlier
-   point (pre-2024-boundary-review, if that's wanted) or post-2025 as real polling/composition data
-   becomes available with time. Each new scenario is its own `src/data/scenarios/<id>/` directory
-   built with the same `scripts/data/*.mjs` pipeline Phase 0 established, just re-run against a
-   different as-of date.
-2. "Custom-generated" scenarios (spec's phrase) are undefined beyond that one line — treat as an
-   open design question for whoever picks this up, not a spec'd feature; don't invent a generation
-   mechanism speculatively.
-3. Add each new scenario as a new `TimelineStop` in `StartScreen.vue`'s existing array.
-
-**Files:** `src/data/scenarios/<new-id>/*`, `scripts/data/*.mjs` (re-run, not rewritten),
-`src/screens/StartScreen.vue` (new timeline stop).
-
-**Acceptance:** at least one additional dated scenario is selectable from the start screen and
-fully playable end-to-end, validated the same way as `uk-2025-01-01` (`npm run validate:data`
-extended to check whichever scenario id is passed, if it isn't already parameterised).
+See [`phase2/P2.10-additional-scenarios.md`](./phase2/P2.10-additional-scenarios.md).
 
 ---
 
