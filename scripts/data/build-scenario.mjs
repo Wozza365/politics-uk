@@ -88,6 +88,7 @@ function main() {
   const seneddRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.senedd.json')
   const niAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.ni_assembly.json')
   const londonAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.london_assembly.json')
+  const lordsRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.lords.json')
   const parties = readJson('../../src/data/scenarios/uk-2025-01-01/parties.json')
 
   const scenario = {
@@ -101,6 +102,7 @@ function main() {
       senedd: seneddRegions,
       ni_assembly: niAssemblyRegions,
       london_assembly: londonAssemblyRegions,
+      lords: lordsRegions,
     },
     parties,
     polling: POLLING,

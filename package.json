@@ -23,6 +23,7 @@
     "data:fetch-london-assembly-composition": "node scripts/data/fetch-london-assembly-composition.mjs",
     "data:fetch-london-constituencies": "node scripts/data/fetch-london-constituencies.mjs",
     "data:build-regional-boundaries": "node scripts/data/build-regional-boundaries.mjs",
+    "data:fetch-lords-composition": "node scripts/data/fetch-lords-composition.mjs",
     "data:build-parties": "node scripts/data/build-parties.mjs",
     "data:build-scenario": "node scripts/data/build-scenario.mjs",
     "validate:data": "node scripts/data/validate-scenario.mjs"

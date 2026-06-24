@@ -1,6 +1,6 @@
 import type { ISODate, PartyId } from './party'
 
-export type TierId = string // "commons", "holyrood", "senedd", "council:metropolitan", ...
+export type TierId = string // "commons", "lords", "holyrood", "senedd", "council:metropolitan", ...
 
 export interface CandidateResult {
   party: PartyId

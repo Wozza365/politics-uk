@@ -42,6 +42,12 @@
     "source": "estimated",
     "notes": "Per spec §13 (resolved): pure estimates are fine, no factual basis required. Every value carries source: 'estimated'."
   },
+  "lords": {
+    "description": "House of Lords peer counts by party/group (spec §4.1 row 2, \"n/a (chamber)\" — stats only, no map), src/data/scenarios/uk-2025-01-01/composition.lords.json",
+    "source": "Reconstructed from LabourList's 20 Dec 2024 report on that month's new-peers list (which quotes the pre-announcement state of the parties: Conservative 273, Labour 187, Liberal Democrat 78, Crossbench 184, \"57 from other parties and independents\"), plus the usual ~25 Lords Spiritual (bishops)",
+    "asOf": "2025-01-01",
+    "notes": "This environment's network egress policy blocks members-api.parliament.uk and lordslibrary.parliament.uk directly, so the official State-of-the-Parties figures for the exact 2025-01-01 date could not be fetched live; this is a best-effort reconstruction, not an official as-at-date table. The pre-announcement (not post-announcement) December 2024 figures are used deliberately, since newly-announced peers take weeks to be formally introduced and would mostly not yet have been seated by 1 January 2025 — consistent with a separately-reported '~807 members as of 2025' headline total (804 here). The '57 other parties and independents' bucket is split using the smaller named groups' typical sizes for the period (DUP 6, UUP 3, Green 2, Plaid Cymru 2), with the remainder folded into the existing 'independent' party entry (non-affiliated peers, the Lord Speaker, and the one sitting Conservative-Independent peer). Modelled as one synthetic region holding one unnamed Seat per peer (group strengths only, not the full membership roll) — see scripts/data/fetch-lords-composition.mjs's header comment."
+  },
   "membership": {
     "description": "Party membership counts",
     "source": "estimated",

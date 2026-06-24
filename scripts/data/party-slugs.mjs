@@ -21,6 +21,18 @@ export const PARTY_SLUGS = {
   'Traditional Unionist Voice': 'tuv',
   Independent: 'independent',
   Speaker: 'speaker',
+  // House of Lords groups (fetch-lords-composition.mjs) that aren't
+  // political parties: crossbench/bishops get their own party-list entries
+  // (build-parties.mjs) since they're sizeable, named groups; non-affiliated
+  // peers (and the handful of individually-named one-off cases — the Lord
+  // Speaker, a sitting Conservative Independent — folded in with them) reuse
+  // the existing Commons "independent" entry rather than adding a near-empty
+  // one-off party id for each.
+  Crossbench: 'crossbench',
+  Bishops: 'bishops',
+  'Non-affiliated': 'independent',
+  'Lord Speaker': 'independent',
+  'Conservative Independent': 'independent',
   // Ballot-paper party names that only ever appear as losing candidates in
   // the results breakdown (fetch-commons-results-breakdown.mjs), mapped
   // onto the same party entries build-scenario.mjs already tracks for
