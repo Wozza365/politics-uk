@@ -108,6 +108,9 @@ const councilsControlled = computed(() => {
     .flatMap((region) => region.seats)
     .filter((seat) => seat.party === selectedPartyId.value).length
 })
+const mayoralties = computed(() =>
+  selectedPartyId.value ? scenario.mayoraltyCountByParty[selectedPartyId.value] ?? 0 : 0,
+)
 const leaderApproval = computed<number | null>(() => null)
 const daysSinceLastElection = computed<number | null>(() => {
   if (!selectedPartyId.value) return null
@@ -275,6 +278,12 @@ function formatMoney(value: PartyFinance | undefined) {
             <p class="text-xs uppercase tracking-wide text-zinc-500">Lords</p>
             <p class="mt-1 text-lg font-semibold text-zinc-100">{{ formatCount(lordsSeats) }}</p>
             <p class="mt-1 text-xs text-zinc-400">Appointed peers, not elected</p>
+          </div>
+
+          <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/60 px-3 py-2">
+            <p class="text-xs uppercase tracking-wide text-zinc-500">Mayoralties</p>
+            <p class="mt-1 text-lg font-semibold text-zinc-100">{{ formatCount(mayoralties) }}</p>
+            <p class="mt-1 text-xs text-zinc-400">London, metro &amp; local mayors held</p>
           </div>
         </div>
 

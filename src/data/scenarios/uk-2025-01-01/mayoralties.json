@@ -1,0 +1,227 @@
+[
+  {
+    "id": "mayor:bedford",
+    "name": "Mayor of Bedford Borough",
+    "kind": "local",
+    "regionRef": "bedford",
+    "party": "conservative",
+    "memberName": "Tom Wootton",
+    "electedAt": "2023-05-04"
+  },
+  {
+    "id": "mayor:cambridgeshire_and_peterborough",
+    "name": "Mayor of Cambridgeshire and Peterborough",
+    "kind": "combined_authority",
+    "regionRef": "cambridgeshire_and_peterborough",
+    "party": "labour",
+    "memberName": "Nik Johnson",
+    "electedAt": "2021-05-06"
+  },
+  {
+    "id": "mayor:croydon",
+    "name": "Mayor of Croydon",
+    "kind": "local",
+    "regionRef": "croydon",
+    "party": "conservative",
+    "memberName": "Jason Perry",
+    "electedAt": "2022-05-05"
+  },
+  {
+    "id": "mayor:doncaster",
+    "name": "Mayor of Doncaster",
+    "kind": "local",
+    "regionRef": "doncaster",
+    "party": "labour",
+    "memberName": "Ros Jones",
+    "electedAt": "2021-05-06"
+  },
+  {
+    "id": "mayor:east_midlands",
+    "name": "Mayor of the East Midlands",
+    "kind": "combined_authority",
+    "regionRef": "east_midlands",
+    "party": "labour",
+    "memberName": "Claire Ward",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:greater_london",
+    "name": "Mayor of London",
+    "kind": "london",
+    "regionRef": "greater_london",
+    "party": "labour",
+    "memberName": "Sadiq Khan",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:greater_manchester",
+    "name": "Mayor of Greater Manchester",
+    "kind": "combined_authority",
+    "regionRef": "greater_manchester",
+    "party": "labour",
+    "memberName": "Andy Burnham",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:hackney",
+    "name": "Mayor of Hackney",
+    "kind": "local",
+    "regionRef": "hackney",
+    "party": "labour",
+    "memberName": "Caroline Woodley",
+    "electedAt": "2023-11-09"
+  },
+  {
+    "id": "mayor:leicester",
+    "name": "Mayor of Leicester",
+    "kind": "local",
+    "regionRef": "leicester",
+    "party": "labour",
+    "memberName": "Peter Soulsby",
+    "electedAt": "2023-05-04"
+  },
+  {
+    "id": "mayor:lewisham",
+    "name": "Mayor of Lewisham",
+    "kind": "local",
+    "regionRef": "lewisham",
+    "party": "labour",
+    "memberName": "Brenda Dacres",
+    "electedAt": "2024-03-07"
+  },
+  {
+    "id": "mayor:liverpool_city_region",
+    "name": "Mayor of the Liverpool City Region",
+    "kind": "combined_authority",
+    "regionRef": "liverpool_city_region",
+    "party": "labour",
+    "memberName": "Steve Rotheram",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:mansfield",
+    "name": "Mayor of Mansfield",
+    "kind": "local",
+    "regionRef": "mansfield",
+    "party": "labour",
+    "memberName": "Andy Abrahams",
+    "electedAt": "2023-05-04"
+  },
+  {
+    "id": "mayor:middlesbrough",
+    "name": "Mayor of Middlesbrough",
+    "kind": "local",
+    "regionRef": "middlesbrough",
+    "party": "labour",
+    "memberName": "Chris Cooke",
+    "electedAt": "2023-05-04"
+  },
+  {
+    "id": "mayor:newham",
+    "name": "Mayor of Newham",
+    "kind": "local",
+    "regionRef": "newham",
+    "party": "labour",
+    "memberName": "Rokhsana Fiaz",
+    "electedAt": "2022-05-05"
+  },
+  {
+    "id": "mayor:north_east",
+    "name": "Mayor of the North East",
+    "kind": "combined_authority",
+    "regionRef": "north_east",
+    "party": "labour",
+    "memberName": "Kim McGuinness",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:north_tyneside",
+    "name": "Mayor of North Tyneside",
+    "kind": "local",
+    "regionRef": "north_tyneside",
+    "party": "labour",
+    "memberName": "Karen Clark",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:salford",
+    "name": "Mayor of Salford",
+    "kind": "local",
+    "regionRef": "salford",
+    "party": "labour",
+    "memberName": "Paul Dennett",
+    "electedAt": "2021-05-06"
+  },
+  {
+    "id": "mayor:south_yorkshire",
+    "name": "Mayor of South Yorkshire",
+    "kind": "combined_authority",
+    "regionRef": "south_yorkshire",
+    "party": "labour",
+    "memberName": "Oliver Coppard",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:tees_valley",
+    "name": "Mayor of Tees Valley",
+    "kind": "combined_authority",
+    "regionRef": "tees_valley",
+    "party": "conservative",
+    "memberName": "Ben Houchen",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:tower_hamlets",
+    "name": "Mayor of Tower Hamlets",
+    "kind": "local",
+    "regionRef": "tower_hamlets",
+    "party": "aspire",
+    "memberName": "Lutfur Rahman",
+    "electedAt": "2022-05-05"
+  },
+  {
+    "id": "mayor:watford",
+    "name": "Mayor of Watford",
+    "kind": "local",
+    "regionRef": "watford",
+    "party": "liberal_democrat",
+    "memberName": "Peter Taylor",
+    "electedAt": "2022-05-05"
+  },
+  {
+    "id": "mayor:west_midlands",
+    "name": "Mayor of the West Midlands",
+    "kind": "combined_authority",
+    "regionRef": "west_midlands",
+    "party": "labour",
+    "memberName": "Richard Parker",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:west_of_england",
+    "name": "Mayor of the West of England",
+    "kind": "combined_authority",
+    "regionRef": "west_of_england",
+    "party": "labour",
+    "memberName": "Dan Norris",
+    "electedAt": "2021-05-06"
+  },
+  {
+    "id": "mayor:west_yorkshire",
+    "name": "Mayor of West Yorkshire",
+    "kind": "combined_authority",
+    "regionRef": "west_yorkshire",
+    "party": "labour",
+    "memberName": "Tracy Brabin",
+    "electedAt": "2024-05-02"
+  },
+  {
+    "id": "mayor:york_and_north_yorkshire",
+    "name": "Mayor of York and North Yorkshire",
+    "kind": "combined_authority",
+    "regionRef": "york_and_north_yorkshire",
+    "party": "labour",
+    "memberName": "David Skaith",
+    "electedAt": "2024-05-02"
+  }
+]

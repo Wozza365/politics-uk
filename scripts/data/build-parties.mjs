@@ -421,6 +421,28 @@ const PARTIES_SOURCE = [
       },
     ],
   },
+  {
+    // Lutfur Rahman's vehicle for the Tower Hamlets mayoralty (P2.3,
+    // fetch-mayors.mjs) -- a single-borough electoral vehicle, not a
+    // national/regional party.
+    id: 'aspire',
+    name: 'Aspire',
+    shortName: 'Aspire',
+    colours: { primary: '#0B6E70' },
+    scope: 'local',
+    founded: 2022,
+    leadership: [{ role: 'leader', personName: 'Lutfur Rahman', since: '2022-05-06' }],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 5000, annualIncome: 20000, source: 'estimated' },
+        membership: 500,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
+  },
 ]
 
 function srgbToLinear(c) {

@@ -70,9 +70,11 @@ See [`phase2/P2.1-regional-view.md`](./phase2/P2.1-regional-view.md).
 
 See [`phase2/P2.2-lords.md`](./phase2/P2.2-lords.md).
 
-### P2.3 — Mayoralty: London, combined-authority, and other local mayors
+### P2.3 — Mayoralty: London, combined-authority, and other local mayors `✅ DONE`
 
-See [`phase2/P2.3-mayoralty.md`](./phase2/P2.3-mayoralty.md).
+See
+[`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p23--mayoralty-london-combined-authority-and-other-local-mayors-)
+for the full record of what was built.
 
 ### P2.4 — Council tiers (the long tail)
 
@@ -178,9 +180,8 @@ visibility:
    using each seat's last `results` breakdown from P1.14) or a simpler proportional-from-vote-share
    model? Left to whoever picks up the task; the uniform-swing approach is the more defensible
    psephological default if the per-task effort allows it.
-2. **P2.3** — how should mayors (no natural multi-region map tier) be represented? A stats list is
-   the pragmatic default; a dedicated overlay is the richer option. Left to whoever picks up the
-   task.
+2. **P2.3** — how should mayors (no natural multi-region map tier) be represented? Resolved as a
+   stats list, not a map overlay — see `PHASE_2_COMPLETED.md`'s P2.3 entry for why.
 3. **P2.4** — does the "councils" view need an authority-type sub-switcher, or one merged
    geography? Spec §9.6 implies one nav entry; the underlying data's overlapping geography (county
    vs. district) makes a single flat map an imperfect fit. Left to whoever picks up the task.

@@ -20,6 +20,7 @@ function makeScenario(overrides: Partial<Scenario> = {}): Scenario {
     date: '2025-01-01',
     label: 'Test',
     tiers: { commons: [] },
+    mayoralties: [],
     parties: [],
     polling: {},
     pollingHistory: [],

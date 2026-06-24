@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { Topology } from 'topojson-specification'
-import type { Region, RegionDemographics, Scenario } from '@/types'
+import type { PartyId, Region, RegionDemographics, Scenario } from '@/types'
 import scenarioData from '@/data/scenarios/uk-2025-01-01/scenario.json'
 import boundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.json'
 import regionalBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.regional.json'
@@ -38,6 +38,15 @@ export const useScenarioStore = defineStore('scenario', {
       const map = new Map<string, RegionDemographics>()
       for (const entry of state.demographics) map.set(entry.regionId, entry)
       return map
+    },
+    // Mayoralties (P2.3) aren't part of any tier (see src/types/mayoralty.ts
+    // for why), so they're counted separately from commonsSeats/otherSeats.
+    mayoraltyCountByParty: (state) => {
+      const counts: Record<PartyId, number> = {}
+      for (const mayoralty of state.scenario.mayoralties) {
+        counts[mayoralty.party] = (counts[mayoralty.party] ?? 0) + 1
+      }
+      return counts
     },
   },
 })

@@ -185,6 +185,27 @@ function validate(scenario, boundariesByTier, demographics = null) {
     }
   }
 
+  // Mayoralties (P2.3): no duplicate ids, every party reference resolves,
+  // every electedAt is a valid ISO date. Not cross-checked against any
+  // boundary/geometryRef -- mayoralties don't have map geometry in this
+  // dataset (see src/types/mayoralty.ts).
+  if (scenario.mayoralties) {
+    const seenMayoraltyIds = new Set()
+    for (const mayoralty of scenario.mayoralties) {
+      if (!mayoralty.id || !mayoralty.name || !mayoralty.regionRef || !mayoralty.memberName) {
+        errors.push(`mayoralty is missing a required field (id/name/regionRef/memberName): ${mayoralty.id}`)
+      }
+      if (seenMayoraltyIds.has(mayoralty.id)) errors.push(`duplicate mayoralty id "${mayoralty.id}"`)
+      seenMayoraltyIds.add(mayoralty.id)
+      if (!partyIds.has(mayoralty.party)) {
+        errors.push(`mayoralty "${mayoralty.id}" references unknown party "${mayoralty.party}"`)
+      }
+      if (!isValidIsoDate(mayoralty.electedAt)) {
+        errors.push(`mayoralty "${mayoralty.id}" electedAt is not a valid ISO date: ${mayoralty.electedAt}`)
+      }
+    }
+  }
+
   // Demographics (P1.14): every entry's regionId resolves to a real commons
   // region, no duplicates, and source is provenance-flagged.
   if (demographics) {

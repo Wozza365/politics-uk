@@ -1,3 +1,4 @@
+import type { Mayoralty } from './mayoralty'
 import type { ISODate, Party, PartyFinance, PartyId } from './party'
 import type { Region, TierId } from './region'
 
@@ -15,6 +16,7 @@ export interface Scenario {
   // has something to compute against. Replace with a real date when known.
   nextElectionDate?: ISODate
   tiers: Record<TierId, Region[]>
+  mayoralties: Mayoralty[]
   parties: Party[]
   polling: Record<PartyId, number> // headline VI %, scenario-start snapshot
   pollingHistory: PollingSnapshot[]

@@ -6,6 +6,43 @@
 > authoritative design remains [`GAME_SPEC.md`](./GAME_SPEC.md). See
 > `PHASE_2_PLAN.md` §A for what's still open and the current critical path.
 
+## P2.3 — Mayoralty: London, combined-authority, and other local mayors ✅
+
+- **Design call (open question from `PHASE_2_PLAN.md`, now resolved):** mayors are a stats list,
+  not a map overlay. None of the ~24 non-London areas (combined authorities especially) have
+  boundary geometry anywhere in this dataset, and building one just to host ~25 disjoint single
+  seats would be exactly the over-building the task warned against — so `Mayoralty` carries a
+  `regionRef` slug for a future hover-link, but nothing resolves it against `geometryRef` today.
+- New `Mayoralty` type (`src/types/mayoralty.ts`): `id`, `name` (office title), `kind`
+  (`'london' | 'combined_authority' | 'local'`), `regionRef`, `party`, `memberName`, `electedAt`.
+  Lives as `Scenario.mayoralties: Mayoralty[]`, a sibling of `tiers`, not inside it — these aren't
+  `Region`/`Seat` shaped (no internal composition, just one current holder).
+- `scripts/data/fetch-mayors.mjs` (new) hand-curates all 25 as-of-2025-01-01 holders (no single
+  bulk source exists): the London mayoralty, all 11 combined-authority/CCA mayors elected/in office
+  by that date (the 6 established 2017-cycle authorities plus North East/East Midlands/York and
+  North Yorkshire, all first elected 2024-05-02; Greater Lincolnshire and Hull and East Yorkshire
+  came later in May 2025 and are correctly excluded), and the 13 single-council directly-elected
+  local mayors still in post (Bristol/Liverpool/Torbay/Copeland/Hartlepool/Stoke-on-Trent had all
+  abolished the role before this date and are excluded). Several holders changed close to the
+  scenario date and needed explicit as-of-date checking rather than just "who holds it now":
+  Cambridgeshire and Peterborough was still Nik Johnson (Paul Bristow won later, 2025-05-01), West
+  of England was still Dan Norris (Helen Godwin also won 2025-05-01), Hackney was Caroline Woodley
+  (won a 2023-11-09 by-election after Philip Glanville's resignation, not Glanville), and Lewisham
+  was Brenda Dacres (won a 2024-03-07 by-election after Damien Egan resigned to fight a
+  parliamentary seat). One new party, Aspire (Lutfur Rahman's Tower Hamlets vehicle), added to
+  `parties.json`/`party-slugs.mjs`.
+- `build-scenario.mjs` reads `mayoralties.json` and adds it to the assembled `Scenario` unchanged
+  (no merging/derivation needed, unlike the tiers' boundary+composition join).
+- `validate-scenario.mjs` gained a mayoralties check (duplicate ids, unknown party references,
+  invalid `electedAt` dates) — not folded into the existing per-tier loop since mayoralties aren't
+  a tier and have no boundary geometry to cross-check.
+- `src/stores/scenario.ts` gained a `mayoraltyCountByParty` getter (counts held per `PartyId`).
+  `PartyPanel.vue` gained a "Mayoralties" stat card (in the same expanded grid as Lords/Leader
+  approval/Days since election) showing the selected party's count — a small addition to the
+  existing panel rather than a new view, per the task's "not a new full-screen view" steer.
+- **Acceptance:** 25 mayoralties exist in the scenario and are surfaced as a real count in the
+  party panel; `npm run validate:data`, `npm run build`, and `npm run test` (66 tests) all clean.
+
 ## P2.1 — Regional view: Holyrood, Senedd, NI Assembly, London Assembly ✅
 
 - One combined **Regional** view, not four separate ones: `src/stores/ui.ts`'s `GameView` union

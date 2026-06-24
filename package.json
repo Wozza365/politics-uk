@@ -22,6 +22,7 @@
     "data:fetch-london-assembly-boundaries": "node scripts/data/fetch-london-assembly-boundaries.mjs",
     "data:fetch-london-assembly-composition": "node scripts/data/fetch-london-assembly-composition.mjs",
     "data:fetch-london-constituencies": "node scripts/data/fetch-london-constituencies.mjs",
+    "data:fetch-mayors": "node scripts/data/fetch-mayors.mjs",
     "data:build-regional-boundaries": "node scripts/data/build-regional-boundaries.mjs",
     "data:fetch-lords-composition": "node scripts/data/fetch-lords-composition.mjs",
     "data:build-parties": "node scripts/data/build-parties.mjs",

@@ -89,6 +89,7 @@ function main() {
   const niAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.ni_assembly.json')
   const londonAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.london_assembly.json')
   const lordsRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.lords.json')
+  const mayoralties = readJson('../../src/data/scenarios/uk-2025-01-01/mayoralties.json')
   const parties = readJson('../../src/data/scenarios/uk-2025-01-01/parties.json')
 
   const scenario = {
@@ -104,6 +105,7 @@ function main() {
       london_assembly: londonAssemblyRegions,
       lords: lordsRegions,
     },
+    mayoralties,
     parties,
     polling: POLLING,
     // No historical snapshots authored yet — only the single scenario-start
