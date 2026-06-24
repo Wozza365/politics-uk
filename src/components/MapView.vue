@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { feature } from 'topojson-client'
-import type { FeatureCollection, Geometry } from 'geojson'
 import { useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
-import type { BoundarySet, RegionState } from '@/map/MapRenderer'
+import type { BoundarySet } from '@/map/MapRenderer'
+import { buildCommonsRegionState } from '@/map/regionState/commons'
+import { buildRegionalRegionState } from '@/map/regionState/regional'
+import type { SeatRegionStateContext } from '@/map/regionState/buildSeatRegionState'
 
 const scenario = useScenarioStore()
 const ui = useUiStore()
@@ -21,67 +22,24 @@ const activeRegion = ref<string | null>(null)
 const isActive = computed(() => activeRegion.value !== null)
 const LIFT_PX = 3
 
-function buildCommonsRegionState(): RegionState {
-  const state: RegionState = {}
-  for (const region of scenario.commonsRegions) {
-    const holder = region.seats[0]
-    const isActiveRegion = activeRegion.value === region.geometryRef
-    state[region.geometryRef] = {
-      fill: holder ? partyColour(holder.party) : '#9ca3af',
-      selected: hovered.value === region.geometryRef,
-      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
-      liftPx: isActiveRegion ? LIFT_PX : undefined,
-      tooltip: {
-        name: region.name,
-        party: holder ? scenario.party(holder.party)?.name : undefined,
-        member: holder?.memberName,
-      },
-    }
-  }
-  return state
-}
-
-// Regional view (P2.1): every geometryRef on boundaries.regional.json is
-// either a real constituency from one of the four bodies (Holyrood/Senedd/
-// NI Assembly/London Assembly) or England-outside-London filler with no
-// matching region — filler renders disabled (greyed out, non-interactive)
-// per the design decision recorded in docs/PHASE_2_PLAN.md's P2.1.
-function buildRegionalRegionState(): RegionState {
-  const state: RegionState = {}
-  const collection = feature(
-    scenario.regionalBoundaries,
-    scenario.regionalBoundaries.objects.regions,
-  ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>
-  for (const feat of collection.features) {
-    const geometryRef = feat.properties.geometryRef
-    const region = scenario.regionalRegionsByGeometryRef.get(geometryRef)
-    if (!region) {
-      state[geometryRef] = { fill: '#d4d4d8', disabled: true }
-      continue
-    }
-    const holder = region.seats[0]
-    const isActiveRegion = activeRegion.value === geometryRef
-    state[geometryRef] = {
-      fill: holder ? partyColour(holder.party) : '#9ca3af',
-      selected: hovered.value === geometryRef,
-      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
-      liftPx: isActiveRegion ? LIFT_PX : undefined,
-      tooltip: {
-        name: region.name,
-        party: holder ? scenario.party(holder.party)?.name : undefined,
-        member: holder?.memberName,
-      },
-    }
-  }
-  return state
-}
-
+// Per-tier region-state builders live in src/map/regionState/ — add a new
+// file there for each new tier's view rather than growing this component.
 function draw() {
   const boundarySet: BoundarySet =
     ui.activeView === 'regional'
       ? { id: 'regional', topology: scenario.regionalBoundaries, objectKey: 'regions' }
       : { id: 'commons', topology: scenario.boundaries, objectKey: 'regions' }
-  const regionState = ui.activeView === 'regional' ? buildRegionalRegionState() : buildCommonsRegionState()
+  const ctx: SeatRegionStateContext = {
+    partyColour,
+    partyName: (partyId) => scenario.party(partyId)?.name,
+    hoveredGeometryRef: hovered.value,
+    activeGeometryRef: activeRegion.value,
+    liftPx: LIFT_PX,
+  }
+  const regionState =
+    ui.activeView === 'regional'
+      ? buildRegionalRegionState(scenario.regionalBoundaries, scenario.regionalRegionsByGeometryRef, ctx)
+      : buildCommonsRegionState(scenario.commonsRegions, ctx)
   renderer.render(boundarySet, regionState)
 }
 
