@@ -104,6 +104,10 @@ See [`phase2/P2.9-party-panel-levers.md`](./phase2/P2.9-party-panel-levers.md).
 
 See [`phase2/P2.10-additional-scenarios.md`](./phase2/P2.10-additional-scenarios.md).
 
+### P2.11 — Mayoral boundary geometry
+
+See [`phase2/P2.11-mayoral-boundaries.md`](./phase2/P2.11-mayoral-boundaries.md).
+
 ---
 
 ## 3. Cross-cutting concerns (apply throughout, unchanged from Phase 1)
@@ -155,13 +159,14 @@ Phase 1 ✅ (done — see PHASE_1_COMPLETED.md, including P1.13)
    ├─ P2.7 hemicycle drill-down (depends on whichever tier views exist by then, for real data to drill into)
    ├─ P2.8 expandable clock panel (independent; benefits from P2.4's council-election dates existing)
    ├─ P2.9 expanded party panel / levers (independent of tiers; the big gameplay item)
-   └─ P2.10 additional scenarios (independent; re-runs the existing data pipeline)
+   ├─ P2.10 additional scenarios (independent; re-runs the existing data pipeline)
+   └─ P2.11 mayoral boundary geometry (depends on P2.3's Mayoralty[] existing, which it now does)
 ```
 
-**Critical path:** none — P2.0–P2.10 are all parallelisable. P2.1–P2.4 (tier data + views) are the
+**Critical path:** none — P2.0–P2.11 are all parallelisable. P2.1–P2.4 (tier data + views) are the
 natural first wave since they share one acquisition pattern and unblock P2.7's real drill-down
 data; P2.0/P2.5/P2.6/P2.9/P2.10 have no data dependency on the others and can proceed concurrently
-from day one.
+from day one; P2.11 only needs P2.3, already done.
 
 **Good sub-agent delegation boundaries:** each of P2.1–P2.4 owns its own `scripts/data/fetch-*.mjs`
 files and only touches shared files (`build-scenario.mjs`, `validate-scenario.mjs`,
