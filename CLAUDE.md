@@ -36,6 +36,14 @@ npm run validate:data      # scenario data integrity (seat counts, refs)
   components.
 - The map is only ever touched through the `MapRenderer` interface (`src/map/MapRenderer.ts`) —
   never reach into SVG/DOM from game logic or other components.
+- Per-tier map colouring logic lives in `src/map/regionState/` (one file per tier, sharing
+  `buildSeatRegionState.ts`'s helper) — add a new file there for a new tier, don't grow
+  `MapView.vue`.
+- `validate-scenario.mjs` is one `validate<Concern>()` function per check, called from a thin
+  `validate()` orchestrator — add a new function for a new check, don't grow an existing one.
+- A panel's derived stats (polling/seats/finance/...) belong in a `use<X>Stats.ts` composable, not
+  inline in the component — see `usePartyStats.ts`. Repeated card/row markup belongs in a small
+  presentational component (see `PartyStatCard.vue`) instead of being copy-pasted per stat.
 - No `Math.random()` in the sim path — use the seeded `mulberry32` PRNG (`src/sim/rng.ts`).
 - Non-hard-fact figures carry a `source: 'estimated' | 'official' | ...` field per the existing
   per-field convention, and are footnoted in UI.
