@@ -367,6 +367,42 @@ const PARTIES_SOURCE = [
     ],
   },
   {
+    id: 'crossbench',
+    name: 'Crossbench',
+    shortName: 'CB',
+    colours: { primary: '#A9906C' },
+    scope: 'local',
+    leadership: [],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 0, annualIncome: 0, source: 'estimated' },
+        membership: 0,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
+  },
+  {
+    id: 'bishops',
+    name: 'Lords Spiritual',
+    shortName: 'Bishops',
+    colours: { primary: '#4B2E83' },
+    scope: 'local',
+    leadership: [],
+    history: [
+      {
+        date: '2024-12-01',
+        polling: 0,
+        finance: { estimatedCashOnHand: 0, annualIncome: 0, source: 'estimated' },
+        membership: 0,
+        commonsSeats: 0,
+        otherSeats: 0,
+      },
+    ],
+  },
+  {
     id: 'people_before_profit',
     name: 'People Before Profit',
     shortName: 'PBP',

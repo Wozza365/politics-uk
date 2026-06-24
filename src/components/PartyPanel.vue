@@ -274,7 +274,7 @@ function formatMoney(value: PartyFinance | undefined) {
           <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/60 px-3 py-2">
             <p class="text-xs uppercase tracking-wide text-zinc-500">Lords</p>
             <p class="mt-1 text-lg font-semibold text-zinc-100">{{ formatCount(lordsSeats) }}</p>
-            <p class="mt-1 text-xs text-zinc-400">Shown separately</p>
+            <p class="mt-1 text-xs text-zinc-400">Appointed peers, not elected</p>
           </div>
         </div>
 
