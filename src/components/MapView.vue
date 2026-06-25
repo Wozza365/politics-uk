@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { feature } from 'topojson-client'
-import type { FeatureCollection, Geometry } from 'geojson'
 import { COUNCIL_LEVELS, councilWardObjectKey, useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
-import type { BoundarySet, RegionState } from '@/map/MapRenderer'
+import type { BoundarySet } from '@/map/MapRenderer'
+import { buildCommonsRegionState } from '@/map/regionState/commons'
+import {
+  buildCouncilRegionState,
+  buildCouncilWardRegionState,
+  type CouncilBoundaryCollection,
+} from '@/map/regionState/councils'
+import { buildRegionalRegionState } from '@/map/regionState/regional'
+import type { SeatRegionStateContext } from '@/map/regionState/buildSeatRegionState'
 
 const scenario = useScenarioStore()
 const ui = useUiStore()
@@ -15,7 +21,6 @@ const partyColour = (partyId: string) => scenario.party(partyId)?.colours.primar
 const container = ref<HTMLElement | null>(null)
 const hovered = ref<string | null>(null)
 const renderer = new SvgMapRenderer()
-type CouncilBoundaryCollection = FeatureCollection<Geometry, { geometryRef: string }>
 const councilBoundaryCollectionCache = new Map<string, CouncilBoundaryCollection>()
 
 // --- Active (clicked) constituency -------------------------------------
@@ -35,131 +40,12 @@ const focusedCouncil = computed(() =>
 const isCouncilWardFocus = computed(() => Boolean(focusedCouncil.value))
 let councilWardFocusTimer: number | null = null
 
-function buildCommonsRegionState(): RegionState {
-  const state: RegionState = {}
-  for (const region of scenario.commonsRegions) {
-    const holder = region.seats[0]
-    const isActiveRegion = activeRegion.value === region.geometryRef
-    state[region.geometryRef] = {
-      fill: holder ? partyColour(holder.party) : '#9ca3af',
-      selected: hovered.value === region.geometryRef,
-      strokeWidth: 0.1,
-      selectedStrokeWidth: 0.2,
-      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
-      liftPx: isActiveRegion ? LIFT_PX : undefined,
-      tooltip: {
-        name: region.name,
-        party: holder ? scenario.party(holder.party)?.name : undefined,
-        member: holder?.memberName,
-      },
-    }
-  }
-  return state
-}
-
-// Regional view (P2.1): every geometryRef on boundaries.regional.json is
-// either a real constituency from one of the four bodies (Holyrood/Senedd/
-// NI Assembly/London Assembly) or England-outside-London filler with no
-// matching region — filler renders disabled (greyed out, non-interactive)
-// per the design decision recorded in docs/PHASE_2_PLAN.md's P2.1.
-function buildRegionalRegionState(): RegionState {
-  const state: RegionState = {}
-  const collection = feature(
-    scenario.regionalBoundaries,
-    scenario.regionalBoundaries.objects.regions,
-  ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>
-  for (const feat of collection.features) {
-    const geometryRef = feat.properties.geometryRef
-    const region = scenario.regionalRegionsByGeometryRef.get(geometryRef)
-    if (!region) {
-      state[geometryRef] = { fill: '#d4d4d8', disabled: true, strokeWidth: 0, selectedStrokeWidth: 0 }
-      continue
-    }
-    const holder = region.seats[0]
-    const isActiveRegion = activeRegion.value === geometryRef
-    state[geometryRef] = {
-      fill: holder ? partyColour(holder.party) : '#9ca3af',
-      selected: hovered.value === geometryRef,
-      strokeWidth: 0.1,
-      selectedStrokeWidth: 0.2,
-      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
-      liftPx: isActiveRegion ? LIFT_PX : undefined,
-      tooltip: {
-        name: region.name,
-        party: holder ? scenario.party(holder.party)?.name : undefined,
-        member: holder?.memberName,
-      },
-    }
-  }
-  return state
-}
-
 function activeCouncilLevel() {
   return COUNCIL_LEVELS.find((level) => level.id === ui.activeCouncilLevel) ?? COUNCIL_LEVELS[0]
 }
 
-function councilBoundaryCollection(level: (typeof COUNCIL_LEVELS)[number]) {
-  const cached = councilBoundaryCollectionCache.get(level.objectKey)
-  if (cached) return cached
-  const collection = feature(
-    scenario.councilBoundaries,
-    scenario.councilBoundaries.objects[level.objectKey],
-  ) as unknown as CouncilBoundaryCollection
-  councilBoundaryCollectionCache.set(level.objectKey, collection)
-  return collection
-}
-
-function buildCouncilRegionState(): RegionState {
-  const state: RegionState = {}
-  const level = activeCouncilLevel()
-  const collection = councilBoundaryCollection(level)
-  const regionsByGeometryRef = councilRegionsByGeometryRef.value
-
-  for (const feat of collection.features) {
-    const geometryRef = feat.properties.geometryRef
-    const region = regionsByGeometryRef.get(geometryRef)
-    if (!region) {
-      state[geometryRef] = { fill: '#d4d4d8', disabled: true, strokeWidth: 0, selectedStrokeWidth: 0 }
-      continue
-    }
-    const controlParty = region.control?.party
-    const isActiveRegion = activeRegion.value === geometryRef
-    state[geometryRef] = {
-      fill: controlParty ? partyColour(controlParty) : '#9ca3af',
-      selected: hovered.value === geometryRef,
-      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
-      liftPx: isActiveRegion ? LIFT_PX : undefined,
-      tooltip: {
-        name: region.name,
-        party: controlParty ? scenario.party(controlParty)?.name : region.control?.label,
-      },
-    }
-  }
-  return state
-}
-
-function buildCouncilWardRegionState(): RegionState {
-  const state: RegionState = {}
-  const council = focusedCouncil.value
-  if (!council) return state
-
-  const wardRegions = scenario.councilWardRegionsForCouncil(council.geometryRef)
-  for (const ward of wardRegions) {
-    const partyId = ward.control?.party ?? ward.seats[0]?.party
-    state[ward.geometryRef] = {
-      fill: partyId ? partyColour(partyId) : '#9ca3af',
-      selected: hovered.value === ward.geometryRef,
-      strokeWidth: 0.1,
-      selectedStrokeWidth: 0.2,
-      tooltip: {
-        name: ward.name,
-        party: partyId ? scenario.party(partyId)?.name : undefined,
-      },
-    }
-  }
-  return state
-}
-
+// Per-tier region-state builders live in src/map/regionState/ -- add a new
+// file there for each new tier's view rather than growing this component.
 function draw() {
   const councilLevel = activeCouncilLevel()
   const boundarySet: BoundarySet =
@@ -181,26 +67,39 @@ function draw() {
             backgroundObjectKey: councilLevel.objectKey,
             backgroundStrokeWidth: 0.1,
           }
-      : ui.activeView === 'councils'
-        ? {
-            id: `councils:${councilLevel.id}`,
-            topology: scenario.councilBoundaries,
-            objectKey: councilLevel.objectKey,
-          }
-        : {
-            id: 'commons',
-            topology: scenario.boundaries,
-            objectKey: 'regions',
-            coordinateSystem: 'lonlat',
-          }
+        : ui.activeView === 'councils'
+          ? {
+              id: `councils:${councilLevel.id}`,
+              topology: scenario.councilBoundaries,
+              objectKey: councilLevel.objectKey,
+            }
+          : {
+              id: 'commons',
+              topology: scenario.boundaries,
+              objectKey: 'regions',
+              coordinateSystem: 'lonlat',
+            }
+  const ctx: SeatRegionStateContext = {
+    partyColour,
+    partyName: (partyId) => scenario.party(partyId)?.name,
+    hoveredGeometryRef: hovered.value,
+    activeGeometryRef: activeRegion.value,
+    liftPx: LIFT_PX,
+  }
   const regionState =
     ui.activeView === 'regional'
-      ? buildRegionalRegionState()
-      : isCouncilWardFocus.value
-        ? buildCouncilWardRegionState()
-      : ui.activeView === 'councils'
-        ? buildCouncilRegionState()
-        : buildCommonsRegionState()
+      ? buildRegionalRegionState(scenario.regionalBoundaries, scenario.regionalRegionsByGeometryRef, ctx)
+      : isCouncilWardFocus.value && focusedCouncil.value
+        ? buildCouncilWardRegionState(scenario.councilWardRegionsForCouncil(focusedCouncil.value.geometryRef), ctx)
+        : ui.activeView === 'councils'
+          ? buildCouncilRegionState(
+              scenario.councilBoundaries,
+              councilLevel.objectKey,
+              councilRegionsByGeometryRef.value,
+              ctx,
+              councilBoundaryCollectionCache,
+            )
+          : buildCommonsRegionState(scenario.commonsRegions, ctx)
   renderer.render(boundarySet, regionState)
 }
 

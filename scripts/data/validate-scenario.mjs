@@ -60,15 +60,10 @@ class ValidationErrors extends Error {
   }
 }
 
-function validate(scenario, boundariesByTier, demographics = null) {
+// Party master list integrity: every party has the required fields and
+// passes WCAG contrast.
+function validateParties(scenario) {
   const errors = []
-
-  if (!isValidIsoDate(scenario.date)) errors.push(`scenario.date is not a valid ISO date: ${scenario.date}`)
-
-  const partyIds = new Set(scenario.parties.map((p) => p.id))
-
-  // Party master list integrity: every party has the required fields and
-  // passes WCAG contrast.
   for (const party of scenario.parties) {
     if (!party.id || !party.name || !party.shortName) {
       errors.push(`party "${party.id ?? '(missing id)'}" is missing a required field (id/name/shortName)`)
@@ -86,94 +81,100 @@ function validate(scenario, boundariesByTier, demographics = null) {
       )
     }
   }
+  return errors
+}
 
-  // Per-tier seat/region/geometry reconciliation.
-  const seenCouncilRegionIds = new Map()
-  for (const [tierId, regions] of Object.entries(scenario.tiers)) {
-    const expectedTotal = KNOWN_TIER_SEAT_TOTALS[tierId]
-    if (expectedTotal !== undefined) {
-      // Total seats, not region count: AMS/STV tiers (holyrood/senedd/
-      // ni_assembly/london_assembly) have multiple seats per region, unlike
-      // Commons' one-seat-per-region shape.
-      const seatTotal = regions.reduce((sum, r) => sum + (r.seats?.length ?? 0), 0)
-      if (seatTotal !== expectedTotal) {
-        errors.push(`tier "${tierId}" has ${seatTotal} seats across ${regions.length} regions, expected ${expectedTotal}`)
+// Seat/region/geometry reconciliation for one tier.
+function validateTier(tierId, regions, partyIds, boundaryRefs, seenCouncilRegionIds) {
+  const errors = []
+
+  const expectedTotal = KNOWN_TIER_SEAT_TOTALS[tierId]
+  if (expectedTotal !== undefined) {
+    // Total seats, not region count: AMS/STV tiers (holyrood/senedd/
+    // ni_assembly/london_assembly) have multiple seats per region, unlike
+    // Commons' one-seat-per-region shape.
+    const seatTotal = regions.reduce((sum, r) => sum + (r.seats?.length ?? 0), 0)
+    if (seatTotal !== expectedTotal) {
+      errors.push(`tier "${tierId}" has ${seatTotal} seats across ${regions.length} regions, expected ${expectedTotal}`)
+    }
+  }
+
+  const seenRegionIds = new Set()
+
+  for (const region of regions) {
+    if (!region.id || !region.geometryRef || !region.name) {
+      errors.push(`tier "${tierId}": region is missing id/geometryRef/name (id: ${region.id})`)
+      continue
+    }
+    if (seenRegionIds.has(region.id)) errors.push(`tier "${tierId}": duplicate region id "${region.id}"`)
+    seenRegionIds.add(region.id)
+
+    if (boundaryRefs && !boundaryRefs.has(region.geometryRef)) {
+      errors.push(`tier "${tierId}": region "${region.id}" geometryRef "${region.geometryRef}" has no matching boundary`)
+    }
+
+    if (tierId.startsWith('council:')) {
+      const previousTier = seenCouncilRegionIds.get(region.id)
+      if (previousTier && previousTier !== tierId) {
+        errors.push(`council region "${region.id}" appears in both "${previousTier}" and "${tierId}"`)
+      }
+      seenCouncilRegionIds.set(region.id, tierId)
+      if (!region.control?.party || !partyIds.has(region.control.party)) {
+        errors.push(`tier "${tierId}": council "${region.id}" has missing/unknown control.party "${region.control?.party}"`)
       }
     }
 
-    const boundaryRefs = boundariesByTier[tierId]
-    const seenRegionIds = new Set()
-
-    for (const region of regions) {
-      if (!region.id || !region.geometryRef || !region.name) {
-        errors.push(`tier "${tierId}": region is missing id/geometryRef/name (id: ${region.id})`)
-        continue
+    if (!region.seats || region.seats.length === 0) {
+      errors.push(`tier "${tierId}": region "${region.id}" has no seats`)
+      continue
+    }
+    for (const seat of region.seats) {
+      if (!partyIds.has(seat.party)) {
+        errors.push(`tier "${tierId}": region "${region.id}" seat references unknown party "${seat.party}"`)
       }
-      if (seenRegionIds.has(region.id)) errors.push(`tier "${tierId}": duplicate region id "${region.id}"`)
-      seenRegionIds.add(region.id)
-
-      if (tierId.startsWith('council:')) {
-        const previousTier = seenCouncilRegionIds.get(region.id)
-        if (previousTier && previousTier !== tierId) {
-          errors.push(`council region "${region.id}" appears in both "${previousTier}" and "${tierId}"`)
-        }
-        seenCouncilRegionIds.set(region.id, tierId)
-        if (!region.control?.party || !partyIds.has(region.control.party)) {
-          errors.push(`tier "${tierId}": council "${region.id}" has missing/unknown control.party "${region.control?.party}"`)
-        }
+      if (seat.majority !== undefined && (typeof seat.majority !== 'number' || Number.isNaN(seat.majority))) {
+        errors.push(`tier "${tierId}": region "${region.id}" seat.majority is not a valid number`)
       }
-
-      if (boundaryRefs && !boundaryRefs.has(region.geometryRef)) {
-        errors.push(`tier "${tierId}": region "${region.id}" geometryRef "${region.geometryRef}" has no matching boundary`)
+      if (seat.voteShare !== undefined && (typeof seat.voteShare !== 'number' || Number.isNaN(seat.voteShare))) {
+        errors.push(`tier "${tierId}": region "${region.id}" seat.voteShare is not a valid number`)
       }
-
-      if (!region.seats || region.seats.length === 0) {
-        errors.push(`tier "${tierId}": region "${region.id}" has no seats`)
-        continue
+      if (seat.electedAt !== undefined && !isValidIsoDate(seat.electedAt)) {
+        errors.push(`tier "${tierId}": region "${region.id}" seat.electedAt is not a valid ISO date`)
       }
-      for (const seat of region.seats) {
-        if (!partyIds.has(seat.party)) {
-          errors.push(`tier "${tierId}": region "${region.id}" seat references unknown party "${seat.party}"`)
-        }
-        if (seat.majority !== undefined && (typeof seat.majority !== 'number' || Number.isNaN(seat.majority))) {
-          errors.push(`tier "${tierId}": region "${region.id}" seat.majority is not a valid number`)
-        }
-        if (seat.voteShare !== undefined && (typeof seat.voteShare !== 'number' || Number.isNaN(seat.voteShare))) {
-          errors.push(`tier "${tierId}": region "${region.id}" seat.voteShare is not a valid number`)
-        }
-        if (seat.electedAt !== undefined && !isValidIsoDate(seat.electedAt)) {
-          errors.push(`tier "${tierId}": region "${region.id}" seat.electedAt is not a valid ISO date`)
-        }
-        if (seat.results !== undefined) {
-          if (seat.results.length === 0) {
-            errors.push(`tier "${tierId}": region "${region.id}" seat.results is present but empty`)
-          } else {
-            const shareSum = seat.results.reduce((sum, r) => sum + r.voteShare, 0)
-            if (Math.abs(shareSum - 100) > 1) {
-              errors.push(`tier "${tierId}": region "${region.id}" seat.results vote shares sum to ${shareSum.toFixed(2)}%, expected ~100%`)
-            }
-            // Not cross-checked against seat.party: seat.party is resolved
-            // as-of the scenario date from party-affiliation history (see
-            // fetch-commons-composition.mjs), so it correctly diverges from
-            // results[0].party (the party the member won the seat as) for
-            // anyone who's since defected, lost the whip, or sat as Speaker.
+      if (seat.results !== undefined) {
+        if (seat.results.length === 0) {
+          errors.push(`tier "${tierId}": region "${region.id}" seat.results is present but empty`)
+        } else {
+          const shareSum = seat.results.reduce((sum, r) => sum + r.voteShare, 0)
+          if (Math.abs(shareSum - 100) > 1) {
+            errors.push(`tier "${tierId}": region "${region.id}" seat.results vote shares sum to ${shareSum.toFixed(2)}%, expected ~100%`)
           }
-        }
-      }
-    }
-
-    // Boundaries -> regions: every boundary geometry should be claimed by a region.
-    if (boundaryRefs && !tierId.startsWith('council:')) {
-      const regionGeometryRefs = new Set(regions.map((r) => r.geometryRef))
-      for (const ref of boundaryRefs) {
-        if (!regionGeometryRefs.has(ref)) {
-          errors.push(`tier "${tierId}": boundary geometryRef "${ref}" has no matching region`)
+          // Not cross-checked against seat.party: seat.party is resolved
+          // as-of the scenario date from party-affiliation history (see
+          // fetch-commons-composition.mjs), so it correctly diverges from
+          // results[0].party (the party the member won the seat as) for
+          // anyone who's since defected, lost the whip, or sat as Speaker.
         }
       }
     }
   }
 
-  // Polling: each entry is a finite number; total should be sensible (<=100).
+  // Boundaries -> regions: every boundary geometry should be claimed by a region.
+  if (boundaryRefs && !tierId.startsWith('council:')) {
+    const regionGeometryRefs = new Set(regions.map((r) => r.geometryRef))
+    for (const ref of boundaryRefs) {
+      if (!regionGeometryRefs.has(ref)) {
+        errors.push(`tier "${tierId}": boundary geometryRef "${ref}" has no matching region`)
+      }
+    }
+  }
+
+  return errors
+}
+
+// Polling: each entry is a finite number; total should be sensible (<=100).
+function validatePolling(scenario, partyIds) {
+  const errors = []
   let pollingTotal = 0
   for (const [partyId, pct] of Object.entries(scenario.polling ?? {})) {
     if (!partyIds.has(partyId)) errors.push(`polling references unknown party "${partyId}"`)
@@ -181,60 +182,98 @@ function validate(scenario, boundariesByTier, demographics = null) {
     else pollingTotal += pct
   }
   if (pollingTotal > 100) errors.push(`polling sums to ${pollingTotal}, expected <= 100`)
+  return errors
+}
 
-  // Finance: every entry is provenance-flagged.
+// Finance: every entry is provenance-flagged.
+function validateFinances(scenario, partyIds) {
+  const errors = []
   for (const [partyId, finance] of Object.entries(scenario.finances ?? {})) {
     if (!partyIds.has(partyId)) errors.push(`finances references unknown party "${partyId}"`)
     if (finance.source !== 'reported' && finance.source !== 'estimated') {
       errors.push(`finances.${partyId}.source must be 'reported' or 'estimated', got "${finance.source}"`)
     }
   }
+  return errors
+}
 
-  // Membership: each entry is a finite, non-negative number.
+// Membership: each entry is a finite, non-negative number.
+function validateMembership(scenario, partyIds) {
+  const errors = []
   for (const [partyId, count] of Object.entries(scenario.membership ?? {})) {
     if (!partyIds.has(partyId)) errors.push(`membership references unknown party "${partyId}"`)
     if (typeof count !== 'number' || Number.isNaN(count) || count < 0) {
       errors.push(`membership.${partyId} is not a valid non-negative number`)
     }
   }
+  return errors
+}
 
-  // Mayoralties (P2.3): no duplicate ids, every party reference resolves,
-  // every electedAt is a valid ISO date. Not cross-checked against any
-  // boundary/geometryRef -- mayoralties don't have map geometry in this
-  // dataset (see src/types/mayoralty.ts).
-  if (scenario.mayoralties) {
-    const seenMayoraltyIds = new Set()
-    for (const mayoralty of scenario.mayoralties) {
-      if (!mayoralty.id || !mayoralty.name || !mayoralty.regionRef || !mayoralty.memberName) {
-        errors.push(`mayoralty is missing a required field (id/name/regionRef/memberName): ${mayoralty.id}`)
-      }
-      if (seenMayoraltyIds.has(mayoralty.id)) errors.push(`duplicate mayoralty id "${mayoralty.id}"`)
-      seenMayoraltyIds.add(mayoralty.id)
-      if (!partyIds.has(mayoralty.party)) {
-        errors.push(`mayoralty "${mayoralty.id}" references unknown party "${mayoralty.party}"`)
-      }
-      if (!isValidIsoDate(mayoralty.electedAt)) {
-        errors.push(`mayoralty "${mayoralty.id}" electedAt is not a valid ISO date: ${mayoralty.electedAt}`)
-      }
+// Mayoralties (P2.3): no duplicate ids, every party reference resolves,
+// every electedAt is a valid ISO date. Not cross-checked against any
+// boundary/geometryRef -- mayoralties don't have map geometry in this
+// dataset (see src/types/mayoralty.ts).
+function validateMayoralties(scenario, partyIds) {
+  const errors = []
+  if (!scenario.mayoralties) return errors
+  const seenMayoraltyIds = new Set()
+  for (const mayoralty of scenario.mayoralties) {
+    if (!mayoralty.id || !mayoralty.name || !mayoralty.regionRef || !mayoralty.memberName) {
+      errors.push(`mayoralty is missing a required field (id/name/regionRef/memberName): ${mayoralty.id}`)
+    }
+    if (seenMayoraltyIds.has(mayoralty.id)) errors.push(`duplicate mayoralty id "${mayoralty.id}"`)
+    seenMayoraltyIds.add(mayoralty.id)
+    if (!partyIds.has(mayoralty.party)) {
+      errors.push(`mayoralty "${mayoralty.id}" references unknown party "${mayoralty.party}"`)
+    }
+    if (!isValidIsoDate(mayoralty.electedAt)) {
+      errors.push(`mayoralty "${mayoralty.id}" electedAt is not a valid ISO date: ${mayoralty.electedAt}`)
     }
   }
+  return errors
+}
 
-  // Demographics (P1.14): every entry's regionId resolves to a real commons
-  // region, no duplicates, and source is provenance-flagged.
-  if (demographics) {
-    const allRegionIds = new Set(Object.values(scenario.tiers).flatMap((regions) => regions.map((r) => r.id)))
-    const seenRegionIds = new Set()
-    for (const entry of demographics) {
-      if (!allRegionIds.has(entry.regionId)) {
-        errors.push(`demographics entry references unknown regionId "${entry.regionId}"`)
-      }
-      if (seenRegionIds.has(entry.regionId)) errors.push(`demographics: duplicate regionId "${entry.regionId}"`)
-      seenRegionIds.add(entry.regionId)
-      if (entry.source !== 'official' && entry.source !== 'estimated') {
-        errors.push(`demographics.${entry.regionId}.source must be 'official' or 'estimated', got "${entry.source}"`)
-      }
+// Demographics (P1.14): every entry's regionId resolves to a real commons
+// region, no duplicates, and source is provenance-flagged.
+function validateDemographics(scenario, demographics) {
+  const errors = []
+  if (!demographics) return errors
+  const allRegionIds = new Set(Object.values(scenario.tiers).flatMap((regions) => regions.map((r) => r.id)))
+  const seenRegionIds = new Set()
+  for (const entry of demographics) {
+    if (!allRegionIds.has(entry.regionId)) {
+      errors.push(`demographics entry references unknown regionId "${entry.regionId}"`)
+    }
+    if (seenRegionIds.has(entry.regionId)) errors.push(`demographics: duplicate regionId "${entry.regionId}"`)
+    seenRegionIds.add(entry.regionId)
+    if (entry.source !== 'official' && entry.source !== 'estimated') {
+      errors.push(`demographics.${entry.regionId}.source must be 'official' or 'estimated', got "${entry.source}"`)
     }
   }
+  return errors
+}
+
+// Orchestrator: add a new check by adding a new validate<Concern> function
+// above and calling it here, not by growing an existing one.
+function validate(scenario, boundariesByTier, demographics = null) {
+  const errors = []
+
+  if (!isValidIsoDate(scenario.date)) errors.push(`scenario.date is not a valid ISO date: ${scenario.date}`)
+
+  const partyIds = new Set(scenario.parties.map((p) => p.id))
+
+  errors.push(...validateParties(scenario))
+
+  const seenCouncilRegionIds = new Map()
+  for (const [tierId, regions] of Object.entries(scenario.tiers)) {
+    errors.push(...validateTier(tierId, regions, partyIds, boundariesByTier[tierId], seenCouncilRegionIds))
+  }
+
+  errors.push(...validatePolling(scenario, partyIds))
+  errors.push(...validateFinances(scenario, partyIds))
+  errors.push(...validateMembership(scenario, partyIds))
+  errors.push(...validateMayoralties(scenario, partyIds))
+  errors.push(...validateDemographics(scenario, demographics))
 
   return errors
 }
