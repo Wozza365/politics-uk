@@ -6,6 +6,26 @@
 > authoritative design remains [`GAME_SPEC.md`](./GAME_SPEC.md). See
 > `PHASE_2_PLAN.md` §A for what's still open and the current critical path.
 
+## P2.5 — Hex-map renderer ✅
+
+- Added `HexBoundarySet` as a sibling to the TopoJSON-backed geographic boundary shape in
+  `src/map/MapRenderer.ts`. The hex layout is deliberately schematic data (fixed `x`/`y` centres
+  keyed by `geometryRef`), not a forced geographic topology.
+- Added `boundaries.commons.hex.json` from the UK WPC hex constitcode v5 June 2024 source:
+  650 GSS-coded Westminster constituencies, all matched to the existing Commons `geometryRef`s.
+  `sources.json` records the download URL and transformation.
+- Added `HexMapRenderer`, implementing the same `MapRenderer` contract as `SvgMapRenderer`:
+  `mount`, `render`, `setEvents`, `resize`, `unmount`, region bounds/size extent, and background
+  blur. It draws equal-size pointy hexes coloured from the existing `RegionState`, with the same
+  hover/click/focus event path used by `MapView.vue`.
+- The bottom view switcher now includes a small Westminster renderer toggle (`Geo` / `Hex`).
+  Regional and council maps stay on the SVG geographic renderer; Westminster can switch without
+  changing the map consumer's tooltip, zoom, pan, or focus logic.
+- **Acceptance:** browser verification on the game screen showed geographic Westminster rendering
+  SVG paths, then Hex rendering exactly 650 SVG polygons with party fills. Clicking a hex lifted one
+  region and dimmed the other 649 through the existing focus code. `npm.cmd run build` and
+  `npm.cmd test` (66 tests) pass.
+
 ## P2.4 — Council tiers (the long tail) ✅
 
 - The bottom view switcher now exposes **County** and **Local** directly alongside Westminster and

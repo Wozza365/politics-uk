@@ -4,8 +4,9 @@ import type { Topology } from 'topojson-specification'
  * A boundary dataset for one tier/view: a TopoJSON topology plus which object
  * within it holds the region geometries.
  */
-export interface BoundarySet {
+export interface GeographicBoundarySet {
   id: string // e.g. "commons-2025"
+  type?: 'topology'
   topology: Topology
   objectKey: string // key within topology.objects to extract, e.g. "regions"
   coordinateSystem?: 'bng' | 'lonlat'
@@ -21,6 +22,31 @@ export interface BoundarySet {
   backgroundObjectKey?: string
   backgroundCoordinateSystem?: 'bng' | 'lonlat'
   backgroundStrokeWidth?: number
+}
+
+export interface HexLayoutEntry {
+  geometryRef: string
+  name?: string
+  x: number
+  y: number
+}
+
+/**
+ * A schematic hex layout for one tier/view. Unlike GeographicBoundarySet,
+ * this is not a geographic topology: each region is represented by a fixed
+ * layout point and rendered as an equal-size hex.
+ */
+export interface HexBoundarySet {
+  id: string
+  type: 'hex-layout'
+  orientation?: 'pointy'
+  hexes: HexLayoutEntry[]
+}
+
+export type BoundarySet = GeographicBoundarySet | HexBoundarySet
+
+export function isHexBoundarySet(boundarySet: BoundarySet): boundarySet is HexBoundarySet {
+  return boundarySet.type === 'hex-layout'
 }
 
 export interface RegionDisplayState {
