@@ -1,4 +1,5 @@
 import { geoIdentity, geoPath, type GeoPermissibleObjects } from 'd3-geo'
+import proj4 from 'proj4'
 import { feature } from 'topojson-client'
 import type { FeatureCollection, Geometry } from 'geojson'
 import type {
@@ -9,6 +10,46 @@ import type {
 } from './MapRenderer'
 
 const NS = 'http://www.w3.org/2000/svg'
+
+proj4.defs(
+  'EPSG:27700',
+  '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs',
+)
+
+function transformCoordinatesToBng(coordinates: unknown): unknown {
+  if (!Array.isArray(coordinates)) return coordinates
+  if (typeof coordinates[0] === 'number' && typeof coordinates[1] === 'number') {
+    return proj4('EPSG:4326', 'EPSG:27700', coordinates as [number, number])
+  }
+  return coordinates.map(transformCoordinatesToBng)
+}
+
+function projectGeometryToBng(geometry: Geometry): Geometry {
+  if (geometry.type === 'GeometryCollection') {
+    return {
+      ...geometry,
+      geometries: geometry.geometries.map(projectGeometryToBng),
+    }
+  }
+  return {
+    ...geometry,
+    coordinates: transformCoordinatesToBng(geometry.coordinates),
+  } as Geometry
+}
+
+function projectFeatureCollectionToBng<P>(
+  collection: FeatureCollection<Geometry, P>,
+  coordinateSystem: 'bng' | 'lonlat' = 'bng',
+): FeatureCollection<Geometry, P> {
+  if (coordinateSystem !== 'lonlat') return collection
+  return {
+    ...collection,
+    features: collection.features.map((entry) => ({
+      ...entry,
+      geometry: entry.geometry ? projectGeometryToBng(entry.geometry) : entry.geometry,
+    })),
+  }
+}
 
 // Shared with the "raised map" whole-map drop-shadow in MapView so a lifted
 // region's own edge (depth = base depth + lift) lines up with the rest of
@@ -119,8 +160,11 @@ export class SvgMapRenderer implements MapRenderer {
   }
 
   private applyRoutineStyle(path: SVGPathElement, state: RegionState[string] | undefined): void {
-    path.setAttribute('fill', state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af')
-    path.setAttribute('stroke-width', state?.selected ? '2' : '0.5')
+    const strokeWidth = state?.selected ? state.selectedStrokeWidth ?? 2 : state?.strokeWidth ?? 0.5
+    const fill = state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af'
+    path.setAttribute('fill', fill)
+    path.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : '#1f2937')
+    path.setAttribute('stroke-width', String(strokeWidth <= 0 && state?.disabled ? 0.75 : strokeWidth))
     path.style.cursor = state?.disabled ? 'default' : 'pointer'
     path.style.pointerEvents = state?.disabled ? 'none' : 'auto'
     path.style.opacity = state?.opacity != null ? String(state.opacity) : ''
@@ -156,7 +200,11 @@ export class SvgMapRenderer implements MapRenderer {
         mainPath.style.display = 'none'
       }
       this.overlayPath.setAttribute('fill', nextState.fill)
-      this.overlayPath.setAttribute('stroke-width', nextState.selected ? '2' : '0.5')
+      const strokeWidth = nextState.selected
+        ? nextState.selectedStrokeWidth ?? 2
+        : nextState.strokeWidth ?? 0.5
+      this.overlayPath.setAttribute('stroke', strokeWidth <= 0 ? 'none' : '#1f2937')
+      this.overlayPath.setAttribute('stroke-width', String(strokeWidth))
       this.overlayPath.style.pointerEvents = 'auto'
       this.overlayPath.style.cursor = 'pointer'
       this.overlayPath.style.transition = 'transform 400ms ease-out, filter 400ms ease-out'
@@ -183,22 +231,33 @@ export class SvgMapRenderer implements MapRenderer {
   ): void {
     if (!this.svg) return
 
-    const collection = feature(
-      boundarySet.topology,
-      boundarySet.topology.objects[boundarySet.objectKey],
-    ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>
+    const collection = projectFeatureCollectionToBng(
+      feature(
+        boundarySet.topology,
+        boundarySet.topology.objects[boundarySet.objectKey],
+      ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>,
+      boundarySet.coordinateSystem,
+    )
     const fitTopology = boundarySet.fitTopology ?? boundarySet.backgroundTopology ?? boundarySet.topology
     const fitObjectKey = boundarySet.fitObjectKey ?? boundarySet.backgroundObjectKey ?? boundarySet.objectKey
-    const fitCollection = feature(
-      fitTopology,
-      fitTopology.objects[fitObjectKey],
-    ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>
+    const fitCoordinateSystem =
+      boundarySet.fitCoordinateSystem ?? boundarySet.backgroundCoordinateSystem ?? boundarySet.coordinateSystem
+    const fitCollection = projectFeatureCollectionToBng(
+      feature(
+        fitTopology,
+        fitTopology.objects[fitObjectKey],
+      ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>,
+      fitCoordinateSystem,
+    )
     const backgroundCollection =
       boundarySet.backgroundTopology && boundarySet.backgroundObjectKey
-        ? (feature(
-            boundarySet.backgroundTopology,
-            boundarySet.backgroundTopology.objects[boundarySet.backgroundObjectKey],
-          ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>)
+        ? projectFeatureCollectionToBng(
+            feature(
+              boundarySet.backgroundTopology,
+              boundarySet.backgroundTopology.objects[boundarySet.backgroundObjectKey],
+            ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>,
+            boundarySet.backgroundCoordinateSystem,
+          )
         : null
 
     const projection = geoIdentity().reflectY(true).fitSize([width, height], fitCollection)
@@ -226,7 +285,7 @@ export class SvgMapRenderer implements MapRenderer {
         path.setAttribute('d', pathGenerator(f as GeoPermissibleObjects) ?? '')
         path.setAttribute('fill', '#d4d4d8')
         path.setAttribute('stroke', '#71717a')
-        path.setAttribute('stroke-width', '0.4')
+        path.setAttribute('stroke-width', String(boundarySet.backgroundStrokeWidth ?? 0.4))
         path.style.opacity = '0.38'
         path.style.pointerEvents = 'none'
         this.svg.appendChild(path)

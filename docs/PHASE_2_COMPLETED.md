@@ -8,8 +8,8 @@
 
 ## P2.4 — Council tiers (the long tail) ✅
 
-- One **Councils** nav entry is now active, with a council-level sub-switcher inside the map for
-  **County** and **Local**. County stays separate because it overlaps districts; Local merges
+- The bottom view switcher now exposes **County** and **Local** directly alongside Westminster and
+  Regional. County stays separate because it overlaps districts; Local merges
   district/borough, unitary, metropolitan, London, Scottish, Welsh, and NI councils after verifying
   those tiers share zero geometry refs. Unrepresented areas may stay neutral grey per
   `GAME_SPEC.md` ?9.6.
@@ -32,8 +32,8 @@
 - `build-scenario.mjs` folds `pcc` and all `council:<level>` tiers into `scenario.json`.
   `validate-scenario.mjs` checks the PCC total and rejects council IDs that appear in more than
   one council tier, which enforces the no-overlapping-seat invariant at data-build time.
-- `MapView.vue` can render the Councils view and switch its boundary object by active council
-  level. Council hover cards show control labels instead of MP/member details. `HemicycleView.vue`
+- `MapView.vue` can render the Councils view through the County/Local tabs and switch its boundary
+  object by active council level. Council hover cards show control labels instead of MP/member details. `HemicycleView.vue`
   now follows the active view and scales large tiers to 1 dot = 10/100 seats as needed.
 - Clicking a focused council now drills into that council's real ward/division geography:
   Local councils use ONS Wards December 2024 BGC, County councils use ONS County Electoral
@@ -45,8 +45,8 @@
 - `sources.json` records Open Council Data UK and House of Commons Library provenance. `package.json`
   gained `data:fetch-councils` and `data:fetch-pcc-composition`; `npm test` excludes local
   `.claude/**` helper worktrees so the repo test command ignores unrelated nested checkouts.
-- **Acceptance:** Councils view exists with real principal-authority composition data, a
-  non-overlapping granularity switcher, real controlled-councils counts, and PCC stats; `npm run
+- **Acceptance:** County and Local map tabs exist with real principal-authority composition data,
+  non-overlapping granularities, real controlled-councils counts, and PCC stats; `npm run
   validate:data`, `npm run test` (66 tests), and `npm run build` clean. The production build emits a
   Vite chunk-size warning because the council dataset is large; this is a performance follow-up,
   not a correctness failure.
@@ -92,7 +92,7 @@
 
 - One combined **Regional** view, not four separate ones: `src/stores/ui.ts`'s `GameView` union
   collapsed `holyrood`/`senedd`/`ni-assembly`/`london` into a single `'regional'` member;
-  `ViewSwitcher.vue` now shows three buttons (Westminster / Regional / Councils) instead of six.
+  `ViewSwitcher.vue` now shows Westminster / Regional / County / Local.
   The four bodies stay separate `TierId`s in `Scenario.tiers` underneath — only the view is merged.
 - Real boundary + composition data fetched for all four bodies as of 2025-01-01: Holyrood (73
   constituencies + 8 list regions, 129 MSPs), Senedd (40 constituencies + 5 list regions, 60 MS,

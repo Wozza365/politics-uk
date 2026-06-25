@@ -8,15 +8,19 @@ export interface BoundarySet {
   id: string // e.g. "commons-2025"
   topology: Topology
   objectKey: string // key within topology.objects to extract, e.g. "regions"
+  coordinateSystem?: 'bng' | 'lonlat'
   /**
    * Optional object to use only for projection fitting. This lets a focused
    * layer render a small subset while retaining the same whole-map frame.
    */
   fitTopology?: Topology
   fitObjectKey?: string
+  fitCoordinateSystem?: 'bng' | 'lonlat'
   /** Optional non-interactive geography rendered behind the primary layer. */
   backgroundTopology?: Topology
   backgroundObjectKey?: string
+  backgroundCoordinateSystem?: 'bng' | 'lonlat'
+  backgroundStrokeWidth?: number
 }
 
 export interface RegionDisplayState {
@@ -27,6 +31,8 @@ export interface RegionDisplayState {
   tooltip?: Record<string, string | number | undefined>
   opacity?: number // e.g. dim every region except the active one
   liftPx?: number // raise this region above the rest of the (otherwise flat) map
+  strokeWidth?: number
+  selectedStrokeWidth?: number
 }
 
 /** Keyed by Region.geometryRef (spec §4.2) */

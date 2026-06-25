@@ -414,7 +414,7 @@ Levers are stubbed at MVP; the collapsed panel ships first.
 ### 9.6 View switcher (bottom-centre) _(MVP shell, one view active)_
 - A single **nav bar** to switch between map/hemicycle views (Westminster, Holyrood, Senedd, NI,
   London, councils…). At MVP only Westminster is active; the bar shows the others as upcoming.
-- The **councils** view is one nav entry with council map granularities underneath it. County
+- The main bottom tab bar includes **County** and **Local** map granularities. County
   councils stay separate because they overlap district councils; district/borough, unitary,
   metropolitan, London, Scottish, Welsh, and NI councils merge into a single **Local** map because
   those LAD-level authorities are mutually exclusive. Each selected granularity must render a
