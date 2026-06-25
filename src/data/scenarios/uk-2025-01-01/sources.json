@@ -6,6 +6,13 @@
     "retrieved": "2026-06-20",
     "notes": "BGC (20m generalised, clipped) layer; simplified a further 10% with mapshaper for web payload size. 650 features, GSS-coded (PCON24CD)."
   },
+  "hexBoundaries": {
+    "description": "Westminster Parliamentary Constituencies 2024 schematic hex layout, src/data/scenarios/uk-2025-01-01/boundaries.commons.hex.json",
+    "source": "Automatic Knowledge / StatsMapsNPix UK constituency hex and geo files, based on the 2024 UK parliamentary constituency hex-map work referenced by Open Innovations",
+    "url": "https://automaticknowledge.org/wpc-hex/uk-wpc-hex-constitcode-v5-june-2024.geojson",
+    "retrieved": "2026-06-25",
+    "notes": "The source GeoJSON contains 650 equal-size hex polygons with GSScode properties. Runtime data stores only the fixed schematic centre point for each GSS-coded constituency; HexMapRenderer draws equal-size hexes from those centres rather than forcing this cartogram into the TopoJSON BoundarySet shape."
+  },
   "composition": {
     "description": "Commons seat holders as of 2025-01-01",
     "source": "UK Parliament Members API (members-api.parliament.uk)",

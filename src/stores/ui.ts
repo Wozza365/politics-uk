@@ -4,12 +4,14 @@ import type { CouncilLevelId } from './scenario'
 export type Screen = 'start' | 'loading' | 'game' | 'result'
 
 export type GameView = 'westminster' | 'regional' | 'councils'
+export type MapRendererChoice = 'geographic' | 'hex'
 
 export const useUiStore = defineStore('ui', {
   state: () => ({
     screen: 'start' as Screen,
     activeView: 'westminster' as GameView,
     activeCouncilLevel: 'local' as CouncilLevelId,
+    westminsterRenderer: 'geographic' as MapRendererChoice,
   }),
   actions: {
     goToStart() {
@@ -29,6 +31,9 @@ export const useUiStore = defineStore('ui', {
     },
     setActiveCouncilLevel(level: CouncilLevelId) {
       this.activeCouncilLevel = level
+    },
+    setWestminsterRenderer(renderer: MapRendererChoice) {
+      this.westminsterRenderer = renderer
     },
   },
 })

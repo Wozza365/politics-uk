@@ -4,11 +4,13 @@ import type { Topology } from 'topojson-specification'
 import type { PartyId, Region, RegionDemographics, Scenario } from '@/types'
 import scenarioData from '@/data/scenarios/uk-2025-01-01/scenario.json'
 import boundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.json'
+import commonsHexBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.hex.json'
 import regionalBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.regional.json'
 import councilBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.councils.json'
 import councilWardBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.council_wards.json'
 import councilWardComposition from '@/data/scenarios/uk-2025-01-01/composition.council_wards.json'
 import demographicsData from '@/data/scenarios/uk-2025-01-01/demographics.commons.json'
+import type { HexBoundarySet } from '@/map/MapRenderer'
 
 const REGIONAL_TIER_IDS = ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'] as const
 export const COUNCIL_LEVELS = [
@@ -44,6 +46,7 @@ export const useScenarioStore = defineStore('scenario', {
   state: () => ({
     scenario: markRaw(scenarioData) as Scenario,
     boundaries: markRaw(boundaries) as unknown as Topology,
+    commonsHexBoundaries: markRaw(commonsHexBoundaries) as HexBoundarySet,
     regionalBoundaries: markRaw(regionalBoundaries) as unknown as Topology,
     councilBoundaries: markRaw(councilBoundaries) as unknown as Topology,
     councilWardBoundaries: markRaw(councilWardBoundaries) as unknown as Topology,

@@ -5,7 +5,8 @@ import type { FeatureCollection, Geometry } from 'geojson'
 import { COUNCIL_LEVELS, councilWardObjectKey, useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
-import type { BoundarySet, RegionState } from '@/map/MapRenderer'
+import { HexMapRenderer } from '@/map/HexMapRenderer'
+import type { BoundarySet, MapRenderer, RegionState } from '@/map/MapRenderer'
 
 const scenario = useScenarioStore()
 const ui = useUiStore()
@@ -14,9 +15,16 @@ const partyColour = (partyId: string) => scenario.party(partyId)?.colours.primar
 
 const container = ref<HTMLElement | null>(null)
 const hovered = ref<string | null>(null)
-const renderer = new SvgMapRenderer()
+const activeRendererKey = computed(() =>
+  ui.activeView === 'westminster' && ui.westminsterRenderer === 'hex' ? 'hex' : 'svg',
+)
+let renderer: MapRenderer = createRenderer(activeRendererKey.value)
 type CouncilBoundaryCollection = FeatureCollection<Geometry, { geometryRef: string }>
 const councilBoundaryCollectionCache = new Map<string, CouncilBoundaryCollection>()
+
+function createRenderer(key: 'svg' | 'hex'): MapRenderer {
+  return key === 'hex' ? new HexMapRenderer() : new SvgMapRenderer()
+}
 
 // --- Active (clicked) constituency -------------------------------------
 const activeRegion = ref<string | null>(null)
@@ -187,12 +195,14 @@ function draw() {
             topology: scenario.councilBoundaries,
             objectKey: councilLevel.objectKey,
           }
-        : {
-            id: 'commons',
-            topology: scenario.boundaries,
-            objectKey: 'regions',
-            coordinateSystem: 'lonlat',
-          }
+        : ui.westminsterRenderer === 'hex'
+          ? scenario.commonsHexBoundaries
+          : {
+              id: 'commons',
+              topology: scenario.boundaries,
+              objectKey: 'regions',
+              coordinateSystem: 'lonlat',
+            }
   const regionState =
     ui.activeView === 'regional'
       ? buildRegionalRegionState()
@@ -474,19 +484,33 @@ function onWindowClick(event: MouseEvent) {
   // the renderer's own event wiring — this only needs to catch "elsewhere":
   // empty map background, or anywhere else on the page entirely.
   const target = event.target as Element
-  if (target.tagName?.toLowerCase() === 'path') return
+  const tagName = target.tagName?.toLowerCase()
+  if (tagName === 'path' || tagName === 'polygon') return
   if (activeRegion.value) deactivate()
 }
 
-onMounted(() => {
-  if (!container.value) return
-  renderer.mount(container.value)
+function bindRendererEvents() {
   renderer.setEvents({
     onRegionHover: (geometryRef) => {
       hovered.value = geometryRef
     },
     onRegionClick,
   })
+}
+
+function remountRenderer() {
+  if (!container.value) return
+  renderer.unmount()
+  renderer = createRenderer(activeRendererKey.value)
+  renderer.mount(container.value)
+  bindRendererEvents()
+  draw()
+}
+
+onMounted(() => {
+  if (!container.value) return
+  renderer.mount(container.value)
+  bindRendererEvents()
   draw()
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', onMouseUp)
@@ -496,6 +520,14 @@ onMounted(() => {
 watch(hovered, draw)
 watch(activeRegion, draw)
 watch(councilWardFocusRegion, draw)
+watch(activeRendererKey, () => {
+  clearCouncilWardFocusTimer()
+  hovered.value = null
+  activeRegion.value = null
+  councilWardFocusRegion.value = null
+  resetZoom()
+  remountRenderer()
+})
 watch(() => ui.activeView, () => {
   clearCouncilWardFocusTimer()
   hovered.value = null

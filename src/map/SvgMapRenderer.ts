@@ -4,10 +4,12 @@ import { feature } from 'topojson-client'
 import type { FeatureCollection, Geometry } from 'geojson'
 import type {
   BoundarySet,
+  GeographicBoundarySet,
   MapRenderer,
   MapRendererEvents,
   RegionState,
 } from './MapRenderer'
+import { isHexBoundarySet } from './MapRenderer'
 
 const NS = 'http://www.w3.org/2000/svg'
 
@@ -133,6 +135,7 @@ export class SvgMapRenderer implements MapRenderer {
 
   render(boundarySet: BoundarySet, regionState: RegionState): void {
     if (!this.svg || !this.container) return
+    if (isHexBoundarySet(boundarySet)) return
 
     const width = this.container.clientWidth || 800
     const height = this.container.clientHeight || 600
@@ -224,7 +227,7 @@ export class SvgMapRenderer implements MapRenderer {
   }
 
   private buildPaths(
-    boundarySet: BoundarySet,
+    boundarySet: GeographicBoundarySet,
     width: number,
     height: number,
     regionState: RegionState,
