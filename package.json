@@ -31,6 +31,8 @@
     "data:fetch-lords-composition": "node scripts/data/fetch-lords-composition.mjs",
     "data:build-parties": "node scripts/data/build-parties.mjs",
     "data:build-scenario": "node scripts/data/build-scenario.mjs",
+    "data:author-events": "node scripts/data/author-events.mjs",
+    "data:author-events:ideas": "node scripts/data/author-events.mjs generate-ideas",
     "validate:data": "node scripts/data/validate-scenario.mjs"
   },
   "dependencies": {
