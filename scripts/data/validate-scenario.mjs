@@ -17,6 +17,7 @@ const KNOWN_TIER_SEAT_TOTALS = {
   senedd: 60,
   ni_assembly: 90,
   london_assembly: 25,
+  pcc: 37,
 }
 
 const MIN_CONTRAST = 4.5
@@ -87,6 +88,7 @@ function validate(scenario, boundariesByTier, demographics = null) {
   }
 
   // Per-tier seat/region/geometry reconciliation.
+  const seenCouncilRegionIds = new Map()
   for (const [tierId, regions] of Object.entries(scenario.tiers)) {
     const expectedTotal = KNOWN_TIER_SEAT_TOTALS[tierId]
     if (expectedTotal !== undefined) {
@@ -109,6 +111,17 @@ function validate(scenario, boundariesByTier, demographics = null) {
       }
       if (seenRegionIds.has(region.id)) errors.push(`tier "${tierId}": duplicate region id "${region.id}"`)
       seenRegionIds.add(region.id)
+
+      if (tierId.startsWith('council:')) {
+        const previousTier = seenCouncilRegionIds.get(region.id)
+        if (previousTier && previousTier !== tierId) {
+          errors.push(`council region "${region.id}" appears in both "${previousTier}" and "${tierId}"`)
+        }
+        seenCouncilRegionIds.set(region.id, tierId)
+        if (!region.control?.party || !partyIds.has(region.control.party)) {
+          errors.push(`tier "${tierId}": council "${region.id}" has missing/unknown control.party "${region.control?.party}"`)
+        }
+      }
 
       if (boundaryRefs && !boundaryRefs.has(region.geometryRef)) {
         errors.push(`tier "${tierId}": region "${region.id}" geometryRef "${region.geometryRef}" has no matching boundary`)
@@ -150,7 +163,7 @@ function validate(scenario, boundariesByTier, demographics = null) {
     }
 
     // Boundaries -> regions: every boundary geometry should be claimed by a region.
-    if (boundaryRefs) {
+    if (boundaryRefs && !tierId.startsWith('council:')) {
       const regionGeometryRefs = new Set(regions.map((r) => r.geometryRef))
       for (const ref of boundaryRefs) {
         if (!regionGeometryRefs.has(ref)) {
@@ -232,6 +245,56 @@ function boundaryRefsFromTopology(topology, objectKey = 'regions') {
   return new Set(object.geometries.map((g) => g.properties.geometryRef))
 }
 
+function councilWardObjectKey(councilGeometryRef) {
+  return `council_wards_${councilGeometryRef.replace(/[^A-Za-z0-9_]/g, '_')}`
+}
+
+function validateCouncilWardDrilldown(scenario, wardRegions, wardTopology) {
+  const errors = []
+  const partyIds = new Set(scenario.parties.map((p) => p.id))
+  const councilRegions = Object.entries(scenario.tiers)
+    .filter(([tierId]) => tierId.startsWith('council:'))
+    .flatMap(([, regions]) => regions)
+
+  const wardsByCouncil = new Map()
+  for (const ward of wardRegions) {
+    if (!ward.councilGeometryRef) {
+      errors.push(`council ward "${ward.id}" is missing councilGeometryRef`)
+      continue
+    }
+    if (!wardsByCouncil.has(ward.councilGeometryRef)) wardsByCouncil.set(ward.councilGeometryRef, [])
+    wardsByCouncil.get(ward.councilGeometryRef).push(ward)
+    for (const seat of ward.seats ?? []) {
+      if (!partyIds.has(seat.party)) {
+        errors.push(`council ward "${ward.id}" seat references unknown party "${seat.party}"`)
+      }
+    }
+  }
+
+  for (const council of councilRegions) {
+    const objectKey = councilWardObjectKey(council.geometryRef)
+    const boundaryRefs = boundaryRefsFromTopology(wardTopology, objectKey)
+    if (!boundaryRefs) {
+      errors.push(`council "${council.name}" has no ward/division boundary object "${objectKey}"`)
+      continue
+    }
+
+    const wards = wardsByCouncil.get(council.geometryRef) ?? []
+    if (!wards.length) {
+      errors.push(`council "${council.name}" has no ward/division composition rows`)
+      continue
+    }
+
+    for (const ward of wards) {
+      if (!boundaryRefs.has(ward.geometryRef)) {
+        errors.push(`council "${council.name}" ward "${ward.name}" geometryRef "${ward.geometryRef}" has no boundary`)
+      }
+    }
+  }
+
+  return errors
+}
+
 function main() {
   const usePlaceholder = process.argv.includes('--placeholder')
 
@@ -256,6 +319,16 @@ function main() {
     // those as errors despite being correct by design.
     const niAssemblyTopology = readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.ni_assembly.json')
     boundariesByTier.ni_assembly = boundaryRefsFromTopology(niAssemblyTopology, 'regions')
+    const councilTopology = readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.councils.json')
+    boundariesByTier['council:county'] = boundaryRefsFromTopology(councilTopology, 'council_county')
+    const localBoundaryRefs = boundaryRefsFromTopology(councilTopology, 'council_local')
+    boundariesByTier['council:district'] = localBoundaryRefs
+    boundariesByTier['council:unitary'] = localBoundaryRefs
+    boundariesByTier['council:metropolitan'] = localBoundaryRefs
+    boundariesByTier['council:london'] = localBoundaryRefs
+    boundariesByTier['council:scottish'] = localBoundaryRefs
+    boundariesByTier['council:welsh'] = localBoundaryRefs
+    boundariesByTier['council:northern_ireland'] = localBoundaryRefs
   }
 
   const demographics = usePlaceholder
@@ -263,6 +336,15 @@ function main() {
     : readJson('../../src/data/scenarios/uk-2025-01-01/demographics.commons.json')
 
   const errors = validate(scenario, boundariesByTier, demographics)
+  if (!usePlaceholder) {
+    errors.push(
+      ...validateCouncilWardDrilldown(
+        scenario,
+        readJson('../../src/data/scenarios/uk-2025-01-01/composition.council_wards.json'),
+        readJson('../../src/data/scenarios/uk-2025-01-01/boundaries.council_wards.json'),
+      ),
+    )
+  }
 
   if (errors.length > 0) {
     console.error(new ValidationErrors(errors).message)

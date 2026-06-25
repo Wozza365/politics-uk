@@ -102,11 +102,7 @@ const membershipTrend = computed(() => {
 })
 const councilsControlled = computed(() => {
   if (!selectedPartyId.value) return 0
-  return Object.entries(scenario.scenario.tiers)
-    .filter(([tierId]) => tierId.includes('council'))
-    .flatMap(([, regions]) => regions)
-    .flatMap((region) => region.seats)
-    .filter((seat) => seat.party === selectedPartyId.value).length
+  return scenario.councilControlCountByParty[selectedPartyId.value] ?? 0
 })
 const mayoralties = computed(() =>
   selectedPartyId.value ? scenario.mayoraltyCountByParty[selectedPartyId.value] ?? 0 : 0,

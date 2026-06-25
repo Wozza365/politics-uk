@@ -19,6 +19,9 @@ export interface Seat {
   turnout?: number // votes cast, last relevant election
   electorate?: number // registered electorate, last relevant election
   results?: CandidateResult[] // full ranked breakdown, winner first
+  wardName?: string // council tiers (P2.4)
+  nextElection?: ISODate // council tiers (P2.4)
+  seatType?: 'councillor'
 }
 
 export interface Region {
@@ -28,6 +31,14 @@ export interface Region {
   name: string
   geometryRef: string // key into the boundary topojson for this tier
   seats: Seat[]
+  councilGeometryRef?: string // ward/division drilldown parent (P2.4)
+  councilName?: string // ward/division drilldown parent (P2.4)
+  control?: {
+    label: string
+    party: PartyId
+    source: string
+    asOf: string
+  }
 }
 
 // Constituency-level reference data for cross-referencing against the

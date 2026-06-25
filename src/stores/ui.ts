@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import type { CouncilLevelId } from './scenario'
 
 export type Screen = 'start' | 'loading' | 'game' | 'result'
 
@@ -8,6 +9,7 @@ export const useUiStore = defineStore('ui', {
   state: () => ({
     screen: 'start' as Screen,
     activeView: 'westminster' as GameView,
+    activeCouncilLevel: 'local' as CouncilLevelId,
   }),
   actions: {
     goToStart() {
@@ -24,6 +26,9 @@ export const useUiStore = defineStore('ui', {
     },
     setActiveView(view: GameView) {
       this.activeView = view
+    },
+    setActiveCouncilLevel(level: CouncilLevelId) {
+      this.activeCouncilLevel = level
     },
   },
 })

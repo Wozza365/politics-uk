@@ -8,6 +8,15 @@ export interface BoundarySet {
   id: string // e.g. "commons-2025"
   topology: Topology
   objectKey: string // key within topology.objects to extract, e.g. "regions"
+  /**
+   * Optional object to use only for projection fitting. This lets a focused
+   * layer render a small subset while retaining the same whole-map frame.
+   */
+  fitTopology?: Topology
+  fitObjectKey?: string
+  /** Optional non-interactive geography rendered behind the primary layer. */
+  backgroundTopology?: Topology
+  backgroundObjectKey?: string
 }
 
 export interface RegionDisplayState {

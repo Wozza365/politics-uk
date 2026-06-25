@@ -1,19 +1,54 @@
 import { defineStore } from 'pinia'
+import { markRaw } from 'vue'
 import type { Topology } from 'topojson-specification'
 import type { PartyId, Region, RegionDemographics, Scenario } from '@/types'
 import scenarioData from '@/data/scenarios/uk-2025-01-01/scenario.json'
 import boundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.json'
 import regionalBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.regional.json'
+import councilBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.councils.json'
+import councilWardBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.council_wards.json'
+import councilWardComposition from '@/data/scenarios/uk-2025-01-01/composition.council_wards.json'
 import demographicsData from '@/data/scenarios/uk-2025-01-01/demographics.commons.json'
 
 const REGIONAL_TIER_IDS = ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'] as const
+export const COUNCIL_LEVELS = [
+  { id: 'county', tierId: 'council:county', objectKey: 'council_county', label: 'County' },
+  { id: 'local', tierId: 'council:local', objectKey: 'council_local', label: 'Local' },
+] as const
+
+export type CouncilLevelId = (typeof COUNCIL_LEVELS)[number]['id']
+
+export function councilWardObjectKey(councilGeometryRef: string) {
+  return `council_wards_${councilGeometryRef.replace(/[^A-Za-z0-9_]/g, '_')}`
+}
+
+const LOCAL_COUNCIL_TIER_IDS = [
+  'council:district',
+  'council:unitary',
+  'council:metropolitan',
+  'council:london',
+  'council:scottish',
+  'council:welsh',
+  'council:northern_ireland',
+] as const
+
+const councilWardRegionsByCouncil = new Map<string, Region[]>()
+for (const region of councilWardComposition as Region[]) {
+  if (!region.councilGeometryRef) continue
+  const regions = councilWardRegionsByCouncil.get(region.councilGeometryRef) ?? []
+  regions.push(region)
+  councilWardRegionsByCouncil.set(region.councilGeometryRef, regions)
+}
 
 export const useScenarioStore = defineStore('scenario', {
   state: () => ({
-    scenario: scenarioData as Scenario,
-    boundaries: boundaries as unknown as Topology,
-    regionalBoundaries: regionalBoundaries as unknown as Topology,
-    demographics: demographicsData as RegionDemographics[],
+    scenario: markRaw(scenarioData) as Scenario,
+    boundaries: markRaw(boundaries) as unknown as Topology,
+    regionalBoundaries: markRaw(regionalBoundaries) as unknown as Topology,
+    councilBoundaries: markRaw(councilBoundaries) as unknown as Topology,
+    councilWardBoundaries: markRaw(councilWardBoundaries) as unknown as Topology,
+    councilWardRegions: markRaw(councilWardComposition) as Region[],
+    demographics: markRaw(demographicsData) as RegionDemographics[],
   }),
   getters: {
     party: (state) => (partyId: string) => state.scenario.parties.find((p) => p.id === partyId),
@@ -48,5 +83,26 @@ export const useScenarioStore = defineStore('scenario', {
       }
       return counts
     },
+    councilRegionsForLevel: (state) => (levelId: CouncilLevelId) => {
+      const level = COUNCIL_LEVELS.find((entry) => entry.id === levelId)
+      if (!level) return []
+      if (level.id === 'local') {
+        return LOCAL_COUNCIL_TIER_IDS.flatMap((tierId) => state.scenario.tiers[tierId] ?? [])
+      }
+      return state.scenario.tiers[level.tierId] ?? []
+    },
+    councilControlCountByParty: (state) => {
+      const counts: Record<PartyId, number> = {}
+      for (const [tierId, regions] of Object.entries(state.scenario.tiers)) {
+        if (!tierId.startsWith('council:')) continue
+        for (const region of regions) {
+          const partyId = region.control?.party
+          if (partyId) counts[partyId] = (counts[partyId] ?? 0) + 1
+        }
+      }
+      return counts
+    },
+    councilWardRegionsForCouncil: () => (councilGeometryRef: string) =>
+      councilWardRegionsByCouncil.get(councilGeometryRef) ?? [],
   },
 })

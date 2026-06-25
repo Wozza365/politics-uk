@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { feature } from 'topojson-client'
 import type { FeatureCollection, Geometry } from 'geojson'
-import { useScenarioStore } from '@/stores/scenario'
+import { COUNCIL_LEVELS, councilWardObjectKey, useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
 import type { BoundarySet, RegionState } from '@/map/MapRenderer'
@@ -15,11 +15,25 @@ const partyColour = (partyId: string) => scenario.party(partyId)?.colours.primar
 const container = ref<HTMLElement | null>(null)
 const hovered = ref<string | null>(null)
 const renderer = new SvgMapRenderer()
+type CouncilBoundaryCollection = FeatureCollection<Geometry, { geometryRef: string }>
+const councilBoundaryCollectionCache = new Map<string, CouncilBoundaryCollection>()
 
 // --- Active (clicked) constituency -------------------------------------
 const activeRegion = ref<string | null>(null)
+const councilWardFocusRegion = ref<string | null>(null)
 const isActive = computed(() => activeRegion.value !== null)
 const LIFT_PX = 3
+const councilRegionsForActiveLevel = computed(() => scenario.councilRegionsForLevel(ui.activeCouncilLevel))
+const councilRegionsByGeometryRef = computed(
+  () => new Map(councilRegionsForActiveLevel.value.map((region) => [region.geometryRef, region])),
+)
+const focusedCouncil = computed(() =>
+  ui.activeView === 'councils' && councilWardFocusRegion.value
+    ? councilRegionsByGeometryRef.value.get(councilWardFocusRegion.value)
+    : undefined,
+)
+const isCouncilWardFocus = computed(() => Boolean(focusedCouncil.value))
+let councilWardFocusTimer: number | null = null
 
 function buildCommonsRegionState(): RegionState {
   const state: RegionState = {}
@@ -76,12 +90,100 @@ function buildRegionalRegionState(): RegionState {
   return state
 }
 
+function activeCouncilLevel() {
+  return COUNCIL_LEVELS.find((level) => level.id === ui.activeCouncilLevel) ?? COUNCIL_LEVELS[0]
+}
+
+function councilBoundaryCollection(level: (typeof COUNCIL_LEVELS)[number]) {
+  const cached = councilBoundaryCollectionCache.get(level.objectKey)
+  if (cached) return cached
+  const collection = feature(
+    scenario.councilBoundaries,
+    scenario.councilBoundaries.objects[level.objectKey],
+  ) as unknown as CouncilBoundaryCollection
+  councilBoundaryCollectionCache.set(level.objectKey, collection)
+  return collection
+}
+
+function buildCouncilRegionState(): RegionState {
+  const state: RegionState = {}
+  const level = activeCouncilLevel()
+  const collection = councilBoundaryCollection(level)
+  const regionsByGeometryRef = councilRegionsByGeometryRef.value
+
+  for (const feat of collection.features) {
+    const geometryRef = feat.properties.geometryRef
+    const region = regionsByGeometryRef.get(geometryRef)
+    if (!region) {
+      state[geometryRef] = { fill: '#d4d4d8', disabled: true }
+      continue
+    }
+    const controlParty = region.control?.party
+    const isActiveRegion = activeRegion.value === geometryRef
+    state[geometryRef] = {
+      fill: controlParty ? partyColour(controlParty) : '#9ca3af',
+      selected: hovered.value === geometryRef,
+      opacity: isActive.value && !isActiveRegion ? 0.5 : undefined,
+      liftPx: isActiveRegion ? LIFT_PX : undefined,
+      tooltip: {
+        name: region.name,
+        party: controlParty ? scenario.party(controlParty)?.name : region.control?.label,
+      },
+    }
+  }
+  return state
+}
+
+function buildCouncilWardRegionState(): RegionState {
+  const state: RegionState = {}
+  const council = focusedCouncil.value
+  if (!council) return state
+
+  const wardRegions = scenario.councilWardRegionsForCouncil(council.geometryRef)
+  for (const ward of wardRegions) {
+    const partyId = ward.control?.party ?? ward.seats[0]?.party
+    state[ward.geometryRef] = {
+      fill: partyId ? partyColour(partyId) : '#9ca3af',
+      selected: hovered.value === ward.geometryRef,
+      tooltip: {
+        name: ward.name,
+        party: partyId ? scenario.party(partyId)?.name : undefined,
+      },
+    }
+  }
+  return state
+}
+
 function draw() {
+  const councilLevel = activeCouncilLevel()
   const boundarySet: BoundarySet =
     ui.activeView === 'regional'
       ? { id: 'regional', topology: scenario.regionalBoundaries, objectKey: 'regions' }
-      : { id: 'commons', topology: scenario.boundaries, objectKey: 'regions' }
-  const regionState = ui.activeView === 'regional' ? buildRegionalRegionState() : buildCommonsRegionState()
+      : isCouncilWardFocus.value && focusedCouncil.value
+        ? {
+            id: `council-wards:${focusedCouncil.value.geometryRef}`,
+            topology: scenario.councilWardBoundaries,
+            objectKey: councilWardObjectKey(focusedCouncil.value.geometryRef),
+            fitTopology: scenario.councilBoundaries,
+            fitObjectKey: councilLevel.objectKey,
+            backgroundTopology: scenario.councilBoundaries,
+            backgroundObjectKey: councilLevel.objectKey,
+          }
+      : ui.activeView === 'councils'
+        ? {
+            id: `councils:${councilLevel.id}`,
+            topology: scenario.councilBoundaries,
+            objectKey: councilLevel.objectKey,
+          }
+        : { id: 'commons', topology: scenario.boundaries, objectKey: 'regions' }
+  const regionState =
+    ui.activeView === 'regional'
+      ? buildRegionalRegionState()
+      : isCouncilWardFocus.value
+        ? buildCouncilWardRegionState()
+      : ui.activeView === 'councils'
+        ? buildCouncilRegionState()
+        : buildCommonsRegionState()
   renderer.render(boundarySet, regionState)
 }
 
@@ -103,6 +205,7 @@ const BUTTON_ZOOM_STEP = 1.3
 // small urban ones).
 const ACTIVE_ZOOM_MIN = 2
 const ACTIVE_ZOOM_MAX = MAX_ZOOM
+const COUNCIL_FOCUS_ZOOM_MULTIPLIER = 3
 
 const zoom = ref(1)
 const panX = ref(0)
@@ -225,7 +328,7 @@ function onTouchEnd(event: TouchEvent) {
 // and dims everything else. Manual zoom/pan is disabled while active (gated
 // above); clicking the active region again, a different region, or empty
 // space all resolve it below.
-function centerOnRegion(geometryRef: string) {
+function centerOnRegion(geometryRef: string, zoomMultiplier = 1) {
   if (!container.value) return
   const bounds = renderer.getRegionBounds(geometryRef)
   if (!bounds) return
@@ -248,9 +351,10 @@ function centerOnRegion(geometryRef: string) {
 
   const centerX = bounds.x + bounds.width / 2
   const centerY = bounds.y + bounds.height / 2
-  zoom.value = activeZoom
-  panX.value = -(centerX - width / 2) * activeZoom
-  panY.value = -(centerY - height / 2) * activeZoom
+  const targetZoom = activeZoom * zoomMultiplier
+  zoom.value = targetZoom
+  panX.value = -(centerX - width / 2) * targetZoom
+  panY.value = -(centerY - height / 2) * targetZoom
 }
 
 // Only the activate/deactivate snap should animate the pan/zoom transform —
@@ -273,13 +377,22 @@ const SNAP_DURATION_MS = 1000
 const SNAP_BACKGROUND_BLUR_PX = 2
 const SNAP_BACKGROUND_BLUR_FADE_MS = 300
 
+function clearCouncilWardFocusTimer() {
+  if (councilWardFocusTimer == null) return
+  window.clearTimeout(councilWardFocusTimer)
+  councilWardFocusTimer = null
+}
+
 function snap(run: () => void) {
   snapping.value = true
-  renderer.setBackgroundBlur(SNAP_BACKGROUND_BLUR_PX)
+  const useBackgroundBlur = ui.activeView !== 'councils'
+  renderer.setBackgroundBlur(useBackgroundBlur ? SNAP_BACKGROUND_BLUR_PX : null)
   run()
-  setTimeout(() => {
-    renderer.setBackgroundBlur(null)
-  }, SNAP_DURATION_MS - SNAP_BACKGROUND_BLUR_FADE_MS)
+  if (useBackgroundBlur) {
+    setTimeout(() => {
+      renderer.setBackgroundBlur(null)
+    }, SNAP_DURATION_MS - SNAP_BACKGROUND_BLUR_FADE_MS)
+  }
   setTimeout(() => {
     snapping.value = false
   }, SNAP_DURATION_MS)
@@ -287,13 +400,28 @@ function snap(run: () => void) {
 
 function activate(geometryRef: string) {
   snap(() => {
-    activeRegion.value = geometryRef
-    centerOnRegion(geometryRef)
+    if (ui.activeView === 'councils') {
+      clearCouncilWardFocusTimer()
+      councilWardFocusRegion.value = null
+      centerOnRegion(geometryRef, COUNCIL_FOCUS_ZOOM_MULTIPLIER)
+      activeRegion.value = geometryRef
+      councilWardFocusTimer = window.setTimeout(() => {
+        councilWardFocusTimer = null
+        if (ui.activeView === 'councils' && activeRegion.value === geometryRef) {
+          councilWardFocusRegion.value = geometryRef
+        }
+      }, SNAP_TRANSFORM_DURATION_MS)
+    } else {
+      activeRegion.value = geometryRef
+      centerOnRegion(geometryRef)
+    }
   })
 }
 
 function deactivate() {
   snap(() => {
+    clearCouncilWardFocusTimer()
+    councilWardFocusRegion.value = null
     activeRegion.value = null
     zoom.value = 1
     panX.value = 0
@@ -302,6 +430,7 @@ function deactivate() {
 }
 
 function onRegionClick(geometryRef: string) {
+  if (isCouncilWardFocus.value) return
   if (activeRegion.value === geometryRef) {
     deactivate()
   } else {
@@ -335,8 +464,25 @@ onMounted(() => {
 
 watch(hovered, draw)
 watch(activeRegion, draw)
-watch(() => ui.activeView, draw)
+watch(councilWardFocusRegion, draw)
+watch(() => ui.activeView, () => {
+  clearCouncilWardFocusTimer()
+  hovered.value = null
+  activeRegion.value = null
+  councilWardFocusRegion.value = null
+  resetZoom()
+  draw()
+})
+watch(() => ui.activeCouncilLevel, () => {
+  clearCouncilWardFocusTimer()
+  hovered.value = null
+  activeRegion.value = null
+  councilWardFocusRegion.value = null
+  resetZoom()
+  draw()
+})
 onUnmounted(() => {
+  clearCouncilWardFocusTimer()
   renderer.unmount()
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', onMouseUp)
@@ -346,13 +492,20 @@ onUnmounted(() => {
 const hoveredRegion = () =>
   ui.activeView === 'regional'
     ? scenario.regionalRegionsByGeometryRef.get(hovered.value ?? '')
-    : scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
+    : isCouncilWardFocus.value && focusedCouncil.value
+      ? scenario.councilWardRegionsForCouncil(focusedCouncil.value.geometryRef).find((r) => r.geometryRef === hovered.value)
+    : ui.activeView === 'councils'
+      ? councilRegionsByGeometryRef.value.get(hovered.value ?? '')
+      : scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
 
 const hoveredSeat = computed(() => hoveredRegion()?.seats[0])
 const hoveredDemographics = computed(() => {
+  if (ui.activeView !== 'westminster') return undefined
   const region = hoveredRegion()
   return region ? scenario.demographicsByRegion.get(region.geometryRef) : undefined
 })
+
+const hoveredCouncilControl = computed(() => (ui.activeView === 'councils' ? hoveredRegion()?.control : undefined))
 
 // --- "Raised" 3D depth -------------------------------------------------
 // The renderer is flat SVG, so depth is faked with drop-shadow(), which
@@ -387,7 +540,7 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
         // while snapping to/from a constituency. Dropping the filter only
         // for the transition window (it's purely decorative) keeps the snap
         // crisp; it reappears once the transform has settled.
-        filter: snapping ? 'none' : raisedMapFilter,
+        filter: snapping || ui.activeView === 'councils' ? 'none' : raisedMapFilter,
       }"
     >
       <div
@@ -412,7 +565,13 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
       class="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 rounded bg-zinc-900/90 px-3 py-2 text-sm text-white shadow-lg"
     >
       <p class="font-semibold">{{ hoveredRegion()?.name }}</p>
-      <p class="text-zinc-300">
+      <p v-if="hoveredCouncilControl" class="text-zinc-300">
+        Control: {{ hoveredCouncilControl.label }}
+        <span v-if="hoveredCouncilControl.party">
+          ({{ scenario.party(hoveredCouncilControl.party)?.shortName ?? hoveredCouncilControl.party }})
+        </span>
+      </p>
+      <p v-else class="text-zinc-300">
         {{ scenario.party(hoveredSeat?.party ?? '')?.name }} —
         {{ hoveredSeat?.memberName }}
       </p>
@@ -457,6 +616,35 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
         </span>
       </div>
     </div>
+
+    <div
+      v-if="ui.activeView === 'councils' && !isCouncilWardFocus"
+      class="absolute bottom-3 left-1/2 flex max-w-[min(44rem,calc(100vw-6rem))] -translate-x-1/2 flex-wrap justify-center gap-1.5 rounded-lg bg-zinc-950/85 px-2 py-2 text-xs shadow-lg"
+      role="tablist"
+      aria-label="Council map granularity"
+    >
+      <button
+        v-for="level in COUNCIL_LEVELS"
+        :key="level.id"
+        type="button"
+        role="tab"
+        :aria-selected="ui.activeCouncilLevel === level.id"
+        class="rounded-md px-2 py-1 transition"
+        :class="ui.activeCouncilLevel === level.id ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-300 hover:bg-zinc-800'"
+        @click="ui.setActiveCouncilLevel(level.id)"
+      >
+        {{ level.label }}
+      </button>
+    </div>
+
+    <button
+      v-if="isCouncilWardFocus"
+      type="button"
+      class="absolute bottom-3 left-1/2 max-w-[min(28rem,calc(100vw-6rem))] -translate-x-1/2 rounded-lg bg-zinc-950/90 px-3 py-2 text-sm font-semibold text-zinc-100 shadow-lg transition hover:bg-zinc-900"
+      @click="deactivate"
+    >
+      Back to {{ activeCouncilLevel().label }} councils
+    </button>
 
     <div class="absolute bottom-3 right-3 flex flex-col gap-1.5">
       <button

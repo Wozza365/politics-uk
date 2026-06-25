@@ -7,7 +7,7 @@ const ui = useUiStore()
 const views: { id: GameView; label: string; available: boolean }[] = [
   { id: 'westminster', label: 'Westminster', available: true },
   { id: 'regional', label: 'Regional', available: true },
-  { id: 'councils', label: 'Councils', available: false },
+  { id: 'councils', label: 'Councils', available: true },
 ]
 </script>
 

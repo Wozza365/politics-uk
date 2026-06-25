@@ -1,0 +1,483 @@
+[
+  {
+    "id": "pcc-conservative-1",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 1",
+    "geometryRef": "pcc-conservative-1",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-1",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-2",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 2",
+    "geometryRef": "pcc-conservative-2",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-2",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-3",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 3",
+    "geometryRef": "pcc-conservative-3",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-3",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-4",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 4",
+    "geometryRef": "pcc-conservative-4",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-4",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-5",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 5",
+    "geometryRef": "pcc-conservative-5",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-5",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-6",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 6",
+    "geometryRef": "pcc-conservative-6",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-6",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-7",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 7",
+    "geometryRef": "pcc-conservative-7",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-7",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-8",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 8",
+    "geometryRef": "pcc-conservative-8",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-8",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-9",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 9",
+    "geometryRef": "pcc-conservative-9",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-9",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-10",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 10",
+    "geometryRef": "pcc-conservative-10",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-10",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-11",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 11",
+    "geometryRef": "pcc-conservative-11",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-11",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-12",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 12",
+    "geometryRef": "pcc-conservative-12",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-12",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-13",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 13",
+    "geometryRef": "pcc-conservative-13",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-13",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-14",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 14",
+    "geometryRef": "pcc-conservative-14",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-14",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-15",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 15",
+    "geometryRef": "pcc-conservative-15",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-15",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-16",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 16",
+    "geometryRef": "pcc-conservative-16",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-16",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-17",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 17",
+    "geometryRef": "pcc-conservative-17",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-17",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-18",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 18",
+    "geometryRef": "pcc-conservative-18",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-18",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-conservative-19",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (conservative) 19",
+    "geometryRef": "pcc-conservative-19",
+    "seats": [
+      {
+        "regionId": "pcc-conservative-19",
+        "party": "conservative",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-1",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 1",
+    "geometryRef": "pcc-labour-1",
+    "seats": [
+      {
+        "regionId": "pcc-labour-1",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-2",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 2",
+    "geometryRef": "pcc-labour-2",
+    "seats": [
+      {
+        "regionId": "pcc-labour-2",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-3",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 3",
+    "geometryRef": "pcc-labour-3",
+    "seats": [
+      {
+        "regionId": "pcc-labour-3",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-4",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 4",
+    "geometryRef": "pcc-labour-4",
+    "seats": [
+      {
+        "regionId": "pcc-labour-4",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-5",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 5",
+    "geometryRef": "pcc-labour-5",
+    "seats": [
+      {
+        "regionId": "pcc-labour-5",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-6",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 6",
+    "geometryRef": "pcc-labour-6",
+    "seats": [
+      {
+        "regionId": "pcc-labour-6",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-7",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 7",
+    "geometryRef": "pcc-labour-7",
+    "seats": [
+      {
+        "regionId": "pcc-labour-7",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-8",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 8",
+    "geometryRef": "pcc-labour-8",
+    "seats": [
+      {
+        "regionId": "pcc-labour-8",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-9",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 9",
+    "geometryRef": "pcc-labour-9",
+    "seats": [
+      {
+        "regionId": "pcc-labour-9",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-10",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 10",
+    "geometryRef": "pcc-labour-10",
+    "seats": [
+      {
+        "regionId": "pcc-labour-10",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-11",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 11",
+    "geometryRef": "pcc-labour-11",
+    "seats": [
+      {
+        "regionId": "pcc-labour-11",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-12",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 12",
+    "geometryRef": "pcc-labour-12",
+    "seats": [
+      {
+        "regionId": "pcc-labour-12",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-13",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 13",
+    "geometryRef": "pcc-labour-13",
+    "seats": [
+      {
+        "regionId": "pcc-labour-13",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-14",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 14",
+    "geometryRef": "pcc-labour-14",
+    "seats": [
+      {
+        "regionId": "pcc-labour-14",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-15",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 15",
+    "geometryRef": "pcc-labour-15",
+    "seats": [
+      {
+        "regionId": "pcc-labour-15",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-16",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 16",
+    "geometryRef": "pcc-labour-16",
+    "seats": [
+      {
+        "regionId": "pcc-labour-16",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-labour-17",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (labour) 17",
+    "geometryRef": "pcc-labour-17",
+    "seats": [
+      {
+        "regionId": "pcc-labour-17",
+        "party": "labour",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "id": "pcc-plaid_cymru-1",
+    "tier": "pcc",
+    "name": "Police and Crime Commissioner (plaid cymru) 1",
+    "geometryRef": "pcc-plaid_cymru-1",
+    "seats": [
+      {
+        "regionId": "pcc-plaid_cymru-1",
+        "party": "plaid_cymru",
+        "electedAt": "2024-05-02"
+      }
+    ]
+  }
+]

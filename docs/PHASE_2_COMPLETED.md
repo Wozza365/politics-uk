@@ -6,6 +6,51 @@
 > authoritative design remains [`GAME_SPEC.md`](./GAME_SPEC.md). See
 > `PHASE_2_PLAN.md` §A for what's still open and the current critical path.
 
+## P2.4 — Council tiers (the long tail) ✅
+
+- One **Councils** nav entry is now active, with a council-level sub-switcher inside the map for
+  **County** and **Local**. County stays separate because it overlaps districts; Local merges
+  district/borough, unitary, metropolitan, London, Scottish, Welsh, and NI councils after verifying
+  those tiers share zero geometry refs. Unrepresented areas may stay neutral grey per
+  `GAME_SPEC.md` ?9.6.
+- `scripts/data/fetch-council-composition.mjs` downloads Open Council Data UK's public 2024
+  councillor archive plus authority-type/control pages, then joins each authority to real ONS
+  December 2024 boundary geometry. The 2024 archive is intentional because the scenario starts on
+  2025-01-01 and Open Council Data's annual CSVs are post-May snapshots. Output:
+  `composition.councils.json` with 381 principal-authority regions and 19,186 councillor seats,
+  split into `council:<level>` tiers; parish/town/community councils remain excluded.
+- `boundaries.councils.json` now contains real ONS TopoJSON geography: the County view uses
+  Counties and Unitary Authorities December 2024 BGC boundaries, and the Local view uses
+  Local Authority Districts December 2024 BGC boundaries. Each object includes grey filler
+  geographies for places not represented by the selected level, so the Councils map remains an
+  actual UK map without merging overlapping county/district seats. The committed topology is
+  simplified to 10% with mapshaper `keep-shapes`.
+- `scripts/data/fetch-pcc-composition.mjs` adds Police & Crime Commissioners as a stats-only `pcc`
+  tier: Conservative 19, Labour 17, Plaid Cymru 1 for the 37 PCC-only areas elected on 2024-05-02.
+  Metro mayors with PCC powers stay in the existing P2.3 mayoralties data rather than being
+  double-counted here.
+- `build-scenario.mjs` folds `pcc` and all `council:<level>` tiers into `scenario.json`.
+  `validate-scenario.mjs` checks the PCC total and rejects council IDs that appear in more than
+  one council tier, which enforces the no-overlapping-seat invariant at data-build time.
+- `MapView.vue` can render the Councils view and switch its boundary object by active council
+  level. Council hover cards show control labels instead of MP/member details. `HemicycleView.vue`
+  now follows the active view and scales large tiers to 1 dot = 10/100 seats as needed.
+- Clicking a focused council now drills into that council's real ward/division geography:
+  Local councils use ONS Wards December 2024 BGC, County councils use ONS County Electoral
+  Divisions May 2024 BGC, and Northern Ireland councils use OSNI District Electoral Areas 2012.
+  `composition.council_wards.json` and `boundaries.council_wards.json` hold 9,375 ward/division
+  regions grouped one TopoJSON object per council, with strict name matching in the generator.
+- `PartyPanel.vue`'s "Controlled councils" card now reads real per-council `control.party` metadata
+  rather than counting raw councillor seats.
+- `sources.json` records Open Council Data UK and House of Commons Library provenance. `package.json`
+  gained `data:fetch-councils` and `data:fetch-pcc-composition`; `npm test` excludes local
+  `.claude/**` helper worktrees so the repo test command ignores unrelated nested checkouts.
+- **Acceptance:** Councils view exists with real principal-authority composition data, a
+  non-overlapping granularity switcher, real controlled-councils counts, and PCC stats; `npm run
+  validate:data`, `npm run test` (66 tests), and `npm run build` clean. The production build emits a
+  Vite chunk-size warning because the council dataset is large; this is a performance follow-up,
+  not a correctness failure.
+
 ## P2.3 — Mayoralty: London, combined-authority, and other local mayors ✅
 
 - **Design call (open question from `PHASE_2_PLAN.md`, now resolved):** mayors are a stats list,
@@ -109,7 +154,7 @@
 - **Scoped deliberately narrow:** `ResultScreen.vue`/`game.result` remain GE-specific. Other
   regular elections (devolved parliaments, councils, mayors/PCCs, by-elections) are intentionally
   **not** routed through this win/lose screen — none of their composition data exists yet
-  (P2.1/P2.3/P2.4 are still open) — and per the doc's own no-speculative-building rule, a generic
+  (P2.1/P2.3/P2.4 were still open when P2.0 landed) — and per the doc's own no-speculative-building rule, a generic
   multi-election-result system wasn't built ahead of that data landing. `PHASE_2_PLAN.md`'s P2.0
   entry and P2.8 carry forward notes for whoever picks those up: non-GE results should be a
   non-blocking "here's what happened" notice, not a second win/lose gate.

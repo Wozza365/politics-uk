@@ -182,8 +182,8 @@ visibility:
    psephological default if the per-task effort allows it.
 2. **P2.3** — how should mayors (no natural multi-region map tier) be represented? Resolved as a
    stats list, not a map overlay — see `PHASE_2_COMPLETED.md`'s P2.3 entry for why.
-3. **P2.4** — does the "councils" view need an authority-type sub-switcher, or one merged
-   geography? Spec §9.6 implies one nav entry; the underlying data's overlapping geography (county
-   vs. district) makes a single flat map an imperfect fit. Left to whoever picks up the task.
+3. **P2.4** — resolved: the "councils" view remains one nav entry, with an authority-level
+   sub-switcher. Each selected council level renders its own non-overlapping seat/authority set;
+   unrepresented areas may remain grey rather than being assigned to a false seat.
 4. **P2.10** — "custom-generated" scenarios (spec §12's phrase) have no defined mechanism. Treat
    as out of scope until a future spec revision defines what "custom-generated" means.

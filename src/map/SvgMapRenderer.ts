@@ -167,15 +167,8 @@ export class SvgMapRenderer implements MapRenderer {
       this.overlayPath.onmouseenter = () => this.events.onRegionHover?.(nextRef)
       this.overlayPath.onmouseleave = () => this.events.onRegionHover?.(null)
       this.overlayPath.onclick = () => this.events.onRegionClick?.(nextRef)
-    } else if (this.overlayPath) {
-      this.overlayPath.removeAttribute('d')
-      this.overlayPath.style.pointerEvents = 'none'
-      this.overlayPath.style.transform = ''
-      this.overlayPath.style.filter = ''
-      this.overlayPath.style.transition = ''
-      this.overlayPath.onmouseenter = null
-      this.overlayPath.onmouseleave = null
-      this.overlayPath.onclick = null
+    } else {
+      this.clearLiftOverlay()
     }
 
     this.liftedGeometryRef = nextRef
@@ -194,8 +187,21 @@ export class SvgMapRenderer implements MapRenderer {
       boundarySet.topology,
       boundarySet.topology.objects[boundarySet.objectKey],
     ) as unknown as FeatureCollection<Geometry, { geometryRef: string }>
+    const fitTopology = boundarySet.fitTopology ?? boundarySet.backgroundTopology ?? boundarySet.topology
+    const fitObjectKey = boundarySet.fitObjectKey ?? boundarySet.backgroundObjectKey ?? boundarySet.objectKey
+    const fitCollection = feature(
+      fitTopology,
+      fitTopology.objects[fitObjectKey],
+    ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>
+    const backgroundCollection =
+      boundarySet.backgroundTopology && boundarySet.backgroundObjectKey
+        ? (feature(
+            boundarySet.backgroundTopology,
+            boundarySet.backgroundTopology.objects[boundarySet.backgroundObjectKey],
+          ) as unknown as FeatureCollection<Geometry, { geometryRef?: string }>)
+        : null
 
-    const projection = geoIdentity().reflectY(true).fitSize([width, height], collection)
+    const projection = geoIdentity().reflectY(true).fitSize([width, height], fitCollection)
     const pathGenerator = geoPath(projection)
 
     this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
@@ -204,6 +210,7 @@ export class SvgMapRenderer implements MapRenderer {
     // Keep the overlay's coordinate space identical to the main map's so a
     // copied `d` attribute lands in exactly the same place.
     this.overlaySvg?.setAttribute('viewBox', `0 0 ${width} ${height}`)
+    this.clearLiftOverlay()
     // The old DOM nodes are gone — forget which one was lifted so syncLift()
     // below re-applies it fresh to its replacement rather than skipping the
     // (now-stale) "nothing changed" check.
@@ -212,6 +219,19 @@ export class SvgMapRenderer implements MapRenderer {
     this.regionBounds.clear()
     let minDiagonal = Infinity
     let maxDiagonal = -Infinity
+
+    if (backgroundCollection) {
+      for (const f of backgroundCollection.features) {
+        const path = document.createElementNS(NS, 'path')
+        path.setAttribute('d', pathGenerator(f as GeoPermissibleObjects) ?? '')
+        path.setAttribute('fill', '#d4d4d8')
+        path.setAttribute('stroke', '#71717a')
+        path.setAttribute('stroke-width', '0.4')
+        path.style.opacity = '0.38'
+        path.style.pointerEvents = 'none'
+        this.svg.appendChild(path)
+      }
+    }
 
     for (const f of collection.features) {
       const geometryRef = f.properties.geometryRef
@@ -242,6 +262,18 @@ export class SvgMapRenderer implements MapRenderer {
     this.sizeExtent = Number.isFinite(minDiagonal) ? { min: minDiagonal, max: maxDiagonal } : null
 
     this.syncLift(regionState)
+  }
+
+  private clearLiftOverlay(): void {
+    if (!this.overlayPath) return
+    this.overlayPath.removeAttribute('d')
+    this.overlayPath.style.pointerEvents = 'none'
+    this.overlayPath.style.transform = ''
+    this.overlayPath.style.filter = ''
+    this.overlayPath.style.transition = ''
+    this.overlayPath.onmouseenter = null
+    this.overlayPath.onmouseleave = null
+    this.overlayPath.onclick = null
   }
 
   getRegionBounds(geometryRef: string): { x: number; y: number; width: number; height: number } | null {

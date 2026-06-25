@@ -89,8 +89,11 @@ function main() {
   const niAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.ni_assembly.json')
   const londonAssemblyRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.london_assembly.json')
   const lordsRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.lords.json')
+  const councilRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.councils.json')
+  const pccRegions = readJson('../../src/data/scenarios/uk-2025-01-01/composition.pcc.json')
   const mayoralties = readJson('../../src/data/scenarios/uk-2025-01-01/mayoralties.json')
   const parties = readJson('../../src/data/scenarios/uk-2025-01-01/parties.json')
+  const councilTiers = Object.groupBy(councilRegions, (region) => region.tier)
 
   const scenario = {
     id: SCENARIO_ID,
@@ -104,6 +107,8 @@ function main() {
       ni_assembly: niAssemblyRegions,
       london_assembly: londonAssemblyRegions,
       lords: lordsRegions,
+      pcc: pccRegions,
+      ...councilTiers,
     },
     mayoralties,
     parties,

@@ -52,5 +52,19 @@
     "description": "Party membership counts",
     "source": "estimated",
     "notes": "Best-effort figures informed by public reporting around 2025-01-01 (e.g. Reform UK's widely-reported overtaking of Conservative membership in late 2024); not independently verified from this environment, so treated as estimates throughout."
+  },
+  "councils": {
+    "description": "Principal-authority councillor composition, council-control labels, and ward/division drilldown, split into council:<level> tiers and joined to real ONS/OSNI boundary datasets",
+    "source": "Open Council Data UK public CSV downloads and authority-type pages; ONS Open Geography Portal LAD December 2024 BGC, Counties/Unitary Authorities December 2024 BGC, Wards December 2024 BGC, County Electoral Divisions May 2024 BGC; OSNI District Electoral Areas 2012 GeoJSON",
+    "asOf": "shortly after May 2024 elections",
+    "retrieved": "2026-06-25",
+    "notes": "The scenario date is 2025-01-01, so the 2024 Open Council Data archive is used deliberately as the closest public snapshot before the scenario start. Parish/town/community councils remain out of scope. The council map exposes County and Local granularities rather than merging overlapping county/district levels. County councils use ONS Counties and Unitary Authorities boundaries, with non-county areas as grey filler. Local merges district/borough, unitary, metropolitan, London, Scottish, Welsh, and NI councils on ONS Local Authority District boundaries; those LAD-level tiers were checked for duplicate geometry refs and have no overlaps. The committed TopoJSON is simplified to 10% with mapshaper keep-shapes, matching the project boundary-size pattern used for Commons. Focused council drilldown uses ONS ward boundaries for Local councils, ONS County Electoral Division boundaries for County councils, and OSNI District Electoral Area boundaries for Northern Ireland councils. The drilldown build is strict: all Open Council Data ward/division names must match a boundary feature, with only documented name aliases for known source naming changes."
+  },
+  "pcc": {
+    "description": "Police and Crime Commissioner party composition, stats-only tier",
+    "source": "House of Commons Library CBP-10030 / 2024 PCC election summary",
+    "asOf": "2024-05-02",
+    "retrieved": "2026-06-25",
+    "notes": "The 2024 election had 37 PCC areas in England and Wales. Headline Labour totals often include five metro mayors with PCC powers; those are already represented in mayoralties, so this pcc tier stores PCC-only seats: Conservative 19, Labour 17, Plaid Cymru 1."
   }
 }

@@ -2,16 +2,17 @@
 import { computed, ref } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
+import { useUiStore } from '@/stores/ui'
 import { buildHemicycleSlots, computeHemicycleLayout, slotToPosition } from '@/sim/hemicycle'
 
 const gameStore = useGameStore()
 const scenarioStore = useScenarioStore()
+const uiStore = useUiStore()
 
 const VIEWPORT_WIDTH = 500
 const VIEWPORT_HEIGHT = 200
 const DOT_RADIUS = 2.5
 const HOVER_HIT_RADIUS = DOT_RADIUS * 2.2 // bigger than the visible dot, for an easier hover target
-const SEATS_PER_DOT = 1
 
 // NI's parties are grouped into a single "NI" slice for this view (they're
 // still tracked individually elsewhere in the data model); the Speaker is
@@ -20,6 +21,25 @@ const NI_PARTY_IDS = ['dup', 'sinn_fein', 'sdlp', 'alliance', 'uup', 'tuv']
 const NI_GROUP_COLOUR = '#6B5B95'
 const SPEAKER_PARTY_ID = 'speaker'
 const INDEPENDENT_PARTY_ID = 'independent'
+
+function activeSeatCounts() {
+  if (uiStore.activeView === 'westminster') return gameStore.commonsSeatsByParty
+
+  const counts: Record<string, number> = {}
+  const tierEntries =
+    uiStore.activeView === 'regional'
+      ? Object.entries(scenarioStore.scenario.tiers).filter(([tierId]) =>
+          ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'].includes(tierId),
+        )
+      : [['councils', scenarioStore.councilRegionsForLevel(uiStore.activeCouncilLevel)] as const]
+
+  for (const [, regions] of tierEntries) {
+    for (const seat of regions.flatMap((region) => region.seats)) {
+      counts[seat.party] = (counts[seat.party] ?? 0) + 1
+    }
+  }
+  return counts
+}
 
 interface PartyWithSeats {
   id: string
@@ -32,7 +52,7 @@ interface PartyWithSeats {
 
 // Compute ordered list of parties with seat counts
 const partiesWithSeats = computed(() => {
-  const seatCounts = gameStore.commonsSeatsByParty
+  const seatCounts = activeSeatCounts()
   const parties: PartyWithSeats[] = []
 
   let niSeats = 0
@@ -111,11 +131,11 @@ const partiesWithSeats = computed(() => {
 // of slots to the largest party, then the next wedge clockwise to the next
 // largest, and so on — the way real hemicycle seating charts are drawn.
 const dots = computed(() => {
-  const totalSeats = totalSeatCount.value
-  const layout = computeHemicycleLayout(totalSeats, SEATS_PER_DOT)
-  const slots = buildHemicycleSlots(layout.rows)
-
   const partiesBySize = [...partiesWithSeats.value].sort((a, b) => b.seats - a.seats)
+  const partyDotCounts = partiesBySize.map((party) => Math.max(1, Math.ceil(party.seats / seatsPerDot.value)))
+  const totalDots = partyDotCounts.reduce((sum, count) => sum + count, 0)
+  const layout = computeHemicycleLayout(totalDots, 1)
+  const slots = buildHemicycleSlots(layout.rows)
 
   const result: Array<{
     id: string
@@ -130,8 +150,8 @@ const dots = computed(() => {
 
   let slotIndex = 0
 
-  for (const party of partiesBySize) {
-    for (let i = 0; i < party.seats; i++) {
+  partiesBySize.forEach((party, partyIndex) => {
+    for (let i = 0; i < partyDotCounts[partyIndex]; i++) {
       const slot = slots[slotIndex]
       const position = slotToPosition(slot, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
 
@@ -148,15 +168,20 @@ const dots = computed(() => {
 
       slotIndex++
     }
-  }
+  })
 
   return result
 })
 
-const totalSeats = computed(() => gameStore.commonsSeatsByParty)
+const totalSeats = computed(() => activeSeatCounts())
 const totalSeatCount = computed(() =>
   Object.values(totalSeats.value).reduce((sum, count) => sum + count, 0),
 )
+const seatsPerDot = computed(() => {
+  if (totalSeatCount.value > 5_000) return 100
+  if (totalSeatCount.value > 900) return 10
+  return 1
+})
 
 // View-mode toggle (P2 stub): will switch between the hemicycle dot fan (⌒)
 // and a "house" view (=) — see GAME_SPEC.md §9.2. No behaviour yet, just the
