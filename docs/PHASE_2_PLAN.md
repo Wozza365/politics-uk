@@ -96,9 +96,11 @@ See [`phase2/P2.7-hemicycle-drilldown.md`](./phase2/P2.7-hemicycle-drilldown.md)
 
 See [`phase2/P2.8-clock-panel.md`](./phase2/P2.8-clock-panel.md).
 
-### P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel)
+### P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel) `✅ DONE`
 
-See [`phase2/P2.9-party-panel-levers.md`](./phase2/P2.9-party-panel-levers.md).
+See
+[`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p29--deeper-democracy-3-style-menus--charts-expanded-party-panel-)
+for the full record of what was built.
 
 ### P2.10 — Additional scenarios
 

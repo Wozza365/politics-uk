@@ -2,12 +2,18 @@
 import { ref } from 'vue'
 import CompassView from '@/components/CompassView.vue'
 import PartyStatCard from '@/components/PartyStatCard.vue'
+import LeverCard from '@/components/LeverCard.vue'
+import PollingHistoryChart from '@/components/PollingHistoryChart.vue'
 import { useGameStore } from '@/stores/game'
 import { usePartyStats } from '@/composables/usePartyStats'
+import { usePartyLevers } from '@/composables/usePartyLevers'
 import type { PartyFinance } from '@/types'
 
 const game = useGameStore()
 const isExpanded = ref(false)
+
+const { fundraisingCooldownDays, runFundraisingAppeal, socialMediaCooldownDays, runSocialMediaCampaign } =
+  usePartyLevers()
 
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
@@ -184,6 +190,10 @@ function formatMoney(value: PartyFinance | undefined) {
           </PartyStatCard>
         </div>
 
+        <PartyStatCard label="Polling history">
+          <PollingHistoryChart :highlight-party-id="game.selectedPartyId" />
+        </PartyStatCard>
+
         <p class="text-xs text-zinc-500">
           Estimated values are flagged; unavailable tiers remain blank until the dataset grows.
         </p>
@@ -209,12 +219,21 @@ function formatMoney(value: PartyFinance | undefined) {
           Compass data pending
         </div>
 
-        <div
-          v-if="isExpanded"
-          class="w-full rounded-xl border border-zinc-800/80 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-400"
-        >
-          Expanded party controls will live here later.
-        </div>
+        <LeverCard
+          label="Fundraising"
+          description="Run an appeal to raise party finance."
+          button-label="Launch appeal"
+          :cooldown-days="fundraisingCooldownDays"
+          @activate="runFundraisingAppeal"
+        />
+
+        <LeverCard
+          label="Social media"
+          description="Run a campaign to grow membership and reach."
+          button-label="Run campaign"
+          :cooldown-days="socialMediaCooldownDays"
+          @activate="runSocialMediaCampaign"
+        />
       </div>
     </div>
   </section>

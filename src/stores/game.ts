@@ -1,11 +1,20 @@
 import { defineStore } from 'pinia'
-import type { EventCallbackContext, FeedEntry, GameEvent, ISODate, PartyId, PollingSnapshot } from '@/types'
+import type { EventCallbackContext, FeedEntry, GameEvent, ISODate, PartyFinance, PartyId, PollingSnapshot } from '@/types'
 import { useScenarioStore } from './scenario'
 import { nextPollingSnapshot, type PollingImpact } from '@/sim/poll'
 import { resolvePollingEffects, rollEventForDay } from '@/sim/events'
 import { runEventCallback } from '@/sim/eventCallbacks'
 import { WORLD_SALIENCE } from '@/sim/policies'
 import { projectSeatsByParty } from '@/sim/projection'
+import { seededUniform } from '@/sim/rng'
+
+/** Player-lever ids (P2.9 — spec §9.3 "Expanded … levers"); each maps to a cooldown so the player
+ * can't spam the same lever every tick. */
+export type LeverId = 'fundraising' | 'socialMedia'
+const LEVER_COOLDOWN_DAYS: Record<LeverId, number> = {
+  fundraising: 14,
+  socialMedia: 7,
+}
 
 /** Adds `days` whole days to an ISO date string ("2025-01-01" + 1 -> "2025-01-02"). */
 function addDays(date: ISODate, days: number): ISODate {
@@ -51,6 +60,13 @@ export const useGameStore = defineStore('game', {
     // poll release can weigh a run of small events against each other rather than each one
     // moving the headline number on its own (see `sim/poll.ts`'s `nextPollingSnapshot`).
     pendingPollImpacts: [] as PollingImpact[],
+    // Live overlays of the scenario's starting finance/membership snapshot (mirrors `polling`'s
+    // relationship to `scenario.scenario.polling`) — the levers below are the only things that
+    // mutate these during play.
+    finance: {} as Record<PartyId, PartyFinance>,
+    membership: {} as Record<PartyId, number>,
+    // Last-used date per `${partyId}:${leverId}` key, checked against `LEVER_COOLDOWN_DAYS`.
+    leverCooldowns: {} as Record<string, ISODate>,
     feed: [] as FeedEntry[],
     // An array so multiple action-required events could in principle queue up; the clock stays
     // paused while any remain (currently the roll only ever produces one per day).
@@ -110,6 +126,15 @@ export const useGameStore = defineStore('game', {
       if (!nextElectionDate) return 0
       return daysBetween(state.date, nextElectionDate)
     },
+    /** Days left before the selected party can use this lever again (0 = ready now). */
+    leverCooldownRemaining(state): (leverId: LeverId) => number {
+      return (leverId) => {
+        if (!state.selectedPartyId) return 0
+        const lastUsed = state.leverCooldowns[`${state.selectedPartyId}:${leverId}`]
+        if (!lastUsed) return 0
+        return Math.max(0, LEVER_COOLDOWN_DAYS[leverId] - daysBetween(lastUsed, state.date))
+      }
+    },
   },
   actions: {
     startGame(partyId: PartyId) {
@@ -125,6 +150,9 @@ export const useGameStore = defineStore('game', {
       this.pendingEvents = []
       this.firedEventIds = []
       this.pendingPollImpacts = []
+      this.finance = { ...scenario.scenario.finances }
+      this.membership = { ...scenario.scenario.membership }
+      this.leverCooldowns = {}
       this.salience = { ...WORLD_SALIENCE }
       this.result = null
     },
@@ -233,6 +261,43 @@ export const useGameStore = defineStore('game', {
       this.polling = polling
       this.pollingHistory.push({ date: this.date, polling: { ...polling } })
       this.pendingPollImpacts = []
+    },
+    /** Fundraising lever (spec §9.3 "run appeals/drives to raise party finance"): a flat finance
+     * gain with a seeded-deterministic amount, on a cooldown so it can't be spammed every tick. */
+    runFundraisingAppeal() {
+      const partyId = this.selectedPartyId
+      if (!partyId || this.leverCooldownRemaining('fundraising') > 0) return
+      const roll = seededUniform(`lever:fundraising:${partyId}:${this.date}`)
+      const raised = Math.round(50_000 + roll * 150_000)
+      const current = this.finance[partyId]
+      this.finance[partyId] = { ...current, estimatedCashOnHand: (current?.estimatedCashOnHand ?? 0) + raised, source: 'estimated' }
+      this.leverCooldowns[`${partyId}:fundraising`] = this.date
+      const scenario = useScenarioStore()
+      this.recordFeedEntry({
+        id: `lever:fundraising:${this.date}`,
+        date: this.date,
+        headline: `${scenario.party(partyId)?.shortName ?? partyId} fundraising appeal raises £${raised.toLocaleString('en-GB')}.`,
+        status: 'actioned',
+      })
+    },
+    /** Social media lever (spec §9.3 "campaigns affecting polling / membership / reach"): grows
+     * membership directly and queues a small `PollingImpact` through the same seam events/actions
+     * use, surfacing at the next poll release rather than moving the headline number immediately. */
+    runSocialMediaCampaign() {
+      const partyId = this.selectedPartyId
+      if (!partyId || this.leverCooldownRemaining('socialMedia') > 0) return
+      const roll = seededUniform(`lever:socialMedia:${partyId}:${this.date}`)
+      const membershipGain = Math.round(200 + roll * 800)
+      this.membership[partyId] = (this.membership[partyId] ?? 0) + membershipGain
+      this.pendingPollImpacts.push({ partyId, magnitude: 0.05 + roll * 0.1, source: 'lever:socialMedia' })
+      this.leverCooldowns[`${partyId}:socialMedia`] = this.date
+      const scenario = useScenarioStore()
+      this.recordFeedEntry({
+        id: `lever:socialMedia:${this.date}`,
+        date: this.date,
+        headline: `${scenario.party(partyId)?.shortName ?? partyId} social media campaign reaches new supporters (+${membershipGain.toLocaleString('en-GB')} members).`,
+        status: 'actioned',
+      })
     },
     pauseClock() {
       this.clock.running = false

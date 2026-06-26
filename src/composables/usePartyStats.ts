@@ -50,7 +50,7 @@ export function usePartyStats() {
   })
 
   const finance = computed<PartyFinance | undefined>(() =>
-    selectedPartyId.value ? scenario.scenario.finances[selectedPartyId.value] : undefined,
+    selectedPartyId.value ? game.finance[selectedPartyId.value] : undefined,
   )
   const previousFinance = computed(() => previousPartyHistory.value?.finance.estimatedCashOnHand ?? null)
   const financeDelta = computed(() => (finance.value?.estimatedCashOnHand ?? 0) - (previousFinance.value ?? 0))
@@ -60,7 +60,7 @@ export function usePartyStats() {
     return { arrow: '=', className: 'text-zinc-100' }
   })
 
-  const membership = computed(() => (selectedPartyId.value ? scenario.scenario.membership[selectedPartyId.value] : undefined))
+  const membership = computed(() => (selectedPartyId.value ? game.membership[selectedPartyId.value] : undefined))
   const previousMembership = computed(() => previousPartyHistory.value?.membership ?? null)
   const membershipDelta = computed(() => (membership.value ?? 0) - (previousMembership.value ?? 0))
   const membershipTrend = computed(() => {

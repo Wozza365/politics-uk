@@ -212,3 +212,64 @@ describe('useGameStore.checkElectionResult — P2.0', () => {
     expect(game.result).not.toBeNull()
   })
 })
+
+describe('useGameStore player levers — P2.9', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('runFundraisingAppeal raises finance and starts a cooldown', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const before = game.finance.labour?.estimatedCashOnHand ?? 0
+
+    game.runFundraisingAppeal()
+
+    expect(game.finance.labour?.estimatedCashOnHand ?? 0).toBeGreaterThan(before)
+    expect(game.leverCooldownRemaining('fundraising')).toBeGreaterThan(0)
+    expect(game.feed.at(-1)?.headline).toContain('fundraising appeal')
+  })
+
+  it('runFundraisingAppeal is a no-op while on cooldown', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.runFundraisingAppeal()
+    const raised = game.finance.labour?.estimatedCashOnHand ?? 0
+    const feedLength = game.feed.length
+
+    game.runFundraisingAppeal()
+
+    expect(game.finance.labour?.estimatedCashOnHand).toBe(raised)
+    expect(game.feed.length).toBe(feedLength)
+  })
+
+  it('runSocialMediaCampaign grows membership and queues a polling impact through the existing seam', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const before = game.membership.labour ?? 0
+
+    game.runSocialMediaCampaign()
+
+    expect(game.membership.labour ?? 0).toBeGreaterThan(before)
+    expect(game.pendingPollImpacts).toHaveLength(1)
+    expect(game.pendingPollImpacts[0]).toMatchObject({ partyId: 'labour', source: 'lever:socialMedia' })
+    expect(game.leverCooldownRemaining('socialMedia')).toBeGreaterThan(0)
+  })
+
+  it('lever cooldowns count down as the game date advances', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.runSocialMediaCampaign()
+    const remaining = game.leverCooldownRemaining('socialMedia')
+
+    game.date = addDaysForTest(game.date, remaining)
+
+    expect(game.leverCooldownRemaining('socialMedia')).toBe(0)
+  })
+})
+
+function addDaysForTest(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}

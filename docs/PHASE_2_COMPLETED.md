@@ -190,3 +190,54 @@
 - **Acceptance:** the GE result reflects in-game polling movement, not just the scenario's starting
   seats, and offers a real "continue playing" path back into the live game; `npm run build` and
   `npm run test` clean.
+
+## P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel) ✅
+
+- `src/stores/game.ts` — added a live `finance`/`membership` overlay (mirroring the existing
+  `polling` pattern relative to `scenario.scenario`'s static JSON, which is `markRaw`'d and so
+  can't be mutated reactively), a `leverCooldowns: Record<string, ISODate>` map keyed by
+  `${partyId}:${leverId}`, a `leverCooldownRemaining(leverId)` getter-as-function, and two actions:
+  `runFundraisingAppeal()` (raises `finance[partyId].estimatedCashOnHand`, posts a feed entry,
+  starts a cooldown) and `runSocialMediaCampaign()` (grows `membership[partyId]`, pushes a
+  `PollingImpact` onto `pendingPollImpacts` with `source: 'lever:socialMedia'` — routed through the
+  existing seam rather than mutating `polling` directly — and starts its own cooldown). Both use
+  the seeded `mulberry32` RNG (`seededUniform`/`seededVariance`), never `Math.random()`.
+- `src/composables/usePartyLevers.ts` (new) — thin composable exposing each lever's remaining
+  cooldown (in days) and its trigger action, keeping `PartyPanel.vue` free of store plumbing.
+- `src/composables/usePartyStats.ts` — `finance`/`membership` computeds now read the live
+  `game.finance`/`game.membership` overlay instead of the static scenario snapshot (trend-arrow
+  `previousFinance`/`previousMembership` deltas are left reading `Party.history`, unaffected).
+- `src/components/LeverCard.vue` (new) — small presentational card (label, description, action
+  button, cooldown state) shared by both levers, per the project's "repeated card markup → small
+  component" convention.
+- `src/components/PollingHistoryChart.vue` (new) — `vue-echarts`/`echarts` (added as dependencies)
+  line chart over `game.pollingHistory`, one series per party that has ever registered a non-zero
+  poll share (so a long tail of zero-data fringe parties doesn't clutter the legend), with the
+  selected party's line highlighted. Tree-shaken imports (`LineChart`, `GridComponent`,
+  `TooltipComponent`, `CanvasRenderer`) per `echarts/core`'s `use()` registration pattern.
+  - **Gotcha hit and fixed:** `vue-echarts` injects its own global `<style>x-vue-echarts{height:100%}</style>`
+    into `document.head` at runtime, unlayered. CSS cascade layers make unlayered rules always beat
+    layered ones (Tailwind v4 generates all utilities inside `@layer utilities`), so a height
+    utility class placed directly on `<v-chart>` was always losing to that injected rule, and
+    `height:100%` against an auto-height parent collapsed to 0. Fixed by giving a wrapping `<div>`
+    the explicit `h-[160px] w-full` instead of putting it on `<v-chart>` itself — a selector
+    vue-echarts' injected CSS doesn't target — so the percentage height it sets has something
+    concrete to resolve against.
+- `src/components/PartyPanel.vue` — the expanded body's previous "Expanded party controls will live
+  here later" placeholder (from P1.7) is now real: a "Polling history" `PartyStatCard` holding the
+  new chart, and two `LeverCard`s (Fundraising / Social media) wired to `usePartyLevers`. The
+  existing direct `pauseClock()`/`resumeClock()` toggle on expand/collapse is left as-is — P2.8
+  (the shared menu-pause flag this task's contract says to reuse if it landed first) is still
+  `🔲 TODO`.
+- **Scoped deliberately narrow:** only fundraising and social media are real, playable levers, per
+  the acceptance criteria's "at least" — staffing, policy, campaigning and leadership levers from
+  `GAME_SPEC.md` §9.3 are left for later.
+- Covered by 4 new tests in `src/stores/game.spec.ts` (`useGameStore player levers — P2.9`):
+  fundraising raises finance and starts a cooldown; is a no-op while on cooldown; social media
+  grows membership and queues exactly one `pendingPollImpacts` entry through the existing seam;
+  cooldowns count down correctly as `game.date` advances. Manually verified end-to-end in
+  `npm run dev` via Playwright (click through party select → start → expand panel → trigger both
+  levers → confirm finance/membership/feed/cooldown UI and the now-visibly-sized polling chart).
+- **Acceptance:** fundraising and social media are real, playable levers that move
+  finance/membership/polling through the existing sim contract; the clock pauses while the panel
+  is expanded; `npm run build` and the test suite are clean.
