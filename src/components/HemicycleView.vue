@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
-import { buildHemicycleSlots, computeHemicycleLayout, slotToPosition } from '@/sim/hemicycle'
+import { buildHemicycleSlots, computeHemicycleLayout, computeHouseSlots, slotToPosition } from '@/sim/hemicycle'
+import type { CandidateResult, Region, Seat } from '@/types'
 
 const gameStore = useGameStore()
 const scenarioStore = useScenarioStore()
@@ -12,33 +13,28 @@ const uiStore = useUiStore()
 const VIEWPORT_WIDTH = 500
 const VIEWPORT_HEIGHT = 200
 const DOT_RADIUS = 2.5
-const HOVER_HIT_RADIUS = DOT_RADIUS * 2.2 // bigger than the visible dot, for an easier hover target
+const HOVER_HIT_RADIUS = DOT_RADIUS * 2.2
 
-// NI's parties are grouped into a single "NI" slice for this view (they're
-// still tracked individually elsewhere in the data model); the Speaker is
-// shown merged into Independent rather than as their own slice.
 const NI_PARTY_IDS = ['dup', 'sinn_fein', 'sdlp', 'alliance', 'uup', 'tuv']
 const NI_GROUP_COLOUR = '#6B5B95'
 const SPEAKER_PARTY_ID = 'speaker'
 const INDEPENDENT_PARTY_ID = 'independent'
 
-function activeSeatCounts() {
-  if (uiStore.activeView === 'westminster') return gameStore.commonsSeatsByParty
-
-  const counts: Record<string, number> = {}
-  const tierEntries =
-    uiStore.activeView === 'regional'
-      ? Object.entries(scenarioStore.scenario.tiers).filter(([tierId]) =>
-          ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'].includes(tierId),
-        )
-      : [['councils', scenarioStore.councilRegionsForLevel(uiStore.activeCouncilLevel)] as const]
-
-  for (const [, regions] of tierEntries) {
-    for (const seat of regions.flatMap((region) => region.seats)) {
-      counts[seat.party] = (counts[seat.party] ?? 0) + 1
-    }
-  }
-  return counts
+interface SeatDetail {
+  id: string
+  party: string
+  regionName: string
+  tier: string
+  memberName?: string
+  majority?: number
+  voteShare?: number
+  electedAt?: string
+  turnout?: number
+  electorate?: number
+  wardName?: string
+  nextElection?: string
+  seatType?: Seat['seatType']
+  results?: CandidateResult[]
 }
 
 interface PartyWithSeats {
@@ -48,94 +44,140 @@ interface PartyWithSeats {
   colour: string
   seats: number
   economicPosition: number
+  seatDetails: SeatDetail[]
 }
 
-// Compute ordered list of parties with seat counts
+function groupedPartyId(partyId: string) {
+  if (NI_PARTY_IDS.includes(partyId)) return 'ni'
+  if (partyId === SPEAKER_PARTY_ID) return INDEPENDENT_PARTY_ID
+  return partyId
+}
+
+function seatDetail(region: Region, seat: Seat, seatIndex: number): SeatDetail {
+  return {
+    id: `${region.tier}:${region.id}:${seatIndex}`,
+    party: groupedPartyId(seat.party),
+    regionName: region.name,
+    tier: region.tier,
+    memberName: seat.memberName,
+    majority: seat.majority,
+    voteShare: seat.voteShare,
+    electedAt: seat.electedAt,
+    turnout: seat.turnout,
+    electorate: seat.electorate,
+    wardName: seat.wardName,
+    nextElection: seat.nextElection,
+    seatType: seat.seatType,
+    results: seat.results,
+  }
+}
+
+function seatDetailsForRegions(regions: Region[]) {
+  const details: SeatDetail[] = []
+  for (const region of regions) {
+    for (const [seatIndex, seat] of region.seats.entries()) {
+      details.push(seatDetail(region, seat, seatIndex))
+    }
+  }
+  return details
+}
+
+const activeSeatDetails = computed(() => {
+  if (uiStore.activeView === 'westminster') return seatDetailsForRegions(scenarioStore.commonsRegions)
+
+  const regions =
+    uiStore.activeView === 'regional'
+      ? ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'].flatMap(
+          (tierId) => scenarioStore.scenario.tiers[tierId] ?? [],
+        )
+      : scenarioStore.councilRegionsForLevel(uiStore.activeCouncilLevel)
+
+  return seatDetailsForRegions(regions)
+})
+
+const activeViewLabel = computed(() => {
+  if (uiStore.activeView === 'westminster') return 'Westminster'
+  if (uiStore.activeView === 'regional') return 'Regional parliaments'
+  return uiStore.activeCouncilLevel === 'county' ? 'County councils' : 'Local councils'
+})
+
 const partiesWithSeats = computed(() => {
-  const seatCounts = activeSeatCounts()
+  const seatsByParty = new Map<string, SeatDetail[]>()
+  for (const detail of activeSeatDetails.value) {
+    const seats = seatsByParty.get(detail.party) ?? []
+    seats.push(detail)
+    seatsByParty.set(detail.party, seats)
+  }
+
   const parties: PartyWithSeats[] = []
-
-  let niSeats = 0
-  let independentSeats = 0
-
   for (const party of scenarioStore.scenario.parties) {
-    const seats = seatCounts[party.id] ?? 0
-    if (seats === 0) continue
-
-    if (NI_PARTY_IDS.includes(party.id)) {
-      niSeats += seats
-      continue
-    }
-    if (party.id === SPEAKER_PARTY_ID) {
-      independentSeats += seats
-      continue
-    }
-    if (party.id === INDEPENDENT_PARTY_ID) {
-      independentSeats += seats
-      continue
-    }
+    if (NI_PARTY_IDS.includes(party.id) || party.id === SPEAKER_PARTY_ID) continue
+    const seatDetails = seatsByParty.get(party.id) ?? []
+    if (seatDetails.length === 0) continue
 
     parties.push({
       id: party.id,
       name: party.name,
       shortName: party.shortName,
       colour: party.colours.primary,
-      seats,
+      seats: seatDetails.length,
       economicPosition: party.compass?.position.economic ?? 0,
+      seatDetails,
     })
   }
 
-  if (niSeats > 0) {
+  const niSeatDetails = seatsByParty.get('ni') ?? []
+  if (niSeatDetails.length > 0) {
     parties.push({
       id: 'ni',
       name: 'Northern Ireland parties',
       shortName: 'NI',
       colour: NI_GROUP_COLOUR,
-      seats: niSeats,
+      seats: niSeatDetails.length,
       economicPosition: 0,
+      seatDetails: niSeatDetails,
     })
   }
 
-  if (independentSeats > 0) {
+  const independentSeatDetails = seatsByParty.get(INDEPENDENT_PARTY_ID) ?? []
+  if (independentSeatDetails.length > 0) {
     const independentParty = scenarioStore.party(INDEPENDENT_PARTY_ID)
     parties.push({
       id: INDEPENDENT_PARTY_ID,
       name: independentParty?.name ?? 'Independent',
       shortName: independentParty?.shortName ?? 'Ind',
       colour: independentParty?.colours.primary ?? '#909090',
-      seats: independentSeats,
+      seats: independentSeatDetails.length,
       economicPosition: independentParty?.compass?.position.economic ?? 0,
+      seatDetails: independentSeatDetails,
     })
   }
 
-  // Order by economic position (left to right), or by seat count descending if no position
-  parties.sort((a, b) => {
-    const aPosValid = a.economicPosition !== undefined
-    const bPosValid = b.economicPosition !== undefined
-
-    if (aPosValid && bPosValid) {
-      return a.economicPosition - b.economicPosition
-    }
-
-    if (aPosValid) return -1
-    if (bPosValid) return 1
-
-    return b.seats - a.seats
-  })
-
+  parties.sort((a, b) => a.economicPosition - b.economicPosition || b.seats - a.seats)
   return parties
 })
 
-// Build the SVG dots for the hemicycle. Fill order sweeps clockwise across
-// the whole fan (not ring-by-ring), assigning the leftmost contiguous wedge
-// of slots to the largest party, then the next wedge clockwise to the next
-// largest, and so on — the way real hemicycle seating charts are drawn.
+const totalSeatCount = computed(() => activeSeatDetails.value.length)
+const seatsPerDot = computed(() => {
+  if (totalSeatCount.value > 5_000) return 100
+  if (totalSeatCount.value > 900) return 10
+  return 1
+})
+
+const isHemicycleMode = ref(true)
+function toggleViewMode() {
+  isHemicycleMode.value = !isHemicycleMode.value
+}
+
 const dots = computed(() => {
   const partiesBySize = [...partiesWithSeats.value].sort((a, b) => b.seats - a.seats)
   const partyDotCounts = partiesBySize.map((party) => Math.max(1, Math.ceil(party.seats / seatsPerDot.value)))
   const totalDots = partyDotCounts.reduce((sum, count) => sum + count, 0)
-  const layout = computeHemicycleLayout(totalDots, 1)
-  const slots = buildHemicycleSlots(layout.rows)
+  const slots = isHemicycleMode.value
+    ? buildHemicycleSlots(computeHemicycleLayout(totalDots, 1).rows).map((slot) =>
+        slotToPosition(slot, VIEWPORT_WIDTH, VIEWPORT_HEIGHT),
+      )
+    : computeHouseSlots(totalDots, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, DOT_RADIUS)
 
   const result: Array<{
     id: string
@@ -146,24 +188,23 @@ const dots = computed(() => {
     colour: string
     seatIndex: number
     partySeatTotal: number
+    representedSeats: SeatDetail[]
   }> = []
 
   let slotIndex = 0
-
   partiesBySize.forEach((party, partyIndex) => {
     for (let i = 0; i < partyDotCounts[partyIndex]; i++) {
       const slot = slots[slotIndex]
-      const position = slotToPosition(slot, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
-
       result.push({
         id: `${party.id}-${i}`,
         partyId: party.id,
         partyName: party.name,
-        x: position.x,
-        y: position.y,
+        x: slot.x,
+        y: slot.y,
         colour: party.colour,
         seatIndex: slotIndex,
         partySeatTotal: party.seats,
+        representedSeats: party.seatDetails.slice(i * seatsPerDot.value, (i + 1) * seatsPerDot.value),
       })
 
       slotIndex++
@@ -173,34 +214,37 @@ const dots = computed(() => {
   return result
 })
 
-const totalSeats = computed(() => activeSeatCounts())
-const totalSeatCount = computed(() =>
-  Object.values(totalSeats.value).reduce((sum, count) => sum + count, 0),
-)
-const seatsPerDot = computed(() => {
-  if (totalSeatCount.value > 5_000) return 100
-  if (totalSeatCount.value > 900) return 10
-  return 1
-})
+const hoveredPartyId = ref<string | null>(null)
+const selectedPartyId = ref<string | null>(null)
+const selectedDotId = ref<string | null>(null)
 
-// View-mode toggle (P2 stub): will switch between the hemicycle dot fan (⌒)
-// and a "house" view (=) — see GAME_SPEC.md §9.2. No behaviour yet, just the
-// affordance and its icon state.
-const isHemicycleMode = ref(true)
-function toggleViewMode() {
-  isHemicycleMode.value = !isHemicycleMode.value
+const selectedParty = computed(() => partiesWithSeats.value.find((party) => party.id === selectedPartyId.value) ?? null)
+const selectedDot = computed(() => dots.value.find((dot) => dot.id === selectedDotId.value) ?? null)
+const selectedSeats = computed(() => selectedParty.value?.seatDetails ?? [])
+const visibleSelectedSeats = computed(() => selectedSeats.value.slice(0, 120))
+const selectedDotSeats = computed(() => selectedDot.value?.representedSeats ?? [])
+
+function selectedTopResult(detail: SeatDetail) {
+  return detail.results?.[0]
 }
 
-// Hovering any one seat highlights every seat held by that party/group.
-const hoveredPartyId = ref<string | null>(null)
+function selectDot(dot: { id: string; partyId: string }) {
+  selectedPartyId.value = dot.partyId
+  selectedDotId.value = dot.id
+}
 
-// Collapsible, same pattern (and clock pause/resume) as PartyPanel.
+function clearSelection() {
+  selectedPartyId.value = null
+  selectedDotId.value = null
+}
+
 const isExpanded = ref(false)
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
   if (isExpanded.value) {
     gameStore.pauseClock()
   } else {
+    clearSelection()
     gameStore.resumeClock()
   }
 }
@@ -238,7 +282,7 @@ const largestParty = computed(() => {
         :aria-checked="isHemicycleMode"
         class="absolute left-2 top-2 z-10 inline-flex h-8 w-16 items-center rounded-full bg-zinc-800/80 px-1.5 transition-colors hover:bg-zinc-700/80"
         :aria-label="isHemicycleMode ? 'Switch to house view' : 'Switch to hemicycle view'"
-        title="Switch view (not yet functional)"
+        title="Switch view"
         @click="toggleViewMode"
       >
         <span class="pointer-events-none flex w-full items-center justify-between px-2 text-base leading-none text-zinc-400">
@@ -259,10 +303,8 @@ const largestParty = computed(() => {
         viewBox="0 0 500 200"
         class="drop-shadow-lg"
       >
-        <!-- Render dots -->
         <g class="hemicycle-dots">
           <g v-for="dot of dots" :key="dot.id">
-            <!-- Invisible hit target, slightly larger than the visible dot -->
             <circle
               :cx="dot.x"
               :cy="dot.y"
@@ -270,14 +312,17 @@ const largestParty = computed(() => {
               fill="transparent"
               :data-party="dot.partyId"
               class="cursor-pointer"
+              tabindex="0"
+              role="button"
+              :aria-label="`${dot.partyName}: ${dot.partySeatTotal} seats in ${activeViewLabel}`"
+              @click="selectDot(dot)"
+              @keydown.enter.prevent="selectDot(dot)"
+              @keydown.space.prevent="selectDot(dot)"
               @mouseenter="hoveredPartyId = dot.partyId"
               @mouseleave="hoveredPartyId = null"
             >
               <title>{{ dot.partyName }} · {{ dot.partySeatTotal }} seats</title>
             </circle>
-            <!-- Visible dot. Hover "grow" uses a CSS transform (compositor-only)
-                 rather than changing the SVG r attribute, which would force a
-                 geometry relayout on every hover change. -->
             <circle
               :cx="dot.x"
               :cy="dot.y"
@@ -285,27 +330,97 @@ const largestParty = computed(() => {
               :fill="dot.colour"
               class="pointer-events-none transition-[opacity,filter,transform] duration-100 [transform-box:fill-box] [transform-origin:center]"
               :class="
-                hoveredPartyId === null
-                  ? 'opacity-90'
-                  : hoveredPartyId === dot.partyId
-                    ? 'scale-[1.2] opacity-100'
-                    : 'opacity-20'
+                selectedPartyId === dot.partyId
+                  ? 'scale-[1.25] opacity-100'
+                  : hoveredPartyId === null
+                    ? 'opacity-90'
+                    : hoveredPartyId === dot.partyId
+                      ? 'scale-[1.2] opacity-100'
+                      : 'opacity-20'
               "
-              :style="hoveredPartyId === dot.partyId ? 'filter: brightness(1.2) saturate(1.2)' : ''"
+              :style="hoveredPartyId === dot.partyId || selectedPartyId === dot.partyId ? 'filter: brightness(1.2) saturate(1.2)' : ''"
             />
           </g>
         </g>
       </svg>
 
-      <!-- Legend -->
       <div class="flex flex-wrap items-center justify-center gap-4">
-        <div v-for="party of partiesWithSeats" :key="party.id" class="flex items-center gap-2">
-          <div :style="{ backgroundColor: party.colour }" class="h-3 w-3 rounded-full"></div>
+        <button
+          v-for="party of partiesWithSeats"
+          :key="party.id"
+          type="button"
+          class="flex items-center gap-2 rounded px-1.5 py-1 text-left transition hover:bg-zinc-800/70"
+          :class="selectedPartyId === party.id ? 'bg-zinc-800/90 text-zinc-100' : ''"
+          @click="selectedPartyId = party.id"
+        >
+          <span :style="{ backgroundColor: party.colour }" class="h-3 w-3 rounded-full"></span>
           <span class="text-xs font-medium">{{ party.shortName }} ({{ party.seats }})</span>
+        </button>
+      </div>
+
+      <div
+        v-if="selectedParty"
+        class="w-full rounded border border-zinc-800 bg-zinc-950/80 text-left shadow-xl"
+      >
+        <div class="flex items-start justify-between gap-3 border-b border-zinc-800 px-3 py-2">
+          <div>
+            <p class="text-sm font-semibold text-zinc-100">{{ selectedParty.name }}</p>
+            <p class="text-xs text-zinc-400">
+              {{ selectedParty.seats.toLocaleString() }} seats · {{ activeViewLabel }}
+              <span v-if="seatsPerDot > 1"> · {{ seatsPerDot }} seats per dot</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="rounded px-2 py-1 text-xs text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
+            aria-label="Close seat breakdown"
+            @click="clearSelection"
+          >
+            Close
+          </button>
+        </div>
+
+        <div v-if="selectedDotSeats.length > 1" class="border-b border-zinc-800 px-3 py-2 text-xs text-zinc-300">
+          Selected dot:
+          {{ selectedDotSeats[0]?.regionName }}
+          <span v-if="selectedDotSeats.length > 1">
+            to {{ selectedDotSeats[selectedDotSeats.length - 1]?.regionName }}
+          </span>
+          ({{ selectedDotSeats.length }} seats)
+        </div>
+
+        <div class="max-h-64 overflow-y-auto px-3 py-2">
+          <div
+            v-for="detail of visibleSelectedSeats"
+            :key="detail.id"
+            class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-b border-zinc-900 py-1.5 last:border-b-0"
+          >
+            <div class="min-w-0">
+              <p class="truncate text-xs font-medium text-zinc-100">
+                {{ detail.wardName ?? detail.regionName }}
+              </p>
+              <p class="truncate text-xs text-zinc-400">
+                <span v-if="detail.memberName">{{ detail.memberName }}</span>
+                <span v-else>{{ detail.tier }}</span>
+              </p>
+            </div>
+            <div class="text-right text-xs text-zinc-400">
+              <p v-if="detail.majority">Maj {{ detail.majority.toLocaleString() }}</p>
+              <p v-else-if="detail.voteShare">{{ detail.voteShare.toFixed(1) }}%</p>
+              <p v-else-if="selectedTopResult(detail)">{{ selectedTopResult(detail)?.voteShare.toFixed(1) }}%</p>
+              <p v-if="detail.nextElection">Next {{ detail.nextElection }}</p>
+            </div>
+          </div>
+          <p v-if="selectedSeats.length > visibleSelectedSeats.length" class="pt-2 text-xs text-zinc-500">
+            Showing first {{ visibleSelectedSeats.length.toLocaleString() }} of
+            {{ selectedSeats.length.toLocaleString() }} seats.
+          </p>
         </div>
       </div>
 
-      <p class="text-xs text-zinc-500">Total: {{ totalSeatCount }} seats</p>
+      <p class="text-xs text-zinc-500">
+        Total: {{ totalSeatCount.toLocaleString() }} seats
+      </p>
     </div>
   </div>
 </template>

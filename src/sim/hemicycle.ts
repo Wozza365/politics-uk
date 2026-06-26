@@ -92,6 +92,13 @@ export interface HemicycleSlot {
   angle: number
 }
 
+export interface HouseSlot {
+  x: number
+  y: number
+  row: number
+  column: number
+}
+
 /**
  * Flatten every row into individual dot slots, sorted by angle ascending
  * (left → right, i.e. clockwise across the fan), then by radius ascending
@@ -135,4 +142,45 @@ export function slotToPosition(
   const y = centerY - slot.radius * Math.cos(slot.angle)
 
   return { x, y }
+}
+
+/**
+ * Compute a compact rows-of-benches layout for the alternate "house" view.
+ * Slots are filled left-to-right, top-to-bottom so callers can keep the same
+ * party ordering as the fan while giving players a flatter grid-like read.
+ */
+export function computeHouseSlots(
+  dotCount: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  dotRadius: number,
+): HouseSlot[] {
+  if (dotCount <= 0) return []
+
+  const horizontalPadding = 36
+  const verticalPadding = 28
+  const minGap = dotRadius * 2.8
+  const usableWidth = Math.max(minGap, viewportWidth - horizontalPadding * 2)
+  const usableHeight = Math.max(minGap, viewportHeight - verticalPadding * 2)
+  const columns = Math.max(1, Math.ceil(Math.sqrt((dotCount * usableWidth) / usableHeight)))
+  const rows = Math.ceil(dotCount / columns)
+  const columnGap = columns > 1 ? usableWidth / (columns - 1) : 0
+  const rowGap = rows > 1 ? usableHeight / (rows - 1) : 0
+  const firstX = columns > 1 ? horizontalPadding : viewportWidth / 2
+  const firstY = rows > 1 ? verticalPadding : viewportHeight / 2
+
+  return Array.from({ length: dotCount }, (_, index) => {
+    const row = Math.floor(index / columns)
+    const column = index % columns
+    const dotsInRow = Math.min(columns, dotCount - row * columns)
+    const rowWidth = (dotsInRow - 1) * columnGap
+    const rowStartX = dotsInRow > 1 ? viewportWidth / 2 - rowWidth / 2 : viewportWidth / 2
+
+    return {
+      x: dotsInRow === columns ? firstX + column * columnGap : rowStartX + column * columnGap,
+      y: firstY + row * rowGap,
+      row,
+      column,
+    }
+  })
 }
