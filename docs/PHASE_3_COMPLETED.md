@@ -73,3 +73,76 @@ file.
   rejected via a recoverable `SaveValidationError` without crashing the app or touching the live
   game or any other save. The restored game's clock is always paused until the player explicitly
   resumes it. `npm run build` and the full test suite are clean.
+
+## P3.1 — Autosave, manual slots, and portable saves ✅
+
+- `src/save/autosave.ts` (new) — `AutosaveScheduler`, a pure, store-free class: `schedule()`
+  debounces a burst of trigger actions into one `write()`; `flush()` cancels the pending debounce
+  and writes immediately (the player-facing "save now" escape hatch, and what the page-visibility
+  seam below calls); a write already in flight is never overlapped — a `schedule()`/`flush()` that
+  arrives mid-write sets `rerunRequested` and queues exactly one more pass once the in-flight write
+  settles, so the latest state always ends up persisted. Reports `'idle' | 'pending' | 'saving' |
+  'saved' | 'error'` through `onStatusChange`, never claiming success before `write()` resolves.
+  `BrowserLifecycleSeam` abstracts `document`'s `visibilitychange`/`pagehide` behind
+  `addListener(handler)` so it's testable with a fake seam; the real `documentLifecycleSeam` guards
+  on `typeof document === 'undefined'` so the module is safe to import under Vitest's plain Node
+  test environment (no jsdom in this project). Covered by 8 tests in `src/save/autosave.spec.ts`
+  (coalescing, status sequencing, failed-write recovery, flush cancelling/no-op behaviour, the
+  in-flight rerun queue, seam-triggered flush, and `dispose()`).
+- `src/types/save.ts`/`src/save/codec.ts`/`src/save/repository.ts`/`src/save/indexedDbRepository.ts`
+  — added an optional `summary?: string` field to `SaveMetadata`/`SaveSummary` (thumbnail-free
+  one-line polling/cash summary, computed once at write time and never recomputed live — the
+  "immutable manual-slot metadata" requirement) and threaded it through validation/decoding/
+  metadata projection. Additive and backward-compatible — no format-version bump.
+- `src/stores/save.ts` — rewritten around the scheduler: `startAutosave()` (idempotent — a second
+  call is a no-op) wires `AutosaveScheduler` to the game store's completed domain actions via a
+  detached `$onAction` hook scoped to a fixed `AUTOSAVE_TRIGGER_ACTIONS` set (`tickDay`,
+  `resolveFeedAction`, `actionContest`, `runFundraisingAppeal`, `runSocialMediaCampaign`,
+  `continuePlaying`) and to the page-visibility seam; `saving`/`lastSavedAt`/`lastWriteError` state
+  mirrors the scheduler's status for the UI. New commands: `saveNow` (flushes the scheduler, or
+  writes directly if it hasn't started yet), `createManualSave`, `overwriteManualSave` (refuses a
+  target whose `kind !== 'manual'` — covers both "no such id" and "that id is the live autosave
+  slot"), `renameManualSave` (label only, save state untouched), `deleteSave` (renamed from
+  `removeSave`), `exportSave` (JSON text, no DOM access — `useSaveManagement.ts` owns the actual
+  download), `importSave` (decodes through the P3.0 validator, always imports as `kind: 'manual'`,
+  and — critically — mints a fresh id when the decoded save's original id was the reserved
+  `'autosave'` slot, so re-importing an exported autosave can never collide with and silently
+  overwrite the live rolling autosave; refuses to overwrite any other existing id without
+  `opts.confirmOverwrite`, returning a typed `conflict` result instead).
+- `src/stores/ui.ts` — `saveManagementPanelOpen` + `toggleSaveManagementPanel`/
+  `closeSaveManagementPanel`, mirroring the existing `byElectionsPanelOpen` pattern; always reset
+  on `hydrateFromSaveState` (never persisted, like the other transient panel flags).
+- `src/components/SaveStatusIndicator.vue` (new) — compact `aria-live="polite"` HUD text driven by
+  `useSaveStore()`; renders "Saving…"/"Saved"/"Save failed" (or nothing while merely `'pending'`),
+  never implying success before the repository resolves. Mounted in `src/components/GameClock.vue`
+  next to a new "Saves" toggle button that opens `SaveManagementPanel` through the same
+  `ui.openMenu()`/`game.pauseClock()` pause-gate pattern the by-elections panel uses.
+- `src/components/ConfirmDialog.vue` (new) — generic accessible confirm modal
+  (`role="alertdialog"`, `aria-modal="true"`), focuses its confirm button on mount, Escape cancels.
+- `src/composables/useSaveManagement.ts` (new) — wraps `useSaveStore()` for the panel: a
+  `manualSaves` computed (filtered to `kind === 'manual'`, sorted newest-first), and
+  `createSave`/`overwriteSave`/`renameSave`/`deleteSave`/`exportSave` (Blob + anchor download,
+  revokes the object URL after triggering it)/`importSaveFile` (reads a `File` to text, then calls
+  `save.importSave`).
+- `src/components/SaveManagementPanel.vue` (new) — lists manual slots (label, summary, updated
+  date) with overwrite/rename/export/delete actions, a labelled "new save" input, and a file-input
+  driven import flow; delete and import-conflict-overwrite both go through `ConfirmDialog`.
+  Toggled from `GameClock.vue`, mounted in `src/screens/GameScreen.vue`.
+- `src/App.vue` — calls `useSaveStore().startAutosave()` once, for the app's lifetime.
+- Covered by 8 new tests in `src/save/autosave.spec.ts` plus a ~16-test block in
+  `src/stores/save.spec.ts` (one autosave per coalesced trigger burst; triggers on a resolved feed
+  action and a resolved contest action; no write during hydration; `startAutosave` idempotency;
+  `saveNow` flushing the debounce; a failed write surfacing as a recoverable error without losing
+  the prior autosave; manual-slot create/overwrite/rename/delete; overwrite refusing to target the
+  autosave slot; export/import round trip; duplicate-import conflict then confirmed overwrite;
+  importing an exported autosave landing as a manual slot under a fresh id; malformed-JSON import
+  rejection). All 135 project tests and `npm run build` pass; manually verified via `npm run dev`
+  (Playwright smoke pass) — day tick debounces into a "Saved" status, the Saves panel creates/
+  deletes a manual slot, and the delete confirmation dialog focuses its confirm button.
+- **Acceptance:** after a day tick, a lever action, and a contest action, the live game's
+  `writeSave('autosave')` (exercised via the scheduler in `save.spec.ts`) captures all three changes
+  in one record — restoring it (P3.0's `loadSave`) reproduces the same playable state. Manual saves
+  can be created, named, overwritten, renamed, deleted, and exported/imported without ever
+  corrupting the rolling autosave (including the previously-broken edge case of re-importing an
+  exported autosave). A failed write leaves the prior autosave and the live game intact and is
+  surfaced as a recoverable status, never thrown.

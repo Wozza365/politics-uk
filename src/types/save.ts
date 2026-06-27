@@ -31,6 +31,9 @@ export interface SaveMetadata {
    * it rather than relying on ambient `Math.random()` (the current sim keys everything off
    * `date`/id strings instead, so nothing needs this yet). */
   playthroughSeed: number
+  /** Thumbnail-free one-line summary (e.g. party/polling/cash) computed once at write time (P3.1
+   * save policy: manual-slot metadata is immutable) — never recomputed from live state on read. */
+  summary?: string
 }
 
 /** Mutable `game` store state worth persisting — static scenario data, derived getters, and
@@ -85,6 +88,7 @@ export interface SaveSummary {
   createdAt: string
   updatedAt: string
   label?: string
+  summary?: string
   date: ISODate
   selectedPartyId: PartyId | null
 }

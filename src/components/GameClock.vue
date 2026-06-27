@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { useGameClock } from '@/composables/useGameClock'
+import SaveStatusIndicator from '@/components/SaveStatusIndicator.vue'
 import type { ISODate } from '@/types'
 
 const game = useGameStore()
@@ -14,6 +15,17 @@ useGameClock()
 function toggleByElectionsPanel() {
   ui.toggleByElectionsPanel()
   if (ui.byElectionsPanelOpen) {
+    ui.openMenu()
+    game.pauseClock()
+  } else {
+    ui.closeMenu()
+    game.resumeClockIfClear()
+  }
+}
+
+function toggleSaveManagementPanel() {
+  ui.toggleSaveManagementPanel()
+  if (ui.saveManagementPanelOpen) {
     ui.openMenu()
     game.pauseClock()
   } else {
@@ -76,6 +88,18 @@ const clockIconStyle = computed(() => ({
         <path d="M5 12h14M13 6l6 6-6 6" />
       </svg>
     </button>
+    <div class="flex shrink-0 flex-col items-end gap-1">
+      <button
+        type="button"
+        class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+        :aria-expanded="ui.saveManagementPanelOpen"
+        aria-label="Open save management panel"
+        @click="toggleSaveManagementPanel"
+      >
+        Saves
+      </button>
+      <SaveStatusIndicator />
+    </div>
   </div>
 </template>
 

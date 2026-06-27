@@ -30,6 +30,7 @@ export const useUiStore = defineStore('ui', {
     // at once can't have one's close prematurely resume the clock while the other is still open.
     openMenus: 0,
     byElectionsPanelOpen: false,
+    saveManagementPanelOpen: false,
     mapFocusRequest: null as MapFocusRequest | null,
   }),
   actions: {
@@ -44,6 +45,12 @@ export const useUiStore = defineStore('ui', {
     },
     closeByElectionsPanel() {
       this.byElectionsPanelOpen = false
+    },
+    toggleSaveManagementPanel() {
+      this.saveManagementPanelOpen = !this.saveManagementPanelOpen
+    },
+    closeSaveManagementPanel() {
+      this.saveManagementPanelOpen = false
     },
     requestMapFocus(request: MapFocusRequest) {
       this.mapFocusRequest = request
@@ -95,6 +102,7 @@ export const useUiStore = defineStore('ui', {
         : 'geographic'
       this.openMenus = 0
       this.byElectionsPanelOpen = false
+      this.saveManagementPanelOpen = false
       this.mapFocusRequest = null
     },
   },

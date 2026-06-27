@@ -43,6 +43,7 @@ function toMetadata(save: SaveGameV1): SaveMetadata {
     updatedAt: save.updatedAt,
     label: save.label,
     playthroughSeed: save.playthroughSeed,
+    summary: save.summary,
   }
 }
 

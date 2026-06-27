@@ -144,7 +144,8 @@ export function decodeSaveEnvelope(value: unknown): SaveDecodeResult {
     !isString(migrated.createdAt) ||
     !isString(migrated.updatedAt) ||
     !isNumber(migrated.playthroughSeed) ||
-    (migrated.label !== undefined && !isString(migrated.label))
+    (migrated.label !== undefined && !isString(migrated.label)) ||
+    (migrated.summary !== undefined && !isString(migrated.summary))
   ) {
     return err('invalid-envelope', 'Save metadata is missing or malformed.')
   }
@@ -165,6 +166,7 @@ export function decodeSaveEnvelope(value: unknown): SaveDecodeResult {
       updatedAt: migrated.updatedAt,
       label: migrated.label as string | undefined,
       playthroughSeed: migrated.playthroughSeed,
+      summary: migrated.summary as string | undefined,
       state: { game: state.game, ui: state.ui },
     },
   }
@@ -205,6 +207,7 @@ export function summariseSaveGame(save: SaveGameV1): SaveSummary {
     createdAt: save.createdAt,
     updatedAt: save.updatedAt,
     label: save.label,
+    summary: save.summary,
     date: save.state.game.date,
     selectedPartyId: save.state.game.selectedPartyId,
   }

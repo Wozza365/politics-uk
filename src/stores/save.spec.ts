@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useGameStore } from './game'
 import { useUiStore } from './ui'
 import { useSaveStore } from './save'
@@ -163,5 +163,294 @@ describe('useSaveStore — P3.0 save contract', () => {
 
     expect(await repository.read('autosave')).toBeNull()
     expect(await repository.read(manual.id)).not.toBeNull()
+  })
+})
+
+describe('useSaveStore — P3.1 autosave scheduler, manual slots, portable saves', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('schedules an autosave after each required trigger point, coalescing a same-tick burst into one write', async () => {
+    const repository = new InMemorySaveRepository()
+    const writeSpy = vi.spyOn(repository, 'write')
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    save.startAutosave()
+    writeSpy.mockClear() // startGame() isn't a trigger, but clear defensively
+
+    game.tickDay()
+    game.runFundraisingAppeal()
+    game.runSocialMediaCampaign()
+    expect(writeSpy).not.toHaveBeenCalled() // debounced, not written yet
+
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(writeSpy).toHaveBeenCalledTimes(1)
+    expect(save.lastSavedAt).not.toBeNull()
+    expect((await repository.read('autosave'))).not.toBeNull()
+  })
+
+  it('triggers on a resolved feed action and a resolved contest action', async () => {
+    const repository = new InMemorySaveRepository()
+    const writeSpy = vi.spyOn(repository, 'write')
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    save.startAutosave()
+    writeSpy.mockClear()
+
+    const event: GameEvent = {
+      id: 'evt-autosave-trigger',
+      headline: 'Test event',
+      scope: 'regional',
+      severity: 'moderate',
+      weight: 1,
+      actions: [{ id: 'respond', label: 'Respond' }],
+    }
+    game.pendingEvents.push(event)
+    game.recordFeedEntry({ id: event.id, date: game.date, headline: event.headline, status: 'unactioned', actions: [{ id: 'respond', label: 'Respond' }] })
+    game.resolveFeedAction(event.id, 'respond')
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(writeSpy).toHaveBeenCalledTimes(1)
+
+    writeSpy.mockClear()
+    game.contests.push({
+      id: 'byelection:commons:test-region:2025-01-02',
+      contestTier: 'commons',
+      regionId: 'test-region',
+      geometryRef: 'test-region',
+      seatName: 'Test Seat',
+      incumbentParty: 'labour',
+      calledDate: game.date,
+      status: 'pending',
+    })
+    game.actionContest(game.contests[0].id, 'local_push')
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(writeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not write during hydration (loadSave/hydrateFromSaveState is not a trigger action)', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    game.tickDay()
+    const metadata = await save.writeSave('manual', 'checkpoint')
+
+    save.startAutosave()
+    const writeSpy = vi.spyOn(repository, 'write')
+
+    await save.loadSave(metadata.id)
+    await vi.advanceTimersByTimeAsync(5000)
+
+    expect(writeSpy).not.toHaveBeenCalled()
+  })
+
+  it('startAutosave is idempotent — a second call does not double-subscribe', async () => {
+    const repository = new InMemorySaveRepository()
+    const writeSpy = vi.spyOn(repository, 'write')
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    save.startAutosave()
+    save.startAutosave()
+    writeSpy.mockClear()
+
+    game.tickDay()
+    await vi.advanceTimersByTimeAsync(2000)
+
+    expect(writeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('saveNow() flushes the debounced autosave immediately', async () => {
+    const repository = new InMemorySaveRepository()
+    const writeSpy = vi.spyOn(repository, 'write')
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    save.startAutosave()
+    writeSpy.mockClear()
+
+    game.tickDay()
+    await save.saveNow()
+
+    expect(writeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('surfaces a failed autosave write as a recoverable error without throwing or losing the prior autosave', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    await save.writeSave('autosave') // a prior good autosave exists
+
+    save.startAutosave()
+    vi.spyOn(repository, 'write').mockRejectedValueOnce(new Error('storage quota exceeded'))
+
+    game.tickDay()
+    await vi.advanceTimersByTimeAsync(2000)
+
+    expect(save.lastWriteError).toContain('storage quota exceeded')
+    expect(await repository.read('autosave')).not.toBeNull() // prior autosave untouched
+  })
+
+  it('createManualSave writes a labelled, summarised manual slot distinct from the autosave', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+
+    const metadata = await save.createManualSave('Before the by-election')
+
+    expect(metadata.kind).toBe('manual')
+    expect(metadata.id).not.toBe('autosave')
+    expect(metadata.summary).toContain('Lab')
+  })
+
+  it('overwriteManualSave re-saves into the same slot, keeping id/createdAt but refreshing state/summary', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    const original = await save.createManualSave('Checkpoint')
+    const originalRaw = (await repository.read(original.id)) as SaveGameV1
+
+    game.tickDay()
+    const updated = await save.overwriteManualSave(original.id)
+
+    expect(updated?.id).toBe(original.id)
+    expect(updated?.label).toBe('Checkpoint')
+    const updatedRaw = (await repository.read(original.id)) as SaveGameV1
+    expect(updatedRaw.createdAt).toBe(originalRaw.createdAt)
+    expect(updatedRaw.state.game.date).not.toBe(originalRaw.state.game.date)
+  })
+
+  it('overwriteManualSave refuses to target the autosave slot', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    await save.writeSave('autosave')
+
+    const result = await save.overwriteManualSave('autosave')
+
+    expect(result).toBeNull()
+  })
+
+  it('renameManualSave updates only the label, leaving saved state untouched', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    const original = await save.createManualSave('Old name')
+
+    const renamed = await save.renameManualSave(original.id, 'New name')
+
+    expect(renamed).toBe(true)
+    expect(save.saves.find((entry) => entry.id === original.id)?.label).toBe('New name')
+  })
+
+  it('deleteSave removes a manual slot', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    const manual = await save.createManualSave('Disposable')
+
+    await save.deleteSave(manual.id)
+
+    expect(await repository.read(manual.id)).toBeNull()
+  })
+
+  it('exports and re-imports a save round trip, restoring equivalent state under a manual slot', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    game.tickDay()
+    const original = await save.createManualSave('Exportable')
+    const exported = await save.exportSave(original.id)
+
+    expect(exported).not.toBeNull()
+    await save.deleteSave(original.id)
+
+    const result = await save.importSave(exported!.json)
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      const imported = await repository.read(result.metadata.id)
+      expect(imported).not.toBeNull()
+      expect(result.metadata.kind).toBe('manual')
+    }
+  })
+
+  it('importSave refuses to silently overwrite a duplicate id, then succeeds once confirmed', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    const original = await save.createManualSave('Original')
+    const exported = await save.exportSave(original.id)
+
+    const firstAttempt = await save.importSave(exported!.json)
+    expect(firstAttempt.ok).toBe(false)
+    if (!firstAttempt.ok && firstAttempt.reason === 'conflict') {
+      expect(firstAttempt.conflict.pendingId).toBe(original.id)
+    } else {
+      throw new Error('expected a conflict result')
+    }
+
+    const confirmed = await save.importSave(exported!.json, { confirmOverwrite: true })
+    expect(confirmed.ok).toBe(true)
+  })
+
+  it('importSave always lands as a manual slot, even when the exported record was the autosave', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    await save.writeSave('autosave')
+    const exported = await save.exportSave('autosave')
+
+    const result = await save.importSave(exported!.json, { confirmOverwrite: true })
+
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.metadata.kind).toBe('manual')
+    // the live autosave slot itself is untouched by the import
+    const liveAutosave = (await repository.read('autosave')) as SaveGameV1
+    expect(liveAutosave.kind).toBe('autosave')
+  })
+
+  it('importSave rejects malformed JSON without throwing', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+
+    const result = await save.importSave('{ not valid json')
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('invalid')
   })
 })

@@ -34,9 +34,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p30--versioned-save-game-contract-and-persistence-repository-)
 for the full record of what was built.
 
-### P3.1 — Autosave, manual slots, and portable saves
+### P3.1 — Autosave, manual slots, and portable saves `✅ DONE`
 
-See [`phase3/P3.1-autosave-slots.md`](./phase3/P3.1-autosave-slots.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p31--autosave-manual-slots-and-portable-saves)
+for the full record of what was built.
 
 ### P3.2 — Main menu, load/new-game flow, and safe game lifecycle
 
