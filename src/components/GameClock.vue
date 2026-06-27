@@ -34,6 +34,17 @@ function toggleGameMenu() {
   }
 }
 
+function toggleTargetingPanel() {
+  ui.toggleTargetingPanel()
+  if (ui.targetingPanelOpen) {
+    ui.openMenu()
+    game.pauseClock()
+  } else {
+    ui.closeMenu()
+    game.resumeClockIfClear()
+  }
+}
+
 // Nothing else starts the clock yet — kick it off once the game screen is up, unless an
 // event is already pending (shouldn't happen this early, but keeps the rule in one place).
 onMounted(() => {
@@ -89,15 +100,26 @@ const clockIconStyle = computed(() => ({
       </svg>
     </button>
     <div class="flex shrink-0 flex-col items-end gap-1">
-      <button
-        type="button"
-        class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
-        :aria-expanded="ui.gameMenuOpen"
-        aria-label="Open game menu"
-        @click="toggleGameMenu"
-      >
-        Menu
-      </button>
+      <div class="flex gap-1.5">
+        <button
+          type="button"
+          class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+          :aria-expanded="ui.targetingPanelOpen"
+          aria-label="Open targeted campaigning panel"
+          @click="toggleTargetingPanel"
+        >
+          Target
+        </button>
+        <button
+          type="button"
+          class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+          :aria-expanded="ui.gameMenuOpen"
+          aria-label="Open game menu"
+          @click="toggleGameMenu"
+        >
+          Menu
+        </button>
+      </div>
       <SaveStatusIndicator />
     </div>
   </div>

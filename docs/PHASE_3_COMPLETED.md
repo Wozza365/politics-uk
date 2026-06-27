@@ -305,3 +305,113 @@ file.
   the same seed produces the same result regardless of save/load timing. P2.8's `ContestCard` and
   P2.9's `LeverCard`/`PartyPanel` both surface disabled reasons and a confirm step for high-cost/
   irreversible actions.
+
+## P3.4 — Targeted campaigning and opponent strategy ✅
+
+- `src/types/action.ts` — `TargetScope` (`kind: 'national' | 'tier' | 'seat' | 'contest'` plus
+  whichever id field matches, and a UI-resolved `label`). `ActiveCommitment`/`ActionOutcome` both
+  gained optional `targetScope?`/`localInfluenceMagnitude?` so a targeting commitment carries where
+  it was aimed and how much bounded local influence it contributes, without a parallel commitment
+  type. `src/types/save.ts`/`src/save/codec.ts` gained an optional `localInfluence?` save field
+  (additive, no version bump — an old save just decodes with `{}`).
+- `src/sim/targeting.ts` (new, pure, store-free) — one `TARGETED_CAMPAIGN` action template
+  (£25k + 12 staff upfront, £2k/day recurring, 14-day duration/cooldown) shared by every scope.
+  `targetActionId(scope)` namespaces a scope into the shared `ActionId` space (`targeting:seat:
+  E14000530`, etc.) so cooldown/`alreadyCommitted` checks are per-target, not per-action-type, and
+  a party can run concurrent campaigns in different places. `isRegionTargetable` restricts 'seat'
+  targeting to commons regions (the only tier with the majority/electorate stats to show
+  competitiveness honestly). `regionIdsForScope` resolves any scope (national/tier/seat/contest) to
+  the concrete region ids it applies to. `resolveTargetingAction(scope, partyId, date)` is
+  deterministic via `seededUniform`: a local scope's real effect is a bounded
+  `localInfluenceMagnitude` (0.4-0.6), with only a small, transparent fraction (15%) spilling into
+  national polling; a national scope skips local influence entirely and resolves as a slightly
+  larger flat polling impact. `clampLocalInfluence`/`NET_LOCAL_INFLUENCE_CAP` bound stacking in
+  either direction; `leadingPartyNetInfluence` resolves competing parties' campaigns in the same
+  region via a net-lead-over-runner-up comparison against `LOCAL_INFLUENCE_FLIP_THRESHOLD`, so two
+  rival campaigns in the same seat cancel out rather than both "winning".
+- `src/sim/opponents.ts` (new, pure, store-free, zero randomness) — deterministic opponent
+  strategy. `isOpponentCadenceDay` gates re-evaluation to once every `OPPONENT_CADENCE_DAYS` (7)
+  days. `marginalityScore(seat)` is `majority / electorate` (capped at 1, null if either stat is
+  missing). `rankTargetingMoves(partyId, commonsRegions, playerTargetedRegionIds)` ranks every
+  commons seat as a defend (held by `partyId`), pursue (held by anyone else), or respond (the
+  player already has an active commitment there) move, scored by how marginal it is and boosted
+  1.5x for a respond move, ties broken on region id for a stable order — a plain sort, never an
+  LLM or hidden roll (spec guardrail). `selectOpponentMove` walks the ranked list and returns the
+  first move the party can actually afford right now, or `null` if nothing is — "preserve scarce
+  resources" falls out of the affordability check rather than a separate budget rule.
+- `src/sim/actions.ts` — `buildCommitment`'s `actionId` param widened from `LeverId` to the full
+  `ActionId` space so targeting commitments share the exact same builder levers use.
+- `src/sim/projection.ts` — `projectSeatsByParty` gained an optional 4th `localInfluenceByRegion`
+  param; for each seat it overrides the uniform-swing winner with `leadingPartyNetInfluence`'s
+  result whenever a region has a decisive local lead, so a scheduled election (and the live seat
+  projection shown throughout play) "consumes" accumulated local influence with no extra plumbing.
+- `src/stores/scenario.ts` — `REGIONAL_TIER_IDS` exported for reuse; new `tierLabel(tierId)`
+  (human-readable label per known tier, falling back to the raw slug) and `regionById` getter (a
+  generic id -> Region lookup spanning every tier including council wards, for resolving any
+  `TargetScope.regionId` without knowing which tier it came from).
+- `src/stores/game.ts` — new `localInfluence: Record<regionId, Record<PartyId, number>>` state.
+  New getters: `targetingAvailability(partyId, scope)` (the same `canTakeAction` gate levers use,
+  shared by the player's panel and the opponent AI), `targetingCooldownRemaining(scope)`,
+  `playerTargetedRegionIds` (every commons region the selected player has an active targeting
+  commitment covering — the opponent AI's "respond to player focus" input),
+  `localInfluenceAt(regionId)`, and `activeTargetingCommitments` (every in-flight commitment with a
+  `targetScope` — the map overlay's and panel's "who's campaigning where" source). New actions:
+  `applyLocalInfluence(scope, partyId, magnitude)` (adds/reverses a commitment's local-influence
+  contribution across its scope's regions, clamped), `runTargetingAction(partyId, scope,
+  rationale?)` (the one entry point every targeted campaign — player or opponent — goes through:
+  validate via `targetingAvailability`, pay, resolve, push the commitment, apply local influence,
+  record a feed entry — an AI move's `rationale` is recorded verbatim as the feed headline, "record
+  public-facing summaries" per spec step 4), and `runOpponentCadence()` (on each cadence day, every
+  eligible non-player party — excluding `scope: 'local'` parties and the player's own — gets at most
+  one move via `rankTargetingMoves`/`selectOpponentMove`, called from `tickDay`). A by-election
+  contest action now adds a bounded polling bonus (50% of accumulated local influence) when the
+  selected party already has a targeting commitment running in that contest's region — "translate
+  it into contest probability" (spec step 3) layered on top of `resolveContestAction`'s own odds,
+  not changing them. `cancelCommitment`/`advanceCommitments` both reverse a targeting commitment's
+  local influence on the way out, same as they already reversed staff/leadership. Save round-trip
+  (`toSaveState`/`hydrateFromSaveState`) and the existing party/lever-cooldown/commitment hydration
+  guards (`pickKnownLeverCooldowns`, `pickKnownCommitments`) were extended to recognise targeting
+  action ids (`targeting:` prefix) alongside `LeverId`.
+- `src/map/MapRenderer.ts`/`SvgMapRenderer.ts`/`HexMapRenderer.ts` — `RegionDisplayState` gained an
+  optional `strokeColor?`, consumed by both renderers' style/overlay paths (falling back to the
+  existing default border colour), so a region can be tinted to show targeting/contest/opponent
+  activity without touching `fill` (which still encodes seat-holder colour).
+- `src/components/MapView.vue` — a new overlay-tinting pass applied to the built `RegionState`
+  just before render: pending contests tinted purple, active targeting commitments tinted cyan
+  (player) or orange (opponent), each gated by a `ui.mapOverlays` toggle. A new bottom-left
+  legend/toggle panel lets the player switch each overlay on/off; new watchers re-draw on
+  `ui.mapOverlays`, `game.activeTargetingCommitments`, or `game.contests` changes.
+- `src/stores/ui.ts` — `targetingPanelOpen` + `mapOverlays: Record<'commitments' | 'contests' |
+  'opponentActivity', boolean>` (transient, never persisted — `hydrateFromSaveState` always resets
+  both to defaults), with `toggleTargetingPanel`/`closeTargetingPanel`/`toggleMapOverlay` actions.
+- `src/composables/useTargeting.ts` (new) — builds the flat, rankable option list the panel shows:
+  national, one per regional/devolved tier, and the top 30 most marginal commons seats (by the same
+  `marginalityScore` the opponent AI ranks by) — deliberately not map-click-driven, per the spec
+  guardrail that targeting "must work without precision pointer gestures". Each option carries its
+  `allowed`/`disabledReason`/cooldown and a `run` callback wired to `runTargetingAction`.
+- `src/components/TargetOptionRow.vue`/`TargetingPanel.vue` (new) — the panel UI, modeled on
+  `LeverCard.vue`/`ByElectionsPanel.vue`: a two-click confirm per option, an optional "View on map"
+  button wired through `ui.requestMapFocus` (never touching the map directly), gated open by
+  `ui.targetingPanelOpen`.
+- `src/components/GameClock.vue`/`src/screens/GameScreen.vue` — a new "Target" button beside the
+  existing "Menu" button, sharing the same `ui.openMenu()`/`game.pauseClock()` pause-gate pattern;
+  `TargetingPanel` mounted in `GameScreen.vue`.
+- Covered by new `src/sim/targeting.spec.ts` (`targetActionId` namespacing/uniqueness,
+  `isTargetingActionId`, `isRegionTargetable`, `regionIdsForScope` for all four scope kinds,
+  `resolveTargetingAction` determinism and its local-vs-national shape, `clampLocalInfluence`, and
+  `leadingPartyNetInfluence`'s no-campaign/under-threshold/over-threshold/lone-party cases) and new
+  `src/sim/opponents.spec.ts` (`marginalityScore`'s null/bounded cases, `isOpponentCadenceDay`'s
+  cadence boundary, `rankTargetingMoves`'s defend/pursue/respond assignment and score ordering with
+  region-id tie-break, and `selectOpponentMove`'s affordable-skip/none-affordable/empty-list cases).
+  All 201 project tests (bar two long-running, pre-existing P2.8 tests that only time out under
+  full-suite CPU contention and pass in isolation — unrelated to this task), `npm run build`, and
+  `npm run validate:data` pass.
+- **Acceptance:** a player can aim a campaign at a real place — a seat, a tier, a contest, or the
+  whole country — using only real region/tier/contest identifiers, never an invented one. The
+  effect is bounded and transparent: a fixed local-influence range per campaign, a small defined
+  national spillover, and an explicit cancellation rule when rival campaigns target the same place.
+  Every opposing party's targeting choice is a plain, inspectable ranking over real marginality
+  data — never an LLM call or a hidden dice roll — and is bounded by the same cost/cooldown/capacity
+  gate the player is held to, so an under-resourced party simply sits a cadence tick out. The map
+  shows targeting/contest/opponent activity through toggleable overlays without the per-tier
+  `regionState/` builders ever knowing P3.4 exists.

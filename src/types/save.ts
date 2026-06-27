@@ -56,6 +56,10 @@ export interface GameSaveStateV1 {
    * already-resolved outcome, so resuming a save mid-commitment still applies exactly once, on
    * the same in-game day, as an uninterrupted playthrough would. */
   activeCommitments: ActiveCommitment[]
+  /** P3.4 bounded local-influence map, keyed by region id then party id — optional so a save
+   * written before this field existed still decodes (`decodeSaveEnvelope` treats it as additive,
+   * no version bump needed; `hydrateFromSaveState` falls back to `{}`). */
+  localInfluence?: Record<string, Record<PartyId, number>>
   feed: FeedEntry[]
   contests: Contest[]
   /** `pendingEvents` are entries straight out of the authored event pool (`sim/events.ts`), so

@@ -59,6 +59,9 @@ export interface RegionDisplayState {
   liftPx?: number // raise this region above the rest of the (otherwise flat) map
   strokeWidth?: number
   selectedStrokeWidth?: number
+  /** P3.4 map overlays — overrides the default border colour to mark a region as targeted/
+   * contested/opponent-active, without touching `fill` (which still encodes seat-holder colour). */
+  strokeColor?: string
 }
 
 /** Keyed by Region.geometryRef (spec §4.2) */

@@ -3,7 +3,7 @@
 // responses. Everything here is pure and store-free — `stores/game.ts` is the only caller, and it's
 // the only place a typed `ActionOutcome`/`ActiveCommitment` is ever turned into a state mutation, so
 // Vue code can request an action by id but can never hand the store an arbitrary numeric delta.
-import type { ActionAvailability, ActionCost, ActionDefinition, ActionOutcome, ActionResourceState, ActiveCommitment, LeverId } from '@/types'
+import type { ActionAvailability, ActionCost, ActionDefinition, ActionId, ActionOutcome, ActionResourceState, ActiveCommitment, LeverId } from '@/types'
 import type { ISODate, PartyId } from '@/types'
 import { seededUniform } from './rng'
 
@@ -161,9 +161,11 @@ export function resolveLeverAction(leverId: LeverId, partyId: PartyId, date: ISO
   }
 }
 
-/** Turns a just-validated, just-resolved lever into the `ActiveCommitment` the store should push
- * onto `activeCommitments` — never called for an instant (`durationDays === 0`) action. */
-export function buildCommitment(actionId: LeverId, partyId: PartyId, date: ISODate, def: ActionDefinition, outcome: ActionOutcome): ActiveCommitment {
+/** Turns a just-validated, just-resolved lever/targeting action into the `ActiveCommitment` the
+ * store should push onto `activeCommitments` — never called for an instant (`durationDays === 0`)
+ * action. `actionId` is widened to the full `ActionId` space (not just `LeverId`) so P3.4's
+ * targeting commitments (`sim/targeting.ts`) share this exact builder rather than duplicating it. */
+export function buildCommitment(actionId: ActionId, partyId: PartyId, date: ISODate, def: ActionDefinition, outcome: ActionOutcome): ActiveCommitment {
   return {
     id: `${actionId}:${partyId}:${date}`,
     actionId,
@@ -178,6 +180,8 @@ export function buildCommitment(actionId: LeverId, partyId: PartyId, date: ISODa
     membershipDelta: outcome.membershipDelta,
     staffCapacityBonus: outcome.staffCapacityBonus,
     resultLabel: outcome.resultLabel,
+    targetScope: outcome.targetScope,
+    localInfluenceMagnitude: outcome.localInfluenceMagnitude,
   }
 }
 

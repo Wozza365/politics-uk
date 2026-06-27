@@ -166,7 +166,7 @@ export class SvgMapRenderer implements MapRenderer {
     const strokeWidth = state?.selected ? state.selectedStrokeWidth ?? 2 : state?.strokeWidth ?? 0.5
     const fill = state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af'
     path.setAttribute('fill', fill)
-    path.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : '#1f2937')
+    path.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : state?.strokeColor ?? '#1f2937')
     path.setAttribute('stroke-width', String(strokeWidth <= 0 && state?.disabled ? 0.75 : strokeWidth))
     path.style.cursor = state?.disabled ? 'default' : 'pointer'
     path.style.pointerEvents = state?.disabled ? 'none' : 'auto'
@@ -206,7 +206,7 @@ export class SvgMapRenderer implements MapRenderer {
       const strokeWidth = nextState.selected
         ? nextState.selectedStrokeWidth ?? 2
         : nextState.strokeWidth ?? 0.5
-      this.overlayPath.setAttribute('stroke', strokeWidth <= 0 ? 'none' : '#1f2937')
+      this.overlayPath.setAttribute('stroke', strokeWidth <= 0 ? 'none' : nextState.strokeColor ?? '#1f2937')
       this.overlayPath.setAttribute('stroke-width', String(strokeWidth))
       this.overlayPath.style.pointerEvents = 'auto'
       this.overlayPath.style.cursor = 'pointer'

@@ -2,9 +2,10 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { COUNCIL_LEVELS, councilWardObjectKey, useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
+import { useGameStore } from '@/stores/game'
 import { HexMapRenderer } from '@/map/HexMapRenderer'
 import { SvgMapRenderer, RAISED_EDGE_DEPTH_PX, RAISED_EDGE_COLOR } from '@/map/SvgMapRenderer'
-import type { BoundarySet, MapRenderer } from '@/map/MapRenderer'
+import type { BoundarySet, MapRenderer, RegionState } from '@/map/MapRenderer'
 import { buildCommonsRegionState } from '@/map/regionState/commons'
 import {
   buildCouncilRegionState,
@@ -13,9 +14,45 @@ import {
 } from '@/map/regionState/councils'
 import { buildRegionalRegionState } from '@/map/regionState/regional'
 import type { SeatRegionStateContext } from '@/map/regionState/buildSeatRegionState'
+import { regionIdsForScope } from '@/sim/targeting'
 
 const scenario = useScenarioStore()
 const ui = useUiStore()
+const game = useGameStore()
+
+// P3.4 map overlays (westminster/commons only — the only tier 'seat' targeting covers) — tints a
+// region's border rather than its fill, since fill already encodes the seat-holder's party colour.
+// Applied after the per-tier region-state builder, as a separate pass, so neither builder needs to
+// know about targeting/contests at all.
+const OVERLAY_STROKE_WIDTH = 1.5
+const PLAYER_COMMITMENT_STROKE = '#22d3ee'
+const OPPONENT_ACTIVITY_STROKE = '#f97316'
+const CONTEST_STROKE = '#a855f7'
+
+function applyTargetingOverlays(regionState: RegionState) {
+  if (ui.activeView !== 'westminster' || isCouncilWardFocus.value) return
+  const tiers = scenario.scenario.tiers
+
+  if (ui.mapOverlays.contests) {
+    for (const contest of game.contests) {
+      if (contest.status !== 'pending') continue
+      const state = regionState[contest.regionId]
+      if (state) state.strokeColor = CONTEST_STROKE
+      if (state) state.strokeWidth = Math.max(state.strokeWidth ?? 0, OVERLAY_STROKE_WIDTH)
+    }
+  }
+
+  for (const commitment of game.activeTargetingCommitments) {
+    const isPlayer = commitment.partyId === game.selectedPartyId
+    if (isPlayer ? !ui.mapOverlays.commitments : !ui.mapOverlays.opponentActivity) continue
+    for (const regionId of regionIdsForScope(commitment.targetScope!, tiers, game.contests)) {
+      const state = regionState[regionId]
+      if (!state) continue
+      state.strokeColor = isPlayer ? PLAYER_COMMITMENT_STROKE : OPPONENT_ACTIVITY_STROKE
+      state.strokeWidth = Math.max(state.strokeWidth ?? 0, OVERLAY_STROKE_WIDTH)
+    }
+  }
+}
 
 const partyColour = (partyId: string) => scenario.party(partyId)?.colours.primary ?? '#9ca3af'
 
@@ -110,6 +147,7 @@ function draw() {
               councilBoundaryCollectionCache,
             )
           : buildCommonsRegionState(scenario.commonsRegions, ctx)
+  applyTargetingOverlays(regionState)
   renderer.render(boundarySet, regionState)
 }
 
@@ -443,6 +481,11 @@ watch(() => ui.activeCouncilLevel, () => {
   resetZoom()
   draw()
 })
+// P3.4 overlay toggles/data — redraw in place (no zoom/focus reset needed; only the border
+// tinting pass above changes).
+watch(() => ui.mapOverlays, draw, { deep: true })
+watch(() => game.activeTargetingCommitments, draw, { deep: true })
+watch(() => game.contests, draw, { deep: true })
 // External focus requests (P2.8's by-elections panel, possibly others later) — the only seam
 // outside code uses to drive the map. `ui.activeView`/`activeCouncilLevel` changes above reset
 // activeRegion/councilWardFocusRegion via their own watchers first; `nextTick` waits for that
@@ -590,6 +633,39 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
           Some figures estimated
         </span>
       </div>
+    </div>
+
+    <div
+      v-if="ui.activeView === 'westminster' && !isCouncilWardFocus"
+      class="absolute bottom-3 left-3 flex flex-col gap-1 rounded-md bg-zinc-950/90 px-2.5 py-2 text-xs text-zinc-300 shadow-lg"
+    >
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-left"
+        :class="{ 'opacity-40': !ui.mapOverlays.commitments }"
+        @click="ui.toggleMapOverlay('commitments')"
+      >
+        <span class="h-2.5 w-2.5 rounded-full" style="background-color: #22d3ee" />
+        Your campaigns
+      </button>
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-left"
+        :class="{ 'opacity-40': !ui.mapOverlays.opponentActivity }"
+        @click="ui.toggleMapOverlay('opponentActivity')"
+      >
+        <span class="h-2.5 w-2.5 rounded-full" style="background-color: #f97316" />
+        Opponent activity
+      </button>
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-left"
+        :class="{ 'opacity-40': !ui.mapOverlays.contests }"
+        @click="ui.toggleMapOverlay('contests')"
+      >
+        <span class="h-2.5 w-2.5 rounded-full" style="background-color: #a855f7" />
+        Active contests
+      </button>
     </div>
 
     <button

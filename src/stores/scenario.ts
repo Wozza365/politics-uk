@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import type { Topology } from 'topojson-specification'
-import type { PartyId, Region, RegionDemographics, Scenario } from '@/types'
+import type { PartyId, Region, RegionDemographics, Scenario, TierId } from '@/types'
 import scenarioData from '@/data/scenarios/uk-2025-01-01/scenario.json'
 import boundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.json'
 import commonsHexBoundaries from '@/data/scenarios/uk-2025-01-01/boundaries.commons.hex.json'
@@ -12,7 +12,7 @@ import councilWardComposition from '@/data/scenarios/uk-2025-01-01/composition.c
 import demographicsData from '@/data/scenarios/uk-2025-01-01/demographics.commons.json'
 import type { HexBoundarySet } from '@/map/MapRenderer'
 
-const REGIONAL_TIER_IDS = ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'] as const
+export const REGIONAL_TIER_IDS = ['holyrood', 'senedd', 'ni_assembly', 'london_assembly'] as const
 export const COUNCIL_LEVELS = [
   { id: 'county', tierId: 'council:county', objectKey: 'council_county', label: 'County' },
   { id: 'local', tierId: 'council:local', objectKey: 'council_local', label: 'Local' },
@@ -33,6 +33,29 @@ const LOCAL_COUNCIL_TIER_IDS = [
   'council:welsh',
   'council:northern_ireland',
 ] as const
+
+// P3.4 targeting (spec — the UI needs a human label for any tier it lets a player aim a campaign
+// at, beyond the raw `TierId` slug). Falls back to the slug itself for anything not listed here
+// rather than guessing a label, so a future tier just shows its id until someone adds one.
+const TIER_LABELS: Record<string, string> = {
+  commons: 'House of Commons',
+  holyrood: 'Holyrood',
+  senedd: 'Senedd',
+  ni_assembly: 'NI Assembly',
+  london_assembly: 'London Assembly',
+  'council:county': 'County councils',
+  'council:district': 'District councils',
+  'council:unitary': 'Unitary councils',
+  'council:metropolitan': 'Metropolitan councils',
+  'council:london': 'London boroughs',
+  'council:scottish': 'Scottish councils',
+  'council:welsh': 'Welsh councils',
+  'council:northern_ireland': 'Northern Ireland councils',
+}
+
+export function tierLabel(tierId: TierId): string {
+  return TIER_LABELS[tierId] ?? tierId
+}
 
 const councilWardRegionsByCouncil = new Map<string, Region[]>()
 for (const region of councilWardComposition as Region[]) {
@@ -107,5 +130,16 @@ export const useScenarioStore = defineStore('scenario', {
     },
     councilWardRegionsForCouncil: () => (councilGeometryRef: string) =>
       councilWardRegionsByCouncil.get(councilGeometryRef) ?? [],
+    // P3.4 targeting: a generic id -> Region lookup spanning every tier (including council wards,
+    // which live outside `scenario.tiers` — see `councilWardRegions`) so the targeting UI/store can
+    // resolve any `TargetScope.regionId` without knowing which tier it came from.
+    regionById: (state) => {
+      const map = new Map<string, Region>()
+      for (const regions of Object.values(state.scenario.tiers)) {
+        for (const region of regions) map.set(region.id, region)
+      }
+      for (const region of state.councilWardRegions) map.set(region.id, region)
+      return map
+    },
   },
 })

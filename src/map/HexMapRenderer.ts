@@ -164,7 +164,7 @@ export class HexMapRenderer implements MapRenderer {
     const strokeWidth = state?.selected ? state.selectedStrokeWidth ?? 2 : state?.strokeWidth ?? 0.5
     const fill = state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af'
     polygon.setAttribute('fill', fill)
-    polygon.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : '#1f2937')
+    polygon.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : state?.strokeColor ?? '#1f2937')
     polygon.setAttribute('stroke-width', String(strokeWidth <= 0 && state?.disabled ? 0.75 : strokeWidth))
     polygon.style.cursor = state?.disabled ? 'default' : 'pointer'
     polygon.style.pointerEvents = state?.disabled ? 'none' : 'auto'

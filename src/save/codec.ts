@@ -125,6 +125,7 @@ function isGameSaveState(value: unknown): value is GameSaveStateV1 {
     isRecordOf(value.leverCooldowns, isString) &&
     isRecordOf(value.staffCapacityBonus, isNumber) &&
     isActiveCommitmentArray(value.activeCommitments) &&
+    (value.localInfluence === undefined || isRecordOf(value.localInfluence, (v): v is Record<string, number> => isRecordOf(v, isNumber))) &&
     isFeedEntryArray(value.feed) &&
     isContestArray(value.contests) &&
     isStringArray(value.pendingEventIds) &&

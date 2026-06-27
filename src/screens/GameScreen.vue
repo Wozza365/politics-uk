@@ -11,6 +11,7 @@ import GameClock from '@/components/GameClock.vue'
 import ByElectionsPanel from '@/components/ByElectionsPanel.vue'
 import SaveManagementPanel from '@/components/SaveManagementPanel.vue'
 import GameMenuPanel from '@/components/GameMenuPanel.vue'
+import TargetingPanel from '@/components/TargetingPanel.vue'
 import ViewSwitcher from '@/components/ViewSwitcher.vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
@@ -46,6 +47,7 @@ watch(
 
     <PartyPanel />
     <ByElectionsPanel />
+    <TargetingPanel />
     <SaveManagementPanel />
     <GameMenuPanel />
 

@@ -48,6 +48,22 @@ export interface ActionDefinition {
   forecast: ActionForecast
 }
 
+// P3.4 targeting (spec — `docs/phase3/P3.4-targeting-opponents.md`): a campaign action's place of
+// effect, from a single ward up to the whole country. 'tier' covers both nations (the devolved
+// tier ids already double as "Scotland"/"Wales"/"NI"/London) and any other electoral tier, since
+// the scenario data has no separate nation/region grouping beyond `TierId` itself.
+export type TargetScopeKind = 'national' | 'tier' | 'seat' | 'contest'
+
+export interface TargetScope {
+  kind: TargetScopeKind
+  tierId?: string // 'tier' scope — a TierId
+  regionId?: string // 'seat' scope — a Region.id
+  contestId?: string // 'contest' scope — a Contest.id
+  /** Human-readable place name shown in the UI/feed — resolved once at selection time so the feed
+   * still reads correctly after a contest resolves or a region renames. */
+  label: string
+}
+
 export type ActionDenialReason =
   | 'no-party'
   | 'on-cooldown'
@@ -93,6 +109,15 @@ export interface ActiveCommitment {
    * just affecting polling/finance/membership. */
   staffCapacityBonus?: number
   resultLabel: string
+  /** Set only for a targeting commitment (`sim/targeting.ts`) — which place it was aimed at, so
+   * the store can apply/reverse `localInfluenceMagnitude` to that scope's regions on start/expiry
+   * and the UI can show "you/they are campaigning here" without re-deriving it from the id. */
+  targetScope?: TargetScope
+  /** Bounded local-influence delta this commitment contributes to every region in `targetScope`
+   * while active (P3.4 step 3) — added to `game.localInfluence` when the commitment starts,
+   * subtracted back out when it ends or is cancelled. Always 0/undefined for a non-targeting
+   * commitment. */
+  localInfluenceMagnitude?: number
 }
 
 /** What `resolveLeverAction`/contest resolution hands back — for an instant action, applied
@@ -103,4 +128,8 @@ export interface ActionOutcome {
   membershipDelta: number
   resultLabel: string
   staffCapacityBonus?: number
+  /** Set only by `sim/targeting.ts`'s `resolveTargetingAction` — see `ActiveCommitment`'s field of
+   * the same name for why it's carried here rather than applied as a polling impact. */
+  targetScope?: TargetScope
+  localInfluenceMagnitude?: number
 }

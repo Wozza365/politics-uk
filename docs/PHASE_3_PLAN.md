@@ -52,9 +52,10 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p33--campaign-action-economy-)
 for the full record of what was built.
 
-### P3.4 — Targeted campaigning and opponent strategy
+### P3.4 — Targeted campaigning and opponent strategy `✅ DONE`
 
-See [`phase3/P3.4-targeting-opponents.md`](./phase3/P3.4-targeting-opponents.md).
+See [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p34--targeted-campaigning-and-opponent-strategy-)
+for the full record of what was built.
 
 ### P3.5 — Election resolution and changing political world state
 

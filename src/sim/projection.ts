@@ -7,6 +7,7 @@
 // `results` breakdown (shouldn't happen for Commons, but kept safe for incomplete data) just keeps
 // its incumbent rather than guessing.
 import type { PartyId, Region } from '@/types'
+import { leadingPartyNetInfluence } from './targeting'
 
 /** Per-party swing in percentage points: `currentPolling - startPolling`, scenario-start to now. */
 export function nationalSwing(
@@ -44,12 +45,14 @@ export function projectSeatsByParty(
   regions: Region[],
   startPolling: Record<PartyId, number>,
   currentPolling: Record<PartyId, number>,
+  localInfluenceByRegion: Record<string, Record<PartyId, number>> = {},
 ): Record<PartyId, number> {
   const swing = nationalSwing(startPolling, currentPolling)
   const counts: Record<PartyId, number> = {}
   for (const region of regions) {
     for (const seat of region.seats) {
-      const winner = projectSeatWinner(seat, swing)
+      const influenceWinner = leadingPartyNetInfluence(localInfluenceByRegion[region.id])
+      const winner = influenceWinner ?? projectSeatWinner(seat, swing)
       counts[winner] = (counts[winner] ?? 0) + 1
     }
   }

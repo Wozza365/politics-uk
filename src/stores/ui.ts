@@ -13,6 +13,8 @@ export type MapRendererChoice = 'geographic' | 'hex'
 const GAME_VIEWS: GameView[] = ['westminster', 'regional', 'councils']
 const MAP_RENDERER_CHOICES: MapRendererChoice[] = ['geographic', 'hex']
 
+export type MapOverlayKey = 'commitments' | 'contests' | 'opponentActivity'
+
 /** External request for `MapView.vue` to focus a region — the only seam other components use to
  * drive the map (spec/CLAUDE.md: "never reach into SVG/DOM from game logic"). `MapView` alone
  * interprets this via its own internal `activate()`; it clears the request once handled. */
@@ -49,8 +51,12 @@ export const useUiStore = defineStore('ui', {
     openMenus: 0,
     byElectionsPanelOpen: false,
     saveManagementPanelOpen: false,
+    targetingPanelOpen: false,
     gameMenuOpen: false,
     mapFocusRequest: null as MapFocusRequest | null,
+    // P3.4 map overlay toggles — transient display preferences for `MapView.vue`'s targeting
+    // tinting pass, never persisted (see `hydrateFromSaveState`, which always resets to defaults).
+    mapOverlays: { commitments: true, contests: true, opponentActivity: true } as Record<MapOverlayKey, boolean>,
     // Transient — `resolve` is a callback, never persisted (see `hydrateFromSaveState`, which
     // always clears this like every other open-panel flag). Only one prompt is ever pending at a
     // time, matching the UI: a screen-level transition is never queued behind another one.
@@ -74,6 +80,15 @@ export const useUiStore = defineStore('ui', {
     },
     closeSaveManagementPanel() {
       this.saveManagementPanelOpen = false
+    },
+    toggleTargetingPanel() {
+      this.targetingPanelOpen = !this.targetingPanelOpen
+    },
+    closeTargetingPanel() {
+      this.targetingPanelOpen = false
+    },
+    toggleMapOverlay(key: MapOverlayKey) {
+      this.mapOverlays[key] = !this.mapOverlays[key]
     },
     toggleGameMenu() {
       this.gameMenuOpen = !this.gameMenuOpen
@@ -155,9 +170,11 @@ export const useUiStore = defineStore('ui', {
       this.openMenus = 0
       this.byElectionsPanelOpen = false
       this.saveManagementPanelOpen = false
+      this.targetingPanelOpen = false
       this.gameMenuOpen = false
       this.mapFocusRequest = null
       this.confirmModal = null
+      this.mapOverlays = { commitments: true, contests: true, opponentActivity: true }
     },
   },
 })
