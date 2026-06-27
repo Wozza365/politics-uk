@@ -1,9 +1,20 @@
 import { defineStore } from 'pinia'
-import type { Contest, ContestActionId, EventCallbackContext, FeedEntry, GameEvent, ISODate, PartyFinance, PartyId, PollingSnapshot } from '@/types'
+import type {
+  Contest,
+  ContestActionId,
+  EventCallbackContext,
+  FeedEntry,
+  GameEvent,
+  GameSaveStateV1,
+  ISODate,
+  PartyFinance,
+  PartyId,
+  PollingSnapshot,
+} from '@/types'
 import { useScenarioStore } from './scenario'
 import { useUiStore } from './ui'
 import { nextPollingSnapshot, type PollingImpact } from '@/sim/poll'
-import { resolvePollingEffects, rollEventForDay } from '@/sim/events'
+import { EVENT_POOL, resolvePollingEffects, rollEventForDay } from '@/sim/events'
 import { runEventCallback } from '@/sim/eventCallbacks'
 import { WORLD_SALIENCE } from '@/sim/policies'
 import { projectSeatsByParty } from '@/sim/projection'
@@ -31,6 +42,44 @@ function daysBetween(from: ISODate, to: ISODate): number {
   const fromMs = new Date(`${from}T00:00:00Z`).getTime()
   const toMs = new Date(`${to}T00:00:00Z`).getTime()
   return Math.round((toMs - fromMs) / msPerDay)
+}
+
+/** Drawn once per playthrough (P3.0 save contract) — not a sim calculation, so `crypto`'s entropy
+ * rather than the seeded `mulberry32` PRNG is the right tool here; see `GameSaveStateV1`'s header
+ * comment on `playthroughSeed`. */
+function generatePlaythroughSeed(): number {
+  const bytes = new Uint32Array(1)
+  crypto.getRandomValues(bytes)
+  return bytes[0]
+}
+
+/** A `Record<PartyId, T>`-shaped save field, filtered down to ids the live scenario still
+ * recognises — guards against a save referencing a party that's been removed/renamed since
+ * (P3.0's "validate referenced party/tier/seat ids" hydration step). */
+function pickKnownParties<T>(record: Record<PartyId, T>, knownPartyIds: Set<PartyId>): Record<PartyId, T> {
+  const result: Record<PartyId, T> = {}
+  for (const [partyId, value] of Object.entries(record)) {
+    if (knownPartyIds.has(partyId)) result[partyId] = value
+  }
+  return result
+}
+
+/** `leverCooldowns` keys are `${partyId}:${leverId}` — both halves are validated against the live
+ * scenario/lever set rather than just the party id, so a renamed/removed lever can't leave a
+ * permanently-stuck cooldown behind. */
+function pickKnownLeverCooldowns(record: Record<string, ISODate>, knownPartyIds: Set<PartyId>): Record<string, ISODate> {
+  const result: Record<string, ISODate> = {}
+  for (const [key, date] of Object.entries(record)) {
+    const [partyId, leverId] = key.split(':')
+    if (knownPartyIds.has(partyId) && leverId in LEVER_COOLDOWN_DAYS) result[key] = date
+  }
+  return result
+}
+
+function isKnownContest(contest: Contest, knownPartyIds: Set<PartyId>, commonsRegionIds: Set<string>, councilWardRegionIds: Set<string>): boolean {
+  if (!knownPartyIds.has(contest.incumbentParty)) return false
+  const pool = contest.contestTier === 'commons' ? commonsRegionIds : councilWardRegionIds
+  return pool.has(contest.regionId)
 }
 
 /** Feed text for a poll release, e.g. "Latest poll: Lab 27.4% (+1.2), Con 24.1% (-0.6)." */
@@ -85,6 +134,8 @@ export const useGameStore = defineStore('game', {
     // Set once the GE date is reached (spec §11.2 win check); null while the game is still
     // running. A screen (GameScreen) watches this to drive the start→loading→game→result loop.
     result: null as 'won' | 'lost' | null,
+    // Drawn once per playthrough (P3.0) — see `generatePlaythroughSeed`'s header comment.
+    playthroughSeed: 0,
   }),
   getters: {
     selectedParty(state) {
@@ -161,6 +212,7 @@ export const useGameStore = defineStore('game', {
       this.leverCooldowns = {}
       this.salience = { ...WORLD_SALIENCE }
       this.result = null
+      this.playthroughSeed = generatePlaythroughSeed()
     },
     /** Builds the narrow context an event callback (`sim/eventCallbacks.ts`) gets to work with —
      * closures over this store's own actions, so `sim/` never has to import `stores/`. */
@@ -424,6 +476,63 @@ export const useGameStore = defineStore('game', {
     resumeClockIfClear() {
       const ui = useUiStore()
       if (this.pendingEvents.length === 0 && ui.openMenus === 0) this.resumeClock()
+    },
+    /** Projects this store's mutable state into the P3.0 save payload — the only thing
+     * `stores/save.ts` is allowed to persist. `pendingEvents` are saved by id only (see
+     * `GameSaveStateV1`'s header comment); everything else is a deep-enough copy that mutating the
+     * live store afterwards can't reach back into the saved snapshot. */
+    toSaveState(): GameSaveStateV1 {
+      return {
+        selectedPartyId: this.selectedPartyId,
+        date: this.date,
+        clockMsPerDay: this.clock.msPerDay,
+        polling: { ...this.polling },
+        pollingHistory: this.pollingHistory.map((snapshot) => ({ date: snapshot.date, polling: { ...snapshot.polling } })),
+        pendingPollImpacts: this.pendingPollImpacts.map((impact) => ({ ...impact })),
+        finance: Object.fromEntries(Object.entries(this.finance).map(([partyId, finance]) => [partyId, { ...finance }])),
+        membership: { ...this.membership },
+        leverCooldowns: { ...this.leverCooldowns },
+        feed: this.feed.map((entry) => ({ ...entry, actions: entry.actions?.map((action) => ({ ...action })) })),
+        contests: this.contests.map((contest) => ({ ...contest })),
+        pendingEventIds: this.pendingEvents.map((event) => event.id),
+        firedEventIds: [...this.firedEventIds],
+        salience: { ...this.salience },
+        result: this.result,
+      }
+    },
+    /** Replaces this store's mutable state with a previously-saved payload (P3.0). Validates every
+     * referenced party/region id against the *current* scenario rather than trusting the save
+     * blindly — a save can outlive a scenario-data update — and always leaves the clock paused
+     * regardless of what was saved, since resuming is an explicit player action
+     * (`continuePlaying`/`resumeClock`), not something a load should do on its own. */
+    hydrateFromSaveState(state: GameSaveStateV1) {
+      const scenario = useScenarioStore()
+      const knownPartyIds = new Set(scenario.scenario.parties.map((party) => party.id))
+      const commonsRegionIds = new Set(scenario.commonsRegions.map((region) => region.id))
+      const councilWardRegionIds = new Set(scenario.councilWardRegions.map((region) => region.id))
+
+      this.selectedPartyId = state.selectedPartyId && knownPartyIds.has(state.selectedPartyId) ? state.selectedPartyId : null
+      this.date = state.date
+      this.clock = { running: false, msPerDay: state.clockMsPerDay }
+      this.polling = pickKnownParties(state.polling, knownPartyIds)
+      this.pollingHistory = state.pollingHistory.map((snapshot) => ({
+        date: snapshot.date,
+        polling: pickKnownParties(snapshot.polling, knownPartyIds),
+      }))
+      this.pendingPollImpacts = state.pendingPollImpacts.filter((impact) => knownPartyIds.has(impact.partyId)).map((impact) => ({ ...impact }))
+      this.finance = pickKnownParties(state.finance, knownPartyIds)
+      this.membership = pickKnownParties(state.membership, knownPartyIds)
+      this.leverCooldowns = pickKnownLeverCooldowns(state.leverCooldowns, knownPartyIds)
+      this.feed = state.feed.map((entry) => ({ ...entry, actions: entry.actions?.map((action) => ({ ...action })) }))
+      this.contests = state.contests
+        .filter((contest) => isKnownContest(contest, knownPartyIds, commonsRegionIds, councilWardRegionIds))
+        .map((contest) => ({ ...contest }))
+      this.pendingEvents = state.pendingEventIds
+        .map((id) => EVENT_POOL.find((event) => event.id === id))
+        .filter((event): event is GameEvent => !!event)
+      this.firedEventIds = [...state.firedEventIds]
+      this.salience = { ...WORLD_SALIENCE, ...state.salience }
+      this.result = state.result
     },
   },
 })

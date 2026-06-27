@@ -370,3 +370,72 @@ describe('useGameStore by-elections — P2.8', () => {
     expect(game.clock.running).toBe(true)
   })
 })
+
+describe('useGameStore.toSaveState / hydrateFromSaveState — P3.0', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('round-trips equivalent state through a fresh store', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.runFundraisingAppeal()
+    const snapshot = game.toSaveState()
+
+    setActivePinia(createPinia())
+    const fresh = useGameStore()
+    fresh.hydrateFromSaveState(snapshot)
+
+    expect(fresh.toSaveState()).toEqual(snapshot)
+    expect(fresh.clock.running).toBe(false)
+  })
+
+  it('drops a contest referencing a party id the current scenario no longer recognises', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const snapshot = game.toSaveState()
+    const bogusContest: Contest = {
+      id: 'byelection:commons:bogus:2025-01-01',
+      contestTier: 'commons',
+      regionId: 'not-a-real-region',
+      geometryRef: 'not-a-real-region',
+      seatName: 'Nowhereshire',
+      incumbentParty: 'not-a-real-party',
+      calledDate: '2025-01-01',
+      status: 'pending',
+    }
+
+    game.hydrateFromSaveState({ ...snapshot, contests: [bogusContest] })
+
+    expect(game.contests).toEqual([])
+  })
+
+  it('drops polling/finance/membership entries for unrecognised party ids instead of crashing', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const snapshot = game.toSaveState()
+
+    game.hydrateFromSaveState({
+      ...snapshot,
+      polling: { ...snapshot.polling, 'ghost-party': 99 },
+      finance: { ...snapshot.finance, 'ghost-party': { estimatedCashOnHand: 1, source: 'estimated' } },
+      membership: { ...snapshot.membership, 'ghost-party': 1 },
+      selectedPartyId: 'ghost-party',
+    })
+
+    expect(game.polling['ghost-party']).toBeUndefined()
+    expect(game.finance['ghost-party']).toBeUndefined()
+    expect(game.membership['ghost-party']).toBeUndefined()
+    expect(game.selectedPartyId).toBeNull()
+  })
+
+  it('drops a pendingEventId that no longer matches anything in the event pool', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const snapshot = game.toSaveState()
+
+    game.hydrateFromSaveState({ ...snapshot, pendingEventIds: ['not-a-real-event-id'] })
+
+    expect(game.pendingEvents).toEqual([])
+  })
+})

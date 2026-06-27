@@ -28,9 +28,11 @@ Phase 3's additional definition of done:
 
 ## 1. Phase 3 — persistence, strategy, elections, and polish
 
-### P3.0 — Versioned save-game contract and persistence repository
+### P3.0 — Versioned save-game contract and persistence repository `✅ DONE`
 
-See [`phase3/P3.0-save-contract.md`](./phase3/P3.0-save-contract.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p30--versioned-save-game-contract-and-persistence-repository-)
+for the full record of what was built.
 
 ### P3.1 — Autosave, manual slots, and portable saves
 

@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia'
-import type { CouncilLevelId } from './scenario'
+import { COUNCIL_LEVELS, type CouncilLevelId } from './scenario'
+import type { UiSaveStateV1 } from '@/types'
 
 export type Screen = 'start' | 'loading' | 'game' | 'result'
 
 export type GameView = 'westminster' | 'regional' | 'councils'
 export type MapRendererChoice = 'geographic' | 'hex'
+
+const GAME_VIEWS: GameView[] = ['westminster', 'regional', 'councils']
+const MAP_RENDERER_CHOICES: MapRendererChoice[] = ['geographic', 'hex']
 
 /** External request for `MapView.vue` to focus a region — the only seam other components use to
  * drive the map (spec/CLAUDE.md: "never reach into SVG/DOM from game logic"). `MapView` alone
@@ -67,6 +71,31 @@ export const useUiStore = defineStore('ui', {
     },
     setWestminsterRenderer(renderer: MapRendererChoice) {
       this.westminsterRenderer = renderer
+    },
+    /** The only `ui` fields worth persisting (P3.0) — display preferences, never an open
+     * panel/modal or a running timer. */
+    toSaveState(): UiSaveStateV1 {
+      return {
+        activeView: this.activeView,
+        activeCouncilLevel: this.activeCouncilLevel,
+        westminsterRenderer: this.westminsterRenderer,
+      }
+    },
+    /** Restores display preferences from a save, falling back to the default for anything that
+     * doesn't match a value this build still recognises, and always resetting transient
+     * panel/modal/focus state regardless of what was saved (P3.0). */
+    hydrateFromSaveState(state: UiSaveStateV1) {
+      const councilLevelIds: CouncilLevelId[] = COUNCIL_LEVELS.map((level) => level.id)
+      this.activeView = GAME_VIEWS.includes(state.activeView as GameView) ? (state.activeView as GameView) : 'westminster'
+      this.activeCouncilLevel = councilLevelIds.includes(state.activeCouncilLevel as CouncilLevelId)
+        ? (state.activeCouncilLevel as CouncilLevelId)
+        : 'local'
+      this.westminsterRenderer = MAP_RENDERER_CHOICES.includes(state.westminsterRenderer as MapRendererChoice)
+        ? (state.westminsterRenderer as MapRendererChoice)
+        : 'geographic'
+      this.openMenus = 0
+      this.byElectionsPanelOpen = false
+      this.mapFocusRequest = null
     },
   },
 })
