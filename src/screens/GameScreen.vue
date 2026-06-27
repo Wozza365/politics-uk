@@ -35,7 +35,7 @@ watch(
 <template>
   <main class="relative h-screen w-screen overflow-hidden bg-zinc-900 text-zinc-100">
     <section
-      class="hud-feed absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+      class="hud-feed absolute left-4 top-4 bottom-44 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
       aria-label="Event feed"
     >
       <header class="border-b border-zinc-800/80 px-4 py-3">
@@ -71,7 +71,7 @@ watch(
     </section>
 
     <section
-      class="hud-map absolute inset-x-0 bottom-32 top-20 z-10 flex items-center justify-center px-8"
+      class="hud-map absolute inset-x-0 bottom-52 top-36 z-10 flex items-center justify-center px-8"
       aria-label="Westminster map"
     >
       <div class="h-full w-full max-w-6xl">
@@ -82,7 +82,7 @@ watch(
     </section>
 
     <section
-      class="hud-hemicycle absolute bottom-20 left-1/2 z-20 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
+      class="hud-hemicycle absolute bottom-28 left-1/2 z-20 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
       aria-label="Party makeup"
     >
       <slot name="hemicycle">
@@ -91,7 +91,7 @@ watch(
     </section>
 
     <nav
-      class="hud-switcher absolute bottom-4 left-1/2 z-20 w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+      class="hud-switcher absolute bottom-3 left-1/2 z-20 w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
       aria-label="View switcher"
     >
       <slot name="view-switcher">

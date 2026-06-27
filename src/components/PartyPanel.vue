@@ -76,7 +76,7 @@ function formatMoney(value: PartyFinance | undefined) {
 
 <template>
   <section
-    class="absolute left-1/2 top-4 z-20 w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+    class="hud-party absolute left-1/2 top-4 z-20 w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
     :style="{
       borderColor: selectedParty?.colours.primary ?? '#52525b',
       borderWidth: '2px',

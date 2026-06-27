@@ -119,10 +119,17 @@ export const useSaveStore = defineStore('save', {
       const validated = decodeSaveEnvelope(save)
       if (!validated.ok) throw new Error(`Refused to write an invalid save record: ${validated.error.message}`)
 
-      const metadata = await this.repository.write(save)
-      await this.refreshSaves()
-      this.selectedSaveId = metadata.id
-      return metadata
+      try {
+        const metadata = await this.repository.write(save)
+        await this.refreshSaves()
+        this.selectedSaveId = metadata.id
+        this.lastWriteError = null
+        if (kind === 'autosave') this.lastSavedAt = metadata.updatedAt
+        return metadata
+      } catch (error: unknown) {
+        this.lastWriteError = error instanceof Error ? error.message : String(error)
+        throw error
+      }
     },
     /** Reads, decodes, and hydrates a save into the live game/ui stores. Returns `false` (and sets
      * `lastError`) on a corrupt/obsolete/unrecognised-scenario record instead of throwing — the

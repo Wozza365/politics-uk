@@ -203,6 +203,20 @@ describe('useSaveStore — P3.0 save contract', () => {
     expect(autosave.state.game.date).toBe(game.date) // the fresh campaign's own start date
   })
 
+  it('direct autosave writes clear stale write errors and update the saved timestamp', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+    game.startGame('labour')
+    save.lastWriteError = 'previous write failed'
+
+    const metadata = await save.writeSave('autosave')
+
+    expect(save.lastWriteError).toBeNull()
+    expect(save.lastSavedAt).toBe(metadata.updatedAt)
+  })
+
   it('clearAutosave removes only the autosave slot, leaving manual saves intact', async () => {
     const repository = new InMemorySaveRepository()
     const game = useGameStore()

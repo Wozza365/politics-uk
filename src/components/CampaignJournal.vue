@@ -43,7 +43,7 @@ function objectiveTone(objective: CampaignObjective | undefined, status: string)
 
 <template>
   <section
-    class="absolute right-4 top-40 z-20 flex max-h-[calc(100vh-15rem)] w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
+    class="hud-journal absolute right-4 top-56 z-20 flex max-h-[calc(100vh-24rem)] w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
     aria-label="Campaign journal"
   >
     <header class="border-b border-zinc-800/80 px-4 py-3">

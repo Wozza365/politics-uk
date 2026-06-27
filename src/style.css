@@ -41,30 +41,53 @@ textarea {
 }
 
 @media (max-width: 48rem) {
+  .hud-party {
+    top: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+
+  .hud-goal {
+    top: 4.75rem;
+    width: calc(100vw - 1rem);
+  }
+
   .hud-feed {
     left: 0.5rem;
     right: 0.5rem;
-    top: 0.5rem;
+    top: 13.5rem;
     bottom: auto;
     width: auto;
-    max-height: 34vh;
+    max-height: 18vh;
   }
 
   .hud-clock {
     left: 0.5rem;
     right: 0.5rem;
-    top: calc(34vh + 1rem);
+    top: calc(18vh + 14rem);
     width: auto;
   }
 
+  .hud-journal,
+  .hud-tutorial {
+    display: none;
+  }
+
+  .hud-side-panel {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: calc(18vh + 27rem);
+    width: auto;
+    max-height: calc(100vh - 33rem);
+  }
+
   .hud-map {
-    top: calc(34vh + 11rem);
-    bottom: 10rem;
+    top: calc(18vh + 27rem);
+    bottom: 10.5rem;
     padding-inline: 0.5rem;
   }
 
   .hud-hemicycle {
-    bottom: 5.25rem;
+    bottom: 9.5rem;
     width: calc(100vw - 1rem);
   }
 
@@ -72,18 +95,20 @@ textarea {
     bottom: 0.5rem;
     width: calc(100vw - 1rem);
   }
+
 }
 
 @media (max-width: 24rem) {
   .hud-feed {
-    max-height: 28vh;
+    max-height: 16vh;
   }
 
   .hud-clock {
-    top: calc(28vh + 1rem);
+    top: calc(16vh + 14.5rem);
   }
 
+  .hud-side-panel,
   .hud-map {
-    top: calc(28vh + 12rem);
+    top: calc(16vh + 28rem);
   }
 }

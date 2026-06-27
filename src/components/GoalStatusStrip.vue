@@ -29,7 +29,7 @@ const pauseReason = computed(() => {
 
 <template>
   <section
-    class="absolute left-1/2 top-4 z-20 grid w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 gap-2 rounded-lg border border-zinc-700/70 bg-zinc-950/85 px-3 py-2 text-xs text-zinc-300 shadow-2xl backdrop-blur-sm md:grid-cols-[1.4fr_0.7fr_1.2fr_0.8fr]"
+    class="hud-goal absolute left-1/2 top-20 z-20 grid w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 gap-2 rounded-lg border border-zinc-700/70 bg-zinc-950/85 px-3 py-2 text-xs text-zinc-300 shadow-2xl backdrop-blur-sm md:grid-cols-[1.4fr_0.7fr_1.2fr_0.8fr]"
     aria-label="Campaign status"
   >
     <button type="button" class="text-left font-semibold text-zinc-100 hover:text-sky-200" @click="ui.toggleHelpPanel()">
