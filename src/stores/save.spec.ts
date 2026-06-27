@@ -76,6 +76,28 @@ describe('useSaveStore — P3.0 save contract', () => {
     expect(freshGame.clock.running).toBe(false) // restored game is always paused
   })
 
+  it('restores campaign objective and arc progress part-way through a campaign', async () => {
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(new InMemorySaveRepository())
+
+    game.startGame('labour')
+    game.campaignArcs[0].status = 'active'
+    game.campaignArcs[0].updatedAt = '2025-02-01'
+    const expectedGameState = game.toSaveState()
+
+    const metadata = await save.writeSave('manual', 'campaign progress')
+
+    setActivePinia(createPinia())
+    const freshGame = useGameStore()
+    const freshSave = useSaveStore()
+    freshSave.useRepository(save.repository)
+
+    expect(await freshSave.loadSave(metadata.id)).toBe(true)
+    expect(freshGame.toSaveState().campaignArcs).toEqual(expectedGameState.campaignArcs)
+    expect(freshGame.toSaveState().campaignObjectives).toEqual(expectedGameState.campaignObjectives)
+  })
+
   it('continues deterministically after a restore: same next-tick outcome as the unsaved original', async () => {
     const repository = new InMemorySaveRepository()
 

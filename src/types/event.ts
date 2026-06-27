@@ -107,6 +107,7 @@ export interface FeedEntry {
   /** 'unactioned' renders choice buttons; 'actioned' renders the choice made + its effect. */
   status: 'actioned' | 'unactioned'
   /** Set once resolved: the action taken (often an action's `label`) and its effect. */
+  actionTakenId?: string
   actionTaken?: string
   effect?: string
   /** Choices rendered as buttons while `status` is 'unactioned'. */

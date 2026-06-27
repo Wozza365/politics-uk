@@ -29,6 +29,12 @@ const timelineStops: TimelineStop[] = [
 ]
 const selectedStopIndex = ref(0)
 const selectedStop = computed(() => timelineStops[selectedStopIndex.value])
+const campaign = computed(() => scenario.scenario.campaign)
+const objectiveSummary = computed(() => {
+  const primary = campaign.value?.primaryObjectives.length ?? 0
+  const optional = campaign.value?.optionalObjectives.filter((objective) => objective.kind !== 'hidden').length ?? 0
+  return `${primary} primary objective${primary === 1 ? '' : 's'}, ${optional} optional objective${optional === 1 ? '' : 's'}`
+})
 
 const nationalParties = computed(() =>
   scenario.scenario.parties.filter((party) => party.scope === 'national'),
@@ -79,6 +85,34 @@ async function startGame() {
       />
       <p class="text-lg text-zinc-100">{{ selectedStop.label }}</p>
     </div>
+
+    <section
+      v-if="campaign"
+      class="grid w-full max-w-5xl gap-4 rounded-2xl border border-zinc-700/70 bg-zinc-950/70 p-5 text-sm text-zinc-300 shadow-xl sm:grid-cols-[1.4fr_1fr]"
+      aria-label="Scenario briefing"
+    >
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Scenario briefing</p>
+        <h2 class="mt-1 text-xl font-semibold text-zinc-100">{{ campaign.briefing.headline }}</h2>
+        <p class="mt-2 leading-6 text-zinc-300">{{ campaign.briefing.summary }}</p>
+        <p class="mt-3 text-xs text-zinc-500">{{ campaign.electoralHorizon.description }}</p>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Horizon</p>
+          <p class="mt-1 text-zinc-100">{{ campaign.electoralHorizon.expectedEndDate }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Difficulty</p>
+          <p class="mt-1 text-zinc-100">{{ objectiveSummary }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Content notes</p>
+          <p class="mt-1 text-xs text-zinc-400">{{ campaign.briefing.assumptions[0] }}</p>
+          <p class="mt-1 text-xs text-zinc-400">{{ campaign.briefing.fictionalPremises[0] }}</p>
+        </div>
+      </div>
+    </section>
 
     <div class="grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <PartyCard

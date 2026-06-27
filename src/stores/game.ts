@@ -4,6 +4,9 @@ import type {
   ActionCost,
   ActionOutcome,
   ActiveCommitment,
+  CampaignArcRecord,
+  CampaignObjective,
+  CampaignObjectiveRecord,
   Contest,
   ContestActionDef,
   ContestActionId,
@@ -48,6 +51,8 @@ import {
 } from '@/sim/targeting'
 import { isOpponentCadenceDay, rankTargetingMoves, selectOpponentMove } from '@/sim/opponents'
 import { resolveCommonsElection } from '@/sim/elections/commons'
+import { applyArcChoice, evaluateArcAvailability, initialiseArcRecords } from '@/sim/arcs'
+import { evaluateObjectiveRecords, flattenObjectives, initialiseObjectiveRecords, type ObjectiveEvaluationContext } from '@/sim/objectives'
 
 /** Polling bonus a targeting commitment's accumulated local influence contributes to that party's
  * effort if they also action a by-election contest in the same region (P3.4 step 3 — "translate it
@@ -189,6 +194,9 @@ export const useGameStore = defineStore('game', {
     // `rollByElectionsForDay` each tick rather than pre-authored; see `sim/byElections.ts`.
     contests: [] as Contest[],
     electionOutcomes: [] as ElectionOutcome[],
+    campaignObjectives: [] as CampaignObjectiveRecord[],
+    campaignArcs: [] as CampaignArcRecord[],
+    campaignProjectionCache: null as { key: string; seats: Record<PartyId, number> } | null,
     // An array so multiple action-required events could in principle queue up; the clock stays
     // paused while any remain (currently the roll only ever produces one per day).
     pendingEvents: [] as GameEvent[],
@@ -376,6 +384,10 @@ export const useGameStore = defineStore('game', {
     activeTargetingCommitments(state): ActiveCommitment[] {
       return state.activeCommitments.filter((commitment) => commitment.targetScope)
     },
+    campaignObjectiveDefinitions(): CampaignObjective[] {
+      const scenario = useScenarioStore()
+      return flattenObjectives(scenario.scenario.campaign?.primaryObjectives, scenario.scenario.campaign?.optionalObjectives)
+    },
   },
   actions: {
     startGame(partyId: PartyId) {
@@ -392,6 +404,8 @@ export const useGameStore = defineStore('game', {
       this.firedEventIds = []
       this.contests = []
       this.electionOutcomes = []
+      this.campaignArcs = initialiseArcRecords(scenario.scenario.campaign?.arcs ?? [], this.date)
+      this.campaignProjectionCache = null
       this.pendingPollImpacts = []
       this.finance = { ...scenario.scenario.finances }
       this.membership = { ...scenario.scenario.membership }
@@ -402,6 +416,51 @@ export const useGameStore = defineStore('game', {
       this.salience = { ...WORLD_SALIENCE }
       this.result = null
       this.playthroughSeed = generatePlaythroughSeed()
+      this.campaignObjectives = initialiseObjectiveRecords(this.campaignObjectiveDefinitions, this.objectiveInitialisationContext())
+    },
+    objectiveInitialisationContext(): ObjectiveEvaluationContext {
+      return {
+        date: this.date,
+        selectedPartyId: this.selectedPartyId,
+        polling: this.polling,
+        projectedSeatsByParty: {},
+        commonsSeatsByParty: {},
+        finance: this.finance,
+        membership: this.membership,
+        feed: this.feed,
+        electionOutcomes: this.electionOutcomes,
+        campaignArcs: this.campaignArcs,
+      }
+    },
+    objectiveEvaluationContext(): ObjectiveEvaluationContext {
+      return {
+        date: this.date,
+        selectedPartyId: this.selectedPartyId,
+        polling: this.polling,
+        projectedSeatsByParty: this.cachedProjectedCommonsSeatsByParty(),
+        commonsSeatsByParty: this.commonsSeatsByParty,
+        finance: this.finance,
+        membership: this.membership,
+        feed: this.feed,
+        electionOutcomes: this.electionOutcomes,
+        campaignArcs: this.campaignArcs,
+      }
+    },
+    cachedProjectedCommonsSeatsByParty(): Record<PartyId, number> {
+      const key = JSON.stringify([this.polling, this.localInfluence])
+      if (this.campaignProjectionCache?.key === key) return this.campaignProjectionCache.seats
+      const seats = this.projectedCommonsSeatsByParty
+      this.campaignProjectionCache = { key, seats }
+      return seats
+    },
+    evaluateCampaignProgress() {
+      const scenario = useScenarioStore()
+      const ctx = this.objectiveEvaluationContext()
+      this.campaignArcs = evaluateArcAvailability(scenario.scenario.campaign?.arcs ?? [], this.campaignArcs, ctx)
+      this.campaignObjectives = evaluateObjectiveRecords(this.campaignObjectiveDefinitions, this.campaignObjectives, {
+        ...ctx,
+        campaignArcs: this.campaignArcs,
+      })
     },
     /** Builds the narrow context an event callback (`sim/eventCallbacks.ts`) gets to work with —
      * closures over this store's own actions, so `sim/` never has to import `stores/`. */
@@ -522,6 +581,7 @@ export const useGameStore = defineStore('game', {
         status: 'actioned',
         effect: applied.provenance,
       })
+      this.evaluateCampaignProgress()
     },
     /** The GE result is a headline moment, not a finale (spec §11.2 doesn't define what happens
      * after) — `ResultScreen.vue` calls this to drop the player back into live play with the
@@ -611,11 +671,13 @@ export const useGameStore = defineStore('game', {
         const entry = this.feed.find((candidate) => candidate.id === contest.id)
         if (entry) {
           entry.status = 'actioned'
+          entry.actionTakenId = actionId
           entry.actionTaken = CONTEST_ACTIONS_BY_TIER[contest.contestTier].find((action) => action.id === actionId)?.label
           entry.effect = resultLabel
           entry.actions = undefined
         }
       }
+      this.evaluateCampaignProgress()
     },
     /** Folds every impact accumulated since the last release (plus this release's own
      * alignment/variance/trend) into a new polling snapshot, makes it the live number, and
@@ -683,6 +745,7 @@ export const useGameStore = defineStore('game', {
           headline: `${partyName} begins: ${def.label.toLowerCase()}.`,
           status: 'actioned',
         })
+        this.evaluateCampaignProgress()
         return
       }
 
@@ -693,6 +756,7 @@ export const useGameStore = defineStore('game', {
         headline: `${partyName} ${outcome.resultLabel}`,
         status: 'actioned',
       })
+      this.evaluateCampaignProgress()
     },
     /** Adds `magnitude` (negative to reverse) to every region in `scope`'s `localInfluence`,
      * clamped to the bounded range a single campaign can ever swing a region by (P3.4 step 3 —
@@ -843,9 +907,26 @@ export const useGameStore = defineStore('game', {
       if (event.publishesPoll) this.publishPoll(summary)
 
       entry.status = 'actioned'
+      entry.actionTakenId = action.id
       entry.actionTaken = action.label
       entry.effect = [action.effects?.summary, ...summary].filter(Boolean).join(' ') || undefined
       entry.actions = undefined
+
+      const scenario = useScenarioStore()
+      const beforeConsequences = new Set(this.campaignArcs.flatMap((record) => record.consequences.map((consequence) => consequence.id)))
+      this.campaignArcs = applyArcChoice(scenario.scenario.campaign?.arcs ?? [], this.campaignArcs, event.id, action.id, this.date)
+      for (const record of this.campaignArcs) {
+        const latest = record.consequences.find((consequence) => !beforeConsequences.has(consequence.id))
+        if (!latest) continue
+        this.recordFeedEntry({
+          id: `arc:${record.arcId}:${latest.id}:${this.date}`,
+          date: this.date,
+          headline: latest.label,
+          status: 'actioned',
+          effect: latest.summary,
+        })
+      }
+      this.evaluateCampaignProgress()
 
       this.firedEventIds.push(event.id)
       this.pendingEvents.splice(eventIndex, 1)
@@ -896,6 +977,11 @@ export const useGameStore = defineStore('game', {
           countsByParty: { ...outcome.countsByParty },
           changesByParty: { ...outcome.changesByParty },
         })),
+        campaignObjectives: this.campaignObjectives.map((record) => ({ ...record })),
+        campaignArcs: this.campaignArcs.map((record) => ({
+          ...record,
+          consequences: record.consequences.map((consequence) => ({ ...consequence })),
+        })),
         pendingEventIds: this.pendingEvents.map((event) => event.id),
         firedEventIds: [...this.firedEventIds],
         salience: { ...this.salience },
@@ -940,6 +1026,7 @@ export const useGameStore = defineStore('game', {
       this.localInfluence = Object.fromEntries(
         Object.entries(state.localInfluence ?? {}).map(([regionId, byParty]) => [regionId, pickKnownParties(byParty, knownPartyIds)]),
       )
+      this.campaignProjectionCache = null
       this.feed = state.feed.map((entry) => ({ ...entry, actions: entry.actions?.map((action) => ({ ...action })) }))
       this.contests = state.contests
         .filter((contest) => isKnownContest(contest, knownPartyIds, commonsRegionIds, councilWardRegionIds))
@@ -953,6 +1040,17 @@ export const useGameStore = defineStore('game', {
           countsByParty: pickKnownParties(outcome.countsByParty, knownRepresentationPartyIds),
           changesByParty: pickKnownParties(outcome.changesByParty, knownRepresentationPartyIds),
         }))
+      const knownCampaignArcIds = new Set((scenario.scenario.campaign?.arcs ?? []).map((arc) => arc.id))
+      const knownCampaignObjectiveIds = new Set(this.campaignObjectiveDefinitions.map((objective) => objective.id))
+      this.campaignArcs = (state.campaignArcs ?? initialiseArcRecords(scenario.scenario.campaign?.arcs ?? [], state.date))
+        .filter((record) => knownCampaignArcIds.has(record.arcId))
+        .map((record) => ({
+          ...record,
+          consequences: record.consequences.map((consequence) => ({ ...consequence })),
+        }))
+      this.campaignObjectives = (state.campaignObjectives ?? initialiseObjectiveRecords(this.campaignObjectiveDefinitions, this.objectiveEvaluationContext()))
+        .filter((record) => knownCampaignObjectiveIds.has(record.objectiveId))
+        .map((record) => ({ ...record }))
       this.pendingEvents = state.pendingEventIds
         .map((id) => EVENT_POOL.find((event) => event.id === id))
         .filter((event): event is GameEvent => !!event)

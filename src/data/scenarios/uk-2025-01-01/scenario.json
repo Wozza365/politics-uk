@@ -3,6 +3,156 @@
   "date": "2025-01-01",
   "label": "United Kingdom, 2025-01-01",
   "nextElectionDate": "2029-01-01",
+  "campaign": {
+    "schemaVersion": 1,
+    "briefing": {
+      "headline": "The long road to the next Westminster majority",
+      "summary": "Begin in January 2025 with the post-2024 Commons, live polling, party resources, and a four-year runway to the next assumed general election.",
+      "facts": [
+        "Seat totals, party holdings, mayoralties, and council control start from the researched scenario data.",
+        "The campaign begins on 2025-01-01 and uses 2029-01-01 as the electoral horizon."
+      ],
+      "assumptions": [
+        "Polling movement is modelled from authored events, party actions, targeting, and deterministic simulation rules.",
+        "The next general election date is a gameplay horizon, not a forecast."
+      ],
+      "fictionalPremises": [
+        "Campaign arcs and event choices after scenario start are authored fiction for replayable play."
+      ]
+    },
+    "electoralHorizon": {
+      "label": "Next UK general election",
+      "expectedEndDate": "2029-01-01",
+      "description": "Build enough support and local strength to turn the next Commons election into a winning result."
+    },
+    "primaryObjectives": [
+      {
+        "id": "commons-majority",
+        "kind": "primary",
+        "title": "Reach a Commons majority",
+        "description": "Project at least 326 Commons seats before the electoral horizon.",
+        "expiresOn": "2029-01-01",
+        "success": [{ "type": "projected-seats-at-least", "partyId": "player", "value": 326 }],
+        "failure": [{ "type": "date-on-or-after", "date": "2029-01-02" }]
+      }
+    ],
+    "optionalObjectives": [
+      {
+        "id": "national-momentum",
+        "kind": "optional",
+        "title": "Create national momentum",
+        "description": "Push your party to 30% in the headline poll.",
+        "expiresOn": "2027-12-31",
+        "success": [{ "type": "polling-at-least", "partyId": "player", "value": 30 }]
+      },
+      {
+        "id": "war-chest",
+        "kind": "optional",
+        "title": "Build a campaign war chest",
+        "description": "Hold at least GBP 500,000 in cash before the final year.",
+        "expiresOn": "2028-01-01",
+        "success": [{ "type": "cash-at-least", "partyId": "player", "value": 500000 }]
+      },
+      {
+        "id": "local-proof",
+        "kind": "hidden",
+        "title": "Turn a local moment into proof",
+        "description": "A visible local response has become part of your national argument.",
+        "hiddenUntil": [{ "type": "arc-consequence", "consequenceId": "storm-visited-ground" }],
+        "success": [{ "type": "arc-consequence", "consequenceId": "storm-visited-ground" }]
+      }
+    ],
+    "featureFlags": ["objectives", "campaign-arcs", "journal"],
+    "expectedTiers": ["commons", "council:county", "council:district", "council:unitary", "council:metropolitan", "council:london", "council:scottish", "council:welsh", "council:northern_ireland"],
+    "tuning": {
+      "recommendedPollTarget": 30,
+      "recommendedCashReserve": 500000
+    },
+    "arcs": [
+      {
+        "id": "storm-response",
+        "title": "Storm response",
+        "description": "A winter storm gives the party a choice between visible local campaigning and a safer national response.",
+        "startsAtStageId": "storm-choice",
+        "oneShot": true,
+        "stages": [
+          {
+            "id": "storm-choice",
+            "title": "First response",
+            "summary": "The first public response frames whether the party looks present or procedural.",
+            "branches": [
+              {
+                "eventId": "winter-storm-disruption-2025",
+                "actionId": "visit-affected-area",
+                "closesArc": true,
+                "consequence": {
+                  "id": "storm-visited-ground",
+                  "label": "Storm arc: ground response locked in",
+                  "summary": "The party is now associated with showing up locally when disruption hits."
+                }
+              },
+              {
+                "eventId": "winter-storm-disruption-2025",
+                "actionId": "statement-only",
+                "closesArc": true,
+                "consequence": {
+                  "id": "storm-statement-only",
+                  "label": "Storm arc: cautious response locked in",
+                  "summary": "The party saves resources but leaves little campaign story behind."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "foreign-policy-test",
+        "title": "Foreign-policy test",
+        "description": "An international crisis forces the party to choose between alliance discipline, public caution, and strategic ambiguity.",
+        "startsAtStageId": "iran-position",
+        "oneShot": true,
+        "stages": [
+          {
+            "id": "iran-position",
+            "title": "Iran statement",
+            "summary": "The position taken in the first hours will close off other narratives.",
+            "branches": [
+              {
+                "eventId": "trump-declares-war-on-iran",
+                "actionId": "support",
+                "closesArc": true,
+                "consequence": {
+                  "id": "iran-alliance-line",
+                  "label": "Foreign-policy arc: alliance line locked in",
+                  "summary": "The party chooses reliability with allies despite domestic risk."
+                }
+              },
+              {
+                "eventId": "trump-declares-war-on-iran",
+                "actionId": "condemn",
+                "closesArc": true,
+                "consequence": {
+                  "id": "iran-deescalation-line",
+                  "label": "Foreign-policy arc: de-escalation line locked in",
+                  "summary": "The party foregrounds caution and public war-weariness."
+                }
+              },
+              {
+                "eventId": "trump-declares-war-on-iran",
+                "actionId": "neutral",
+                "closesArc": true,
+                "consequence": {
+                  "id": "iran-ambiguity-line",
+                  "label": "Foreign-policy arc: ambiguity locked in",
+                  "summary": "The party avoids an immediate split but gains no clear story."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   "tiers": {
     "commons": [
       {

@@ -458,3 +458,36 @@ file.
   applied outcome. The map, hemicycle, party statistics, feed, save game, and objective result all
   reflect the applied outcome after refresh. The same election cannot be applied twice, and seat
   totals reconcile to the Commons total.
+
+## P3.6 - Campaign objectives, scenario arcs, and replayable content DONE
+
+- `src/types/scenario.ts`, `src/types/objective.ts`, and `src/types/campaignArc.ts` — added the
+  versioned `campaign` scenario section: briefing/provenance notes, electoral horizon, primary and
+  optional objectives, feature flags, expected tiers, tuning values, and authored arc/stage/branch
+  records with named consequences.
+- `src/data/scenarios/uk-2025-01-01/scenario.json` — authored the vertical slice: opening briefing,
+  the Commons-majority primary objective, two visible optional objectives, one hidden objective,
+  and two branching arcs tied to existing scripted event choices (`winter-storm-disruption-2025`
+  and `trump-declares-war-on-iran`).
+- `src/sim/objectives.ts` and `src/sim/arcs.ts` — pure evaluators for objective lifecycle records
+  and campaign arc branching. They observe polling, finance, membership, action/feed history,
+  election outcomes, projected/current seats, dates, and arc consequences without mutating store
+  state directly.
+- `src/stores/game.ts` and `src/types/save.ts` — campaign objective and arc records are now mutable
+  playthrough state, initialised on new game, updated after relevant player choices/actions and
+  election outcomes, projected into saves, and restored through the existing hydration seam.
+- `src/components/CampaignJournal.vue`, `src/screens/GameScreen.vue`, and
+  `src/screens/NewGameScreen.vue` — added the scenario briefing to new-game setup and an in-game
+  campaign journal showing visible objectives, active arcs, and completed consequences without
+  revealing hidden branches early.
+- `scripts/data/validate-scenario.mjs` — validates campaign schema version, objective party/date
+  conditions, duplicate ids, arc stage references, event/action branch references, and consequence
+  references before content reaches the app.
+- Covered by new `src/sim/objectives.spec.ts` and `src/sim/arcs.spec.ts`, plus save restoration
+  coverage in `src/stores/save.spec.ts`. The two existing long-run by-election tests now carry an
+  explicit 15s timeout because they simulate a full year over the full scenario dataset. Full
+  verification: 212 tests pass; `npm run build` and `npm run validate:data` pass.
+- **Acceptance:** a new campaign starts with a readable briefing and active objective records;
+  authored event choices record arc consequences into the feed and journal; objective/arc state
+  persists through save/load; hidden objective content stays hidden until its consequence exists;
+  invalid campaign relationships fail data validation.

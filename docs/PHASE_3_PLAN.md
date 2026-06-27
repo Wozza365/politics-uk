@@ -63,9 +63,11 @@ See
 [PHASE_3_COMPLETED.md](./PHASE_3_COMPLETED.md#p35--election-resolution-and-changing-political-world-state)
 for the full record of what was built.
 
-### P3.6 — Campaign objectives, scenario arcs, and replayable content
+### P3.6 — Campaign objectives, scenario arcs, and replayable content `DONE`
 
-See [`phase3/P3.6-campaign-content.md`](./phase3/P3.6-campaign-content.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p36---campaign-objectives-scenario-arcs-and-replayable-content-done)
+for the full record of what was built.
 
 ### P3.7 — Onboarding and simulation explainability
 

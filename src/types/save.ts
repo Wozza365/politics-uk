@@ -1,6 +1,8 @@
 import type { ActiveCommitment } from './action'
+import type { CampaignArcRecord } from './campaignArc'
 import type { Contest, ElectionOutcome } from './election'
 import type { FeedEntry } from './event'
+import type { CampaignObjectiveRecord } from './objective'
 import type { ISODate, PartyFinance, PartyId } from './party'
 import type { PollingSnapshot } from './scenario'
 import type { PollingImpact } from '@/sim/poll'
@@ -65,6 +67,10 @@ export interface GameSaveStateV1 {
   /** P3.5 applied election outcome ledger. This is the mutable representation overlay: scenario
    * composition is still only the historical starting snapshot. Optional for pre-P3.5 saves. */
   electionOutcomes?: ElectionOutcome[]
+  /** P3.6 objective lifecycle and campaign arc progress. Optional so pre-P3.6 saves hydrate into
+   * freshly evaluated campaign state. */
+  campaignObjectives?: CampaignObjectiveRecord[]
+  campaignArcs?: CampaignArcRecord[]
   /** `pendingEvents` are entries straight out of the authored event pool (`sim/events.ts`), so
    * only their ids are saved; hydration looks them back up rather than duplicating authored
    * content into every save. */

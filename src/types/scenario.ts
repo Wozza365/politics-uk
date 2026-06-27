@@ -1,10 +1,36 @@
 import type { Mayoralty } from './mayoralty'
+import type { CampaignArc } from './campaignArc'
+import type { CampaignObjective } from './objective'
 import type { ISODate, Party, PartyFinance, PartyId } from './party'
 import type { Region, TierId } from './region'
 
 export interface PollingSnapshot {
   date: ISODate
   polling: Record<PartyId, number>
+}
+
+export interface CampaignBriefing {
+  headline: string
+  summary: string
+  facts: string[]
+  assumptions: string[]
+  fictionalPremises: string[]
+}
+
+export interface CampaignScenarioConfig {
+  schemaVersion: 1
+  briefing: CampaignBriefing
+  electoralHorizon: {
+    label: string
+    expectedEndDate: ISODate
+    description: string
+  }
+  primaryObjectives: CampaignObjective[]
+  optionalObjectives: CampaignObjective[]
+  featureFlags: string[]
+  expectedTiers: TierId[]
+  tuning: Record<string, number>
+  arcs: CampaignArc[]
 }
 
 export interface Scenario {
@@ -22,4 +48,5 @@ export interface Scenario {
   pollingHistory: PollingSnapshot[]
   finances: Record<PartyId, PartyFinance>
   membership: Record<PartyId, number>
+  campaign?: CampaignScenarioConfig
 }

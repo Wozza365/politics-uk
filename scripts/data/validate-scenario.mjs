@@ -209,6 +209,88 @@ function validateMembership(scenario, partyIds) {
   return errors
 }
 
+function validateCampaignCondition(condition, partyIds, eventActionsById, consequences) {
+  const errors = []
+  if (!condition || typeof condition.type !== 'string') return ['campaign condition is missing type']
+  if ('partyId' in condition && condition.partyId !== 'player' && !partyIds.has(condition.partyId)) {
+    errors.push(`campaign condition "${condition.type}" references unknown party "${condition.partyId}"`)
+  }
+  if ('date' in condition && !isValidIsoDate(condition.date)) {
+    errors.push(`campaign condition "${condition.type}" has invalid date "${condition.date}"`)
+  }
+  if ('value' in condition && (typeof condition.value !== 'number' || Number.isNaN(condition.value))) {
+    errors.push(`campaign condition "${condition.type}" has invalid numeric value "${condition.value}"`)
+  }
+  if (condition.type === 'event-action-taken') {
+    const actions = eventActionsById.get(condition.eventId)
+    if (!actions) errors.push(`campaign condition references unknown event "${condition.eventId}"`)
+    else if (!actions.has(condition.actionId)) errors.push(`campaign condition references unknown action "${condition.eventId}:${condition.actionId}"`)
+  }
+  if (condition.type === 'arc-consequence' && !consequences.has(condition.consequenceId)) {
+    errors.push(`campaign condition references unknown arc consequence "${condition.consequenceId}"`)
+  }
+  return errors
+}
+
+function validateCampaign(scenario, partyIds, events) {
+  const errors = []
+  const campaign = scenario.campaign
+  if (!campaign) return errors
+  if (campaign.schemaVersion !== 1) errors.push(`campaign.schemaVersion must be 1, got "${campaign.schemaVersion}"`)
+  if (!campaign.briefing?.headline || !campaign.briefing?.summary) errors.push('campaign.briefing requires headline and summary')
+  if (!isValidIsoDate(campaign.electoralHorizon?.expectedEndDate)) {
+    errors.push(`campaign.electoralHorizon.expectedEndDate is not a valid ISO date: ${campaign.electoralHorizon?.expectedEndDate}`)
+  }
+
+  const eventActionsById = new Map()
+  for (const event of events) eventActionsById.set(event.id, new Set((event.actions ?? []).map((action) => action.id)))
+
+  const consequenceIds = new Set()
+  const arcIds = new Set()
+  for (const arc of campaign.arcs ?? []) {
+    if (!arc.id || !arc.title || !arc.startsAtStageId) errors.push(`campaign arc is missing id/title/startsAtStageId: ${arc.id}`)
+    if (arcIds.has(arc.id)) errors.push(`duplicate campaign arc id "${arc.id}"`)
+    arcIds.add(arc.id)
+    const stageIds = new Set((arc.stages ?? []).map((stage) => stage.id))
+    if (!stageIds.has(arc.startsAtStageId)) errors.push(`campaign arc "${arc.id}" starts at unknown stage "${arc.startsAtStageId}"`)
+    for (const stage of arc.stages ?? []) {
+      for (const condition of stage.prerequisites ?? []) errors.push(...validateCampaignCondition(condition, partyIds, eventActionsById, consequenceIds))
+      for (const branch of stage.branches ?? []) {
+        const actions = eventActionsById.get(branch.eventId)
+        if (!actions) errors.push(`campaign arc "${arc.id}" branch references unknown event "${branch.eventId}"`)
+        else if (!actions.has(branch.actionId)) errors.push(`campaign arc "${arc.id}" branch references unknown action "${branch.eventId}:${branch.actionId}"`)
+        if (branch.nextStageId && !stageIds.has(branch.nextStageId)) {
+          errors.push(`campaign arc "${arc.id}" branch references unknown nextStageId "${branch.nextStageId}"`)
+        }
+        if (!branch.consequence?.id || !branch.consequence?.label) {
+          errors.push(`campaign arc "${arc.id}" branch is missing consequence id/label`)
+        } else if (consequenceIds.has(branch.consequence.id)) {
+          errors.push(`duplicate campaign consequence id "${branch.consequence.id}"`)
+        } else {
+          consequenceIds.add(branch.consequence.id)
+        }
+      }
+    }
+  }
+
+  const objectiveIds = new Set()
+  for (const objective of [...(campaign.primaryObjectives ?? []), ...(campaign.optionalObjectives ?? [])]) {
+    if (!objective.id || !objective.title || !objective.kind) errors.push(`campaign objective is missing id/title/kind: ${objective.id}`)
+    if (objectiveIds.has(objective.id)) errors.push(`duplicate campaign objective id "${objective.id}"`)
+    objectiveIds.add(objective.id)
+    for (const partyId of objective.partyIds ?? []) {
+      if (!partyIds.has(partyId)) errors.push(`campaign objective "${objective.id}" references unknown party "${partyId}"`)
+    }
+    if (objective.activeFrom && !isValidIsoDate(objective.activeFrom)) errors.push(`campaign objective "${objective.id}" activeFrom is invalid`)
+    if (objective.expiresOn && !isValidIsoDate(objective.expiresOn)) errors.push(`campaign objective "${objective.id}" expiresOn is invalid`)
+    for (const condition of objective.hiddenUntil ?? []) errors.push(...validateCampaignCondition(condition, partyIds, eventActionsById, consequenceIds))
+    for (const condition of objective.success ?? []) errors.push(...validateCampaignCondition(condition, partyIds, eventActionsById, consequenceIds))
+    for (const condition of objective.failure ?? []) errors.push(...validateCampaignCondition(condition, partyIds, eventActionsById, consequenceIds))
+  }
+
+  return errors
+}
+
 // Mayoralties (P2.3): no duplicate ids, every party reference resolves,
 // every electedAt is a valid ISO date. Not cross-checked against any
 // boundary/geometryRef -- mayoralties don't have map geometry in this
@@ -255,7 +337,7 @@ function validateDemographics(scenario, demographics) {
 
 // Orchestrator: add a new check by adding a new validate<Concern> function
 // above and calling it here, not by growing an existing one.
-function validate(scenario, boundariesByTier, demographics = null) {
+function validate(scenario, boundariesByTier, demographics = null, events = []) {
   const errors = []
 
   if (!isValidIsoDate(scenario.date)) errors.push(`scenario.date is not a valid ISO date: ${scenario.date}`)
@@ -274,6 +356,7 @@ function validate(scenario, boundariesByTier, demographics = null) {
   errors.push(...validateMembership(scenario, partyIds))
   errors.push(...validateMayoralties(scenario, partyIds))
   errors.push(...validateDemographics(scenario, demographics))
+  errors.push(...validateCampaign(scenario, partyIds, events))
 
   return errors
 }
@@ -374,7 +457,14 @@ function main() {
     ? null
     : readJson('../../src/data/scenarios/uk-2025-01-01/demographics.commons.json')
 
-  const errors = validate(scenario, boundariesByTier, demographics)
+  const events = usePlaceholder
+    ? []
+    : [
+        ...readJson('../../src/data/scenarios/uk-2025-01-01/events.seed.json'),
+        ...readJson('../../src/data/scenarios/uk-2025-01-01/events.scripted.json'),
+      ]
+
+  const errors = validate(scenario, boundariesByTier, demographics, events)
   if (!usePlaceholder) {
     errors.push(
       ...validateCouncilWardDrilldown(

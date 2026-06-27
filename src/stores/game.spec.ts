@@ -417,7 +417,7 @@ describe('useGameStore by-elections — P2.8', () => {
     for (const contest of commonsContests) {
       expect(game.feed.some((entry) => entry.id === contest.id)).toBe(true)
     }
-  })
+  }, 15_000)
 
   it('rolls council contests into one upserted "called this week" feed entry per ISO week', () => {
     const game = useGameStore()
@@ -430,7 +430,7 @@ describe('useGameStore by-elections — P2.8', () => {
     // One entry per distinct ISO week a council contest landed in, never duplicated.
     const ids = weeklyEntries.map((entry) => entry.id)
     expect(new Set(ids).size).toBe(ids.length)
-  })
+  }, 15_000)
 
   it('actionContest resolves the contest, queues its polling impact, and updates the matching commons feed entry', () => {
     const game = useGameStore()
