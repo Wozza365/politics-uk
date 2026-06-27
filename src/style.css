@@ -30,8 +30,7 @@ textarea {
 }
 
 .hud-party-expanded {
-  top: 9rem;
-  max-height: calc(100vh - 22rem);
+  max-height: calc(100vh - 12rem);
   z-index: 35;
 }
 

@@ -24,7 +24,7 @@ function formatWeek(week: ISODate) {
 <template>
   <section
     v-if="ui.byElectionsPanelOpen"
-    class="hud-side-panel absolute right-4 top-56 z-30 max-h-[calc(100vh-15rem)] w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
+    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
     aria-label="By-elections panel"
   >
     <header class="border-b border-zinc-800/80 px-4 py-3">
