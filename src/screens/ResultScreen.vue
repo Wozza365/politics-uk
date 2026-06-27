@@ -11,10 +11,12 @@ import { computed } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
+import { useSaveStore } from '@/stores/save'
 
 const game = useGameStore()
 const scenario = useScenarioStore()
 const ui = useUiStore()
+const save = useSaveStore()
 
 const won = computed(() => game.result === 'won')
 const totalCommonsSeats = computed(() => scenario.commonsRegions.length)
@@ -25,8 +27,12 @@ function continuePlaying() {
   ui.goToGame()
 }
 
-function playAgain() {
-  ui.goToStart()
+/** Result -> main menu (P3.2): flushes the autosave before leaving so "Continue" on the title
+ * screen reflects this result, same as `GameMenuPanel`'s "Return to main menu" — never clears the
+ * live `game` store itself. */
+async function backToMainMenu() {
+  await save.saveNow()
+  ui.goToTitle()
 }
 </script>
 
@@ -54,9 +60,9 @@ function playAgain() {
       <button
         type="button"
         class="rounded-xl border border-zinc-700 px-6 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-        @click="playAgain"
+        @click="backToMainMenu"
       >
-        Play again
+        Main menu
       </button>
     </div>
   </main>

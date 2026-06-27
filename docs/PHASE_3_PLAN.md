@@ -40,9 +40,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p31--autosave-manual-slots-and-portable-saves)
 for the full record of what was built.
 
-### P3.2 — Main menu, load/new-game flow, and safe game lifecycle
+### P3.2 — Main menu, load/new-game flow, and safe game lifecycle `✅ DONE`
 
-See [`phase3/P3.2-game-lifecycle.md`](./phase3/P3.2-game-lifecycle.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p32--main-menu-loadnew-game-flow-and-safe-game-lifecycle)
+for the full record of what was built.
 
 ### P3.3 — Campaign action economy
 

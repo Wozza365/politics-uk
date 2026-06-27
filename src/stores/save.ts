@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import type { SaveGameV1, SaveKind, SaveMetadata, SaveSummary, SaveValidationError } from '@/types'
+import type { PartyId, SaveGameV1, SaveKind, SaveMetadata, SaveSummary, SaveValidationError } from '@/types'
 import { CURRENT_SAVE_FORMAT_VERSION } from '@/types'
 import {
   decodeSaveEnvelope,
@@ -78,6 +78,18 @@ export const useSaveStore = defineStore('save', {
     },
     async refreshSaves() {
       this.saves = await this.repository.list()
+    },
+    /** P3.2's single orchestration entry point for starting a brand-new campaign: resets every
+     * mutable store via `game.startGame`, then writes its first autosave before the caller's first
+     * playable frame (save policy: "queue an autosave only after a domain transaction completes" —
+     * starting a fresh campaign is one). Confirming an overwrite of an existing active campaign is
+     * the caller's job (`ui.requestConfirm`, since the single rolling autosave slot means a new
+     * campaign's first write would otherwise silently replace the previous one) — this action
+     * assumes that's already happened. */
+    async startNewGame(partyId: PartyId): Promise<void> {
+      const game = useGameStore()
+      game.startGame(partyId)
+      await this.writeSave('autosave')
     },
     /** Snapshots the live game/ui stores into a complete, self-validated record and writes it in
      * one repository call — never a partial one ("atomic-replacement strategy appropriate to

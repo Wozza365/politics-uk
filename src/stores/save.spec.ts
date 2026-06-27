@@ -150,6 +150,37 @@ describe('useSaveStore — P3.0 save contract', () => {
     expect(save.lastError?.type).toBe('unsupported-version')
   })
 
+  it('startNewGame (P3.2) resets the game store and writes its first autosave before the caller proceeds', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+
+    await save.startNewGame('labour')
+
+    expect(game.selectedPartyId).toBe('labour')
+    const autosave = await repository.read('autosave')
+    expect(autosave).not.toBeNull()
+    expect((autosave as SaveGameV1).state.game.selectedPartyId).toBe('labour')
+  })
+
+  it('startNewGame replaces a previous campaign\'s rolling autosave (the single global slot)', async () => {
+    const repository = new InMemorySaveRepository()
+    const game = useGameStore()
+    const save = useSaveStore()
+    save.useRepository(repository)
+
+    await save.startNewGame('labour')
+    game.tickDay()
+    await save.writeSave('autosave')
+
+    await save.startNewGame('conservative')
+
+    const autosave = (await repository.read('autosave')) as SaveGameV1
+    expect(autosave.state.game.selectedPartyId).toBe('conservative')
+    expect(autosave.state.game.date).toBe(game.date) // the fresh campaign's own start date
+  })
+
   it('clearAutosave removes only the autosave slot, leaving manual saves intact', async () => {
     const repository = new InMemorySaveRepository()
     const game = useGameStore()

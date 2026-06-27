@@ -2,7 +2,10 @@ import { defineStore } from 'pinia'
 import { COUNCIL_LEVELS, type CouncilLevelId } from './scenario'
 import type { UiSaveStateV1 } from '@/types'
 
-export type Screen = 'start' | 'loading' | 'game' | 'result'
+// P3.2: title/main-menu, new-game setup, load-game browser, the brief spinner while a *new*
+// campaign initialises, restoring (loading an *existing* save), the live game, and the post-GE
+// result screen. Replaces the MVP's one-way 'start' -> 'loading' -> 'game'.
+export type Screen = 'title' | 'newGame' | 'loadGame' | 'loading' | 'restoring' | 'game' | 'result'
 
 export type GameView = 'westminster' | 'regional' | 'councils'
 export type MapRendererChoice = 'geographic' | 'hex'
@@ -19,9 +22,24 @@ export interface MapFocusRequest {
   geometryRef: string // passed straight to MapView's activate()
 }
 
+/** A screen-level "are you sure?" prompt (P3.2 step 1) — the single source of truth for
+ * destructive *screen transitions* (new game over an active campaign, return to menu, restart),
+ * kept in `ui.ts` rather than as a component-local boolean per screen so it can't conflict after a
+ * load. Distinct from `SaveManagementPanel.vue`'s own local confirm state, which only ever guards
+ * that panel's delete/import-overwrite actions. */
+export interface ConfirmModalRequest {
+  title: string
+  message: string
+  confirmLabel?: string
+  cancelLabel?: string
+}
+
 export const useUiStore = defineStore('ui', {
   state: () => ({
-    screen: 'start' as Screen,
+    screen: 'title' as Screen,
+    // Set by `goToRestoring` so `RestoreScreen.vue` knows which save id to read — cleared once
+    // restore succeeds or the player bails back to the load list.
+    pendingRestoreId: null as string | null,
     activeView: 'westminster' as GameView,
     activeCouncilLevel: 'local' as CouncilLevelId,
     westminsterRenderer: 'geographic' as MapRendererChoice,
@@ -31,7 +49,12 @@ export const useUiStore = defineStore('ui', {
     openMenus: 0,
     byElectionsPanelOpen: false,
     saveManagementPanelOpen: false,
+    gameMenuOpen: false,
     mapFocusRequest: null as MapFocusRequest | null,
+    // Transient — `resolve` is a callback, never persisted (see `hydrateFromSaveState`, which
+    // always clears this like every other open-panel flag). Only one prompt is ever pending at a
+    // time, matching the UI: a screen-level transition is never queued behind another one.
+    confirmModal: null as { request: ConfirmModalRequest; resolve: (confirmed: boolean) => void } | null,
   }),
   actions: {
     openMenu() {
@@ -52,23 +75,52 @@ export const useUiStore = defineStore('ui', {
     closeSaveManagementPanel() {
       this.saveManagementPanelOpen = false
     },
+    toggleGameMenu() {
+      this.gameMenuOpen = !this.gameMenuOpen
+    },
+    closeGameMenu() {
+      this.gameMenuOpen = false
+    },
     requestMapFocus(request: MapFocusRequest) {
       this.mapFocusRequest = request
     },
     clearMapFocus() {
       this.mapFocusRequest = null
     },
-    goToStart() {
-      this.screen = 'start'
+    goToTitle() {
+      this.screen = 'title'
+    },
+    goToNewGame() {
+      this.screen = 'newGame'
+    },
+    goToLoadGame() {
+      this.screen = 'loadGame'
     },
     goToLoading() {
       this.screen = 'loading'
+    },
+    goToRestoring(saveId: string) {
+      this.pendingRestoreId = saveId
+      this.screen = 'restoring'
     },
     goToGame() {
       this.screen = 'game'
     },
     goToResult() {
       this.screen = 'result'
+    },
+    /** Awaitable confirm prompt — resolves once the player picks an option in the `ConfirmDialog`
+     * `App.vue` mounts for `confirmModal`. */
+    requestConfirm(request: ConfirmModalRequest): Promise<boolean> {
+      return new Promise((resolve) => {
+        this.confirmModal = { request, resolve }
+      })
+    },
+    resolveConfirm(confirmed: boolean) {
+      if (!this.confirmModal) return
+      const { resolve } = this.confirmModal
+      this.confirmModal = null
+      resolve(confirmed)
     },
     setActiveView(view: GameView) {
       this.activeView = view
@@ -103,7 +155,9 @@ export const useUiStore = defineStore('ui', {
       this.openMenus = 0
       this.byElectionsPanelOpen = false
       this.saveManagementPanelOpen = false
+      this.gameMenuOpen = false
       this.mapFocusRequest = null
+      this.confirmModal = null
     },
   },
 })

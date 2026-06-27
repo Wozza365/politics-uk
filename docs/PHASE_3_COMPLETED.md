@@ -146,3 +146,69 @@ file.
   corrupting the rolling autosave (including the previously-broken edge case of re-importing an
   exported autosave). A failed write leaves the prior autosave and the live game intact and is
   surfaced as a recoverable status, never thrown.
+
+## P3.2 — Main menu, load/new-game flow, and safe game lifecycle ✅
+
+- `src/stores/ui.ts` — extended as the single source of truth for screen/modal state.
+  `Screen` grew to `'title' | 'newGame' | 'loadGame' | 'loading' | 'restoring' | 'game' | 'result'`
+  (initial screen is now `'title'`, replacing the old `'start'`). New state: `pendingRestoreId`
+  (the save id `RestoreScreen` should load, set by `goToRestoring(id)`), `gameMenuOpen`, and
+  `confirmModal: { request: ConfirmModalRequest; resolve } | null` — a single awaitable confirm-
+  modal slot rather than a collection of component-local booleans. `requestConfirm(request)` returns
+  a `Promise<boolean>` and stashes its `resolve` in store state; `resolveConfirm(confirmed)` resolves
+  it and clears the slot. `hydrateFromSaveState` always resets `gameMenuOpen` and `confirmModal` to
+  their defaults alongside the other transient flags it already cleared — a restore can never land
+  on an open menu or a stuck confirm prompt.
+- `src/stores/save.ts` — added `startNewGame(partyId)`, the one orchestration entry point for
+  starting a brand-new campaign: calls `game.startGame(partyId)` then writes the first autosave
+  before the caller's first playable frame. Confirming an overwrite of an active campaign's single
+  rolling autosave slot is the caller's job (`ui.requestConfirm`); this action assumes that already
+  happened.
+- `src/screens/TitleScreen.vue` (new) — the main menu. Shows "Continue" only when an autosave exists
+  for the live scenario (party/date metadata shown), plus "New game" and "Load game"; a disabled
+  Settings placeholder; footer shows `Save format v{{ CURRENT_SAVE_FORMAT_VERSION }}`.
+- `src/screens/NewGameScreen.vue` (new, replaces the deleted `StartScreen.vue`) — the timeline/party
+  picker, now behind "← Back" to the title screen. Starting a campaign while one is already active
+  (`game.selectedPartyId !== null`) goes through `ui.requestConfirm` first (cancelling leaves the
+  picker untouched); confirmed, it calls `save.startNewGame` then `ui.goToLoading()`.
+  `PartyCard.vue`'s header comment updated to match the rename.
+- `src/screens/LoadGameScreen.vue` (new) — lists saves for the live scenario (newest first), each
+  with a "Load" button (`ui.goToRestoring(id)`); deliberately excludes rename/delete/export, which
+  stay exclusive to `SaveManagementPanel.vue`.
+- `src/screens/RestoreScreen.vue` (new) — on mount, loads `ui.pendingRestoreId` via `save.loadSave`.
+  Success shows "Campaign restored." behind an explicit "Continue" button (`ui.goToGame()` — never
+  an automatic/timed transition, since a restored clock must always come back paused); failure shows
+  `save.lastError?.message` with a "Back to load list" button.
+- `src/components/GameMenuPanel.vue` (new) — the in-game menu opened from `GameClock.vue`'s "Menu"
+  button (renamed from "Saves", now driving `ui.gameMenuOpen` through the existing
+  `ui.openMenu()`/`game.pauseClock()` pause-gate pattern). Resume closes the menu and resumes the
+  clock; "Manage saves" hands the pause-gate claim to `SaveManagementPanel` without touching the
+  shared `openMenus` counter; "Return to main menu" confirms, then flushes a save (`save.saveNow()`)
+  and goes to the title screen without ever clearing the live `game` store; "Restart campaign"
+  confirms, then calls `save.startNewGame(game.selectedPartyId)` and goes to the loading screen
+  (reusing the current party rather than re-presenting the picker). Mounted in `GameScreen.vue`.
+- `src/App.vue` — rewritten as a thin screen router keyed off `ui.screen` (`title`/`newGame`/
+  `loadGame`/`loading`/`restoring`/`game`/`result`), and mounts one global `ConfirmDialog` driven by
+  `ui.confirmModal`/`ui.resolveConfirm`. Still calls `useSaveStore().startAutosave()` once.
+- `src/screens/ResultScreen.vue` — "Play again" became "Main menu": flushes a save
+  (`save.saveNow()`) then `ui.goToTitle()`, instead of silently discarding the just-finished
+  campaign's final state.
+- Covered by 7 new tests in `src/stores/ui.spec.ts` (initial screen; the full legal transition walk
+  through every `goTo*` action including `pendingRestoreId`; `requestConfirm`/`resolveConfirm(true
+  /false)`; `resolveConfirm` as a no-op with nothing pending; `toggleGameMenu`/`closeGameMenu`;
+  `hydrateFromSaveState` resetting every transient UI flag regardless of prior state) and 2 new
+  tests in `src/stores/save.spec.ts` (`startNewGame` resets the game store and writes the first
+  autosave before returning; a second `startNewGame` replaces the previous campaign's rolling
+  autosave rather than merging with it). All 144 project tests, `npm run build`, and
+  `npm run validate:data` pass. Manually verified with three Playwright smoke runs against
+  `npm run dev`: title → new game → game → menu → return to main menu → continue → restore; the
+  load-game screen listing an autosave entry plus the restart-campaign confirm flow; and the
+  new-game-over-an-active-campaign confirm/cancel/confirm flow — no console or page errors in any
+  run.
+- **Acceptance:** the title screen offers Continue (when an autosave exists for the live scenario),
+  New game, and Load game. Starting a new campaign over an active one, returning to the main menu,
+  and restarting a campaign all require an explicit confirm step backed by a single store-owned
+  `confirmModal` slot rather than scattered component booleans. Returning to the main menu and
+  finishing a campaign (`ResultScreen`) both flush a save before navigating away, so no progress is
+  silently lost. A restored campaign's clock always starts paused, and the player must explicitly
+  press Continue to enter play.

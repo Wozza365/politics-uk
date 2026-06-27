@@ -23,9 +23,9 @@ function toggleByElectionsPanel() {
   }
 }
 
-function toggleSaveManagementPanel() {
-  ui.toggleSaveManagementPanel()
-  if (ui.saveManagementPanelOpen) {
+function toggleGameMenu() {
+  ui.toggleGameMenu()
+  if (ui.gameMenuOpen) {
     ui.openMenu()
     game.pauseClock()
   } else {
@@ -92,11 +92,11 @@ const clockIconStyle = computed(() => ({
       <button
         type="button"
         class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
-        :aria-expanded="ui.saveManagementPanelOpen"
-        aria-label="Open save management panel"
-        @click="toggleSaveManagementPanel"
+        :aria-expanded="ui.gameMenuOpen"
+        aria-label="Open game menu"
+        @click="toggleGameMenu"
       >
-        Saves
+        Menu
       </button>
       <SaveStatusIndicator />
     </div>

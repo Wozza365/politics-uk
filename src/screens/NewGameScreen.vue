@@ -1,8 +1,13 @@
 <script setup lang="ts">
-// Start menu (spec §7): timeline selector + party cards + Start button.
+// New-game setup (P3.2 step 3, formerly the MVP's `StartScreen`): timeline selector + party cards
+// + Start button. Starting over an active campaign confirms first (the single rolling autosave
+// slot means a new campaign's first autosave would otherwise silently replace the previous one) —
+// then the whole reset+first-autosave sequence runs through one orchestration action
+// (`save.startNewGame`) rather than this screen poking `game`/`save` separately.
 import { computed, ref } from 'vue'
 import { useScenarioStore } from '@/stores/scenario'
 import { useGameStore } from '@/stores/game'
+import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import PartyCard from '@/components/PartyCard.vue'
 
@@ -16,6 +21,7 @@ interface TimelineStop {
 
 const scenario = useScenarioStore()
 const game = useGameStore()
+const save = useSaveStore()
 const ui = useUiStore()
 
 const timelineStops: TimelineStop[] = [
@@ -34,16 +40,30 @@ function selectParty(partyId: string) {
   selectedPartyId.value = partyId
 }
 
-function startGame() {
+async function startGame() {
   if (!selectedPartyId.value) return
-  game.startGame(selectedPartyId.value)
+  if (game.selectedPartyId) {
+    const confirmed = await ui.requestConfirm({
+      title: 'Start a new campaign?',
+      message: 'You have an active campaign in progress. Starting a new one replaces its autosave — any manual saves you made are unaffected.',
+      confirmLabel: 'Start new campaign',
+    })
+    if (!confirmed) return
+  }
+  await save.startNewGame(selectedPartyId.value)
   ui.goToLoading()
 }
 </script>
 
 <template>
   <main class="flex h-screen w-screen flex-col items-center gap-8 overflow-y-auto bg-zinc-900 p-8 pb-[50px]">
-    <h1 class="text-3xl font-semibold text-zinc-100">Politics UK</h1>
+    <div class="flex w-full max-w-5xl items-center justify-start">
+      <button type="button" class="text-sm text-zinc-400 hover:text-zinc-100" @click="ui.goToTitle">
+        ← Back
+      </button>
+    </div>
+
+    <h1 class="text-3xl font-semibold text-zinc-100">New game</h1>
 
     <div class="flex w-full max-w-md flex-col items-center gap-2">
       <label for="timeline-slider" class="text-sm font-medium text-zinc-300">Scenario</label>

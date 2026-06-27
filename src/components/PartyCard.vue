@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Start-menu party card (spec §7.2). Renders whatever party it's given — the
-// parent (StartScreen) is responsible for filtering to scope === 'national'.
+// New-game party card (spec §7.2). Renders whatever party it's given — the
+// parent (NewGameScreen) is responsible for filtering to scope === 'national'.
 import { computed } from 'vue'
 import type { Party } from '@/types'
 import { useScenarioStore } from '@/stores/scenario'
