@@ -24,6 +24,23 @@ function validSave(overrides: Partial<SaveGameV1> = {}): SaveGameV1 {
         finance: { labour: { estimatedCashOnHand: 1000, source: 'estimated' } },
         membership: { labour: 5000 },
         leverCooldowns: { 'labour:fundraising': '2025-01-20' },
+        staffCapacityBonus: { labour: 10 },
+        activeCommitments: [
+          {
+            id: 'campaigning:labour:2025-01-25',
+            actionId: 'campaigning',
+            partyId: 'labour',
+            startedDate: '2025-01-25',
+            endsDate: '2025-02-01',
+            recurringCost: { money: 3000 },
+            staffHeld: 15,
+            leadershipHeld: 0,
+            pollingImpacts: [{ partyId: 'labour', magnitude: 0.2, source: 'lever:campaigning' }],
+            financeDelta: 0,
+            membershipDelta: 0,
+            resultLabel: 'doorstep campaign push concludes.',
+          },
+        ],
         feed: [{ id: 'f1', date: '2025-01-15', headline: 'Something happened.', status: 'actioned' }],
         contests: [
           {

@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useScenarioStore } from '@/stores/scenario'
-import type { Contest, ContestActionDef, ContestActionId, ISODate } from '@/types'
+import type { Contest, ContestActionId, ISODate } from '@/types'
 
-defineProps<{ contest: Contest; actions: ContestActionDef[] }>()
-defineEmits<{ action: [actionId: ContestActionId]; focus: [] }>()
+interface AvailableContestAction {
+  id: ContestActionId
+  label: string
+  description: string
+  allowed: boolean
+  disabledReason?: string
+}
+
+const props = defineProps<{ contest: Contest; actions: AvailableContestAction[] }>()
+const emit = defineEmits<{ action: [actionId: ContestActionId]; focus: [] }>()
 
 const scenario = useScenarioStore()
+const awaitingConfirmationFor = ref<ContestActionId | null>(null)
 
 function partyName(partyId: string) {
   return scenario.party(partyId)?.shortName ?? partyId
@@ -13,6 +23,28 @@ function partyName(partyId: string) {
 
 function formatDate(date: ISODate) {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+/** "Nationalise the race" is the one high-cost, high-risk-or-reward contest response — worth a
+ * confirming click, same as a multi-day lever commitment (P3.3). */
+function requiresConfirmation(actionId: ContestActionId) {
+  return actionId === 'nationalise'
+}
+
+function onActionClick(action: AvailableContestAction) {
+  if (!action.allowed) return
+  if (requiresConfirmation(action.id) && awaitingConfirmationFor.value !== action.id) {
+    awaitingConfirmationFor.value = action.id
+    return
+  }
+  awaitingConfirmationFor.value = null
+  emit('action', action.id)
+}
+
+function actionLabel(action: AvailableContestAction) {
+  if (!action.allowed) return action.disabledReason ?? action.label
+  if (awaitingConfirmationFor.value === action.id) return 'Confirm?'
+  return action.label
 }
 </script>
 
@@ -35,14 +67,16 @@ function formatDate(date: ISODate) {
     <p v-if="contest.status === 'resolved'" class="mt-2 text-sm text-zinc-300">Result: {{ contest.resultLabel }}</p>
     <div v-else class="mt-2 flex flex-wrap gap-2">
       <button
-        v-for="action in actions"
+        v-for="action in props.actions"
         :key="action.id"
         type="button"
-        :title="action.description"
-        class="rounded-lg border border-zinc-500 px-2 py-1 text-xs text-zinc-100 transition hover:bg-zinc-100 hover:text-zinc-900"
-        @click="$emit('action', action.id)"
+        :title="action.allowed ? action.description : action.disabledReason"
+        :disabled="!action.allowed"
+        class="rounded-lg border border-zinc-500 px-2 py-1 text-xs text-zinc-100 transition hover:bg-zinc-100 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-100"
+        @click="onActionClick(action)"
+        @blur="awaitingConfirmationFor = null"
       >
-        {{ action.label }}
+        {{ actionLabel(action) }}
       </button>
     </div>
   </div>

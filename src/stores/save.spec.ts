@@ -30,8 +30,8 @@ describe('useSaveStore — P3.0 save contract', () => {
 
     game.startGame('labour')
     game.tickDay()
-    game.runFundraisingAppeal() // P2.9 party-lever change
-    game.runSocialMediaCampaign()
+    game.runLeverAction('fundraising') // P2.9 party-lever change
+    game.runLeverAction('socialMedia')
     game.rollByElections() // P2.8 contest state
 
     // A representative queued-then-resolved action event, same pattern as the existing
@@ -218,8 +218,8 @@ describe('useSaveStore — P3.1 autosave scheduler, manual slots, portable saves
     writeSpy.mockClear() // startGame() isn't a trigger, but clear defensively
 
     game.tickDay()
-    game.runFundraisingAppeal()
-    game.runSocialMediaCampaign()
+    game.runLeverAction('fundraising')
+    game.runLeverAction('socialMedia')
     expect(writeSpy).not.toHaveBeenCalled() // debounced, not written yet
 
     await vi.advanceTimersByTimeAsync(2000)

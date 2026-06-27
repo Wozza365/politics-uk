@@ -23,6 +23,8 @@ function buildSave(overrides: Partial<SaveGameV1> = {}): SaveGameV1 {
         finance: {},
         membership: {},
         leverCooldowns: {},
+        staffCapacityBonus: {},
+        activeCommitments: [],
         feed: [],
         contests: [],
         pendingEventIds: [],

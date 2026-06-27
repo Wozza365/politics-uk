@@ -1,3 +1,4 @@
+export * from './action'
 export * from './election'
 export * from './event'
 export * from './mayoralty'

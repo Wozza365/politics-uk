@@ -224,7 +224,7 @@ describe('useGameStore player levers — P2.9', () => {
     game.startGame('labour')
     const before = game.finance.labour?.estimatedCashOnHand ?? 0
 
-    game.runFundraisingAppeal()
+    game.runLeverAction('fundraising')
 
     expect(game.finance.labour?.estimatedCashOnHand ?? 0).toBeGreaterThan(before)
     expect(game.leverCooldownRemaining('fundraising')).toBeGreaterThan(0)
@@ -234,11 +234,11 @@ describe('useGameStore player levers — P2.9', () => {
   it('runFundraisingAppeal is a no-op while on cooldown', () => {
     const game = useGameStore()
     game.startGame('labour')
-    game.runFundraisingAppeal()
+    game.runLeverAction('fundraising')
     const raised = game.finance.labour?.estimatedCashOnHand ?? 0
     const feedLength = game.feed.length
 
-    game.runFundraisingAppeal()
+    game.runLeverAction('fundraising')
 
     expect(game.finance.labour?.estimatedCashOnHand).toBe(raised)
     expect(game.feed.length).toBe(feedLength)
@@ -249,7 +249,7 @@ describe('useGameStore player levers — P2.9', () => {
     game.startGame('labour')
     const before = game.membership.labour ?? 0
 
-    game.runSocialMediaCampaign()
+    game.runLeverAction('socialMedia')
 
     expect(game.membership.labour ?? 0).toBeGreaterThan(before)
     expect(game.pendingPollImpacts).toHaveLength(1)
@@ -260,12 +260,94 @@ describe('useGameStore player levers — P2.9', () => {
   it('lever cooldowns count down as the game date advances', () => {
     const game = useGameStore()
     game.startGame('labour')
-    game.runSocialMediaCampaign()
+    game.runLeverAction('socialMedia')
     const remaining = game.leverCooldownRemaining('socialMedia')
 
     game.date = addDaysForTest(game.date, remaining)
 
     expect(game.leverCooldownRemaining('socialMedia')).toBe(0)
+  })
+})
+
+describe('useGameStore action economy — P3.3 (UI cannot bypass validation)', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('runLeverAction is a no-op when the party cannot afford the cost — components only ever request an action by id, never supply a delta', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.finance.labour = { ...game.finance.labour, estimatedCashOnHand: 0 }
+    const before = game.toSaveState()
+
+    game.runLeverAction('staffing') // costs money + staff
+
+    expect(game.toSaveState()).toEqual(before)
+  })
+
+  it('a multi-day commitment holds its staff/leadership for the duration and rejects a repeat attempt while it is running', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+
+    game.runLeverAction('staffing')
+
+    expect(game.activeCommitments).toHaveLength(1)
+    expect(game.staffHeld('labour')).toBe(10)
+    expect(game.leverAvailability('staffing').allowed).toBe(false)
+
+    const before = game.toSaveState()
+    game.runLeverAction('staffing')
+    expect(game.toSaveState()).toEqual(before) // still a no-op
+  })
+
+  it('denies a new multi-day commitment once a party is already at its concurrent-commitment cap, even with money/staff/leadership to spare', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.finance.labour!.estimatedCashOnHand = 10_000_000
+
+    game.runLeverAction('staffing')
+    game.runLeverAction('campaigning')
+    game.runLeverAction('leadership')
+
+    expect(game.activeCommitmentCount('labour')).toBe(3)
+    expect(game.leverAvailability('policy')).toEqual({ allowed: true }) // instant actions aren't capacity-gated
+  })
+
+  it('a multi-day commitment is applied only once it expires on the daily tick, not the instant it starts', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const membershipBefore = game.membership.labour ?? 0
+
+    game.runLeverAction('staffing')
+    expect(game.membership.labour ?? 0).toBe(membershipBefore) // outcome not applied yet
+
+    const endsDate = game.activeCommitments[0].endsDate
+    while (game.date < endsDate) game.tickDay()
+
+    expect(game.activeCommitments).toHaveLength(0)
+    expect(game.membership.labour ?? 0).toBeGreaterThan(membershipBefore)
+    expect(game.staffCapacity('labour')).toBe(50) // STAFF_CAPACITY_BASE (40) + the drive's bonus (10)
+  })
+
+  it('actionContest is a no-op when the selected party cannot afford the chosen response', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.finance.labour = { ...game.finance.labour, estimatedCashOnHand: 0 }
+    game.contests.push({
+      id: 'byelection:commons:seat-0:2025-01-02',
+      contestTier: 'commons',
+      regionId: 'seat-0',
+      geometryRef: 'seat-0',
+      seatName: 'Seat 0',
+      incumbentParty: 'conservative',
+      calledDate: '2025-01-02',
+      status: 'pending',
+    })
+    const before = game.toSaveState()
+
+    game.actionContest('byelection:commons:seat-0:2025-01-02', 'local_push')
+
+    expect(game.toSaveState()).toEqual(before)
   })
 })
 
@@ -379,7 +461,7 @@ describe('useGameStore.toSaveState / hydrateFromSaveState — P3.0', () => {
   it('round-trips equivalent state through a fresh store', () => {
     const game = useGameStore()
     game.startGame('labour')
-    game.runFundraisingAppeal()
+    game.runLeverAction('fundraising')
     const snapshot = game.toSaveState()
 
     setActivePinia(createPinia())

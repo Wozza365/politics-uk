@@ -1,3 +1,4 @@
+import type { ActionCost } from './action'
 import type { ISODate, PartyId } from './party'
 
 // P2.8 runtime by-election/minor-election contracts (spec §9.5 "expandable later to list
@@ -29,4 +30,7 @@ export interface ContestActionDef {
   id: ContestActionId
   label: string
   description: string
+  /** P3.3 action economy — paid (and validated against the acting party's resources) before
+   * `resolveContestAction` runs; `ignore` always costs nothing. */
+  cost: ActionCost
 }

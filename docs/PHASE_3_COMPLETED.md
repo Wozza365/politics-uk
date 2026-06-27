@@ -212,3 +212,96 @@ file.
   finishing a campaign (`ResultScreen`) both flush a save before navigating away, so no progress is
   silently lost. A restored campaign's clock always starts paused, and the player must explicitly
   press Continue to enter play.
+
+## P3.3 — Campaign action economy ✅
+
+- `src/types/action.ts` (new) — the shared contract: `ActionId`/`ActionCost` (`money`/`staff`/
+  `leadership`, each optional), `ActionForecast`, `ActionDefinition` (`cooldownDays`/`durationDays`/
+  `cost`/`recurringCost?`/`forecast`), `ActionDenialReason` and `ActionAvailability`, the per-call
+  `ActionResourceState` snapshot the store assembles, `ActiveCommitment` (a running multi-day
+  action — `staffHeld`/`leadershipHeld`/`pollingImpacts`/`financeDelta`/`membershipDelta`/
+  `staffCapacityBonus?`/`resultLabel`, keyed `${actionId}:${partyId}:${startedDate}`), and
+  `ActionOutcome` (what resolution hands back, applied immediately for an instant action or copied
+  onto the commitment for a multi-day one). `LeverId` moved here from `stores/game.ts` (re-exported
+  from there for existing consumers).
+- `src/sim/actions.ts` (new, pure, store-free) — the one engine both P2.9 levers and P2.8 contest
+  actions share: validate → pay → apply → record. `LEVER_ACTIONS` is the audited six-lever set:
+  `fundraising`/`socialMedia`/`policy` stay instant (`durationDays: 0`); `staffing`/`campaigning`/
+  `leadership` are the three multi-day commitments (5/7/5 days), `campaigning` carrying a
+  `recurringCost` (£3,000/day). `canTakeAction(def, resources)` checks cooldown → already-committed
+  → commitment-capacity (multi-day only) → money → staff → leadership, in that order, and is the
+  *only* place an action can be denied. `resolveLeverAction(leverId, partyId, date)` is deterministic
+  per `(leverId, partyId, date)` via `seededUniform` — same inputs always produce the same
+  `ActionOutcome`, regardless of when a commitment's result is actually applied. `buildCommitment`
+  turns a resolved multi-day action into an `ActiveCommitment`; `advanceCommitmentsForDay` is the
+  pure daily-tick step — sorts by commitment id (not insertion order) before splitting into
+  `stillActive`/`expired` and summing each party's recurring money cost for the day, so two
+  commitments started the same day in different in-memory orders still resolve identically.
+  Resource constants: `STAFF_CAPACITY_BASE` (40) + per-party bonus, capped `STAFF_CAPACITY_MAX`
+  (100); `LEADERSHIP_ATTENTION_MAX` (100, a fixed pool with no passive regen — only held/released by
+  commitments); `MAX_CONCURRENT_COMMITMENTS` (3, the blunt "time/turn capacity" cap).
+- `src/sim/byElections.ts` — every `CONTEST_ACTIONS_BY_TIER` entry gained a `cost: ActionCost`
+  (`ignore` actions stay free; `local_push`/`nationalise`/`token_effort` cost money and/or staff/
+  leadership). `resolveContestAction` is unchanged — contest outcomes still depend on contest-
+  specific data, so it wasn't merged into `resolveLeverAction`.
+- `src/stores/game.ts` — new state: `staffCapacityBonus: Record<PartyId, number>` and
+  `activeCommitments: ActiveCommitment[]`. New getters: `staffCapacity(partyId)`,
+  `staffHeld(partyId)`/`leadershipHeld(partyId)` (summed across that party's active commitments),
+  `activeCommitmentCount(partyId)`, `actionResourceState(partyId, actionId, cooldownDays)` (the
+  snapshot `canTakeAction` validates against), `leverAvailability(leverId)` and
+  `contestActionAvailability(actionDef)` (the two `ActionAvailability` lookups components consume —
+  the latter short-circuits to `{ allowed: true }` for a zero-cost action like `ignore` even with no
+  party selected, matching `actionContest`'s existing leniency). New actions: `payActionCost`,
+  `applyInstantOutcome`, `runLeverAction(leverId)` (replaces the deleted `runFundraisingAppeal`/
+  `runSocialMediaCampaign` — validates via `leverAvailability`, pays, then either applies the
+  outcome instantly or pushes an `ActiveCommitment`; silently a no-op if denied, so a component can
+  never bypass validation by calling it directly), `cancelCommitment(id)` (forfeits the upfront cost
+  and any of its outcome, simply removing it), and `advanceCommitments()` (wraps the pure
+  `advanceCommitmentsForDay`, applies each expired commitment's outcome and every active
+  commitment's recurring money cost, called from `tickDay`). `actionContest` now validates via
+  `contestActionAvailability` and pays via `payActionCost` before calling the unchanged
+  `resolveContestAction`.
+- `src/types/save.ts` / `src/save/codec.ts` — `GameSaveStateV1` gained `staffCapacityBonus` and
+  `activeCommitments` as required fields (kept at format version 1 — no shipped saves with the old
+  shape exist yet, so a full v1→v2 migration would be disproportionate); `codec.ts` gained a runtime
+  `isActiveCommitmentArray` guard alongside the existing hand-rolled type guards.
+- `src/composables/useActionAvailability.ts` (new) — `describeDenial(reason)` maps each
+  `ActionDenialReason` to the player-facing text shown as a disabled button's title/label.
+- `src/composables/usePartyLevers.ts` — rewritten to map generically over `LEVER_ACTIONS` instead of
+  two hand-written entries, returning `{ id, label, description, forecastSummary, cooldownDays,
+  allowed, disabledReason, requiresConfirmation, run }` per lever.
+- `src/components/LeverCard.vue` — gained `allowed`/`disabledReason?`/`forecastSummary?`/
+  `requiresConfirmation?` props; disables its button with the denial reason as the title, and gives
+  high-cost/irreversible levers (the three multi-day commitments) a second confirming click before
+  firing.
+- `src/components/PartyPanel.vue` — its two hardcoded `<LeverCard>` usages became one
+  `v-for="lever in levers"` over `usePartyLevers()`'s generic list.
+- `src/composables/useByElections.ts` — `actionsFor(contest)` now maps each contest action through
+  `game.contestActionAvailability` to attach `allowed`/`disabledReason`.
+- `src/components/ContestCard.vue` — renders each action's disabled state/reason, and gives
+  `nationalise` (the one high-cost, high-risk contest response) the same two-click confirm pattern
+  as a multi-day lever commitment.
+- Covered by a new `src/sim/actions.spec.ts` (pure-engine unit tests: every `canTakeAction` denial
+  reason plus the allowed case; `resolveLeverAction` determinism across all six levers and variance
+  across date/party; `buildCommitment`'s shape; `advanceCommitmentsForDay`'s active/expired
+  boundary, id-ordering independent of input order, and per-party recurring-cost summation) and a
+  new "UI cannot bypass validation" block in `src/stores/game.spec.ts` (an unaffordable
+  `runLeverAction` and an unaffordable `actionContest` are both no-ops against the store's own
+  `toSaveState()` snapshot; a multi-day commitment holds its staff for the duration and rejects a
+  repeat attempt while running; a party already at the concurrent-commitment cap is denied a new
+  multi-day commitment even with resources to spare, while instant actions stay ungated; a
+  commitment's outcome is only applied at expiry on the daily tick, never the instant it starts).
+  The existing P2.9 lever tests and P3.0/P3.1 save round-trip tests were updated to call the new
+  generic `runLeverAction('fundraising' | 'socialMedia')` instead of the two deleted hand-rolled
+  actions. All 167 project tests, `npm run build`, and `npm run validate:data` pass.
+- **Acceptance:** every lever and contest response is a typed `ActionDefinition`/`ContestActionDef`
+  with a real cost, cooldown, and (where relevant) multi-day duration with a recurring cost — no
+  lever is a free, infinitely repeatable polling button. Money, staff capacity, leadership
+  attention, and concurrent-commitment slots are meaningful, distinct resources; membership is never
+  used as a generic currency. `canTakeAction`/`resolveLeverAction`/`advanceCommitmentsForDay` are
+  pure and store-free; every store action that spends a cost or applies an outcome routes through
+  them, so a component can only ever request an action by id. Multi-day commitments resolve their
+  outcome once, deterministically, at the moment they start, and only apply it at expiry — replaying
+  the same seed produces the same result regardless of save/load timing. P2.8's `ContestCard` and
+  P2.9's `LeverCard`/`PartyPanel` both surface disabled reasons and a confirm step for high-cost/
+  irreversible actions.

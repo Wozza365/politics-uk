@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { CONTEST_ACTIONS_BY_TIER, startOfIsoWeek } from '@/sim/byElections'
+import { describeDenial } from './useActionAvailability'
 import type { Contest, ContestActionId } from '@/types'
 
 export interface CouncilContestWeek {
@@ -35,8 +36,14 @@ export function useByElections() {
       .sort((a, b) => (a.week < b.week ? 1 : -1))
   })
 
+  /** Each action def augmented with whether the selected party can afford/take it right now
+   * (P3.3) — `ContestCard.vue` disables the button and surfaces the reason instead of letting the
+   * click silently no-op against `game.actionContest`'s own validation. */
   function actionsFor(contest: Contest) {
-    return CONTEST_ACTIONS_BY_TIER[contest.contestTier]
+    return CONTEST_ACTIONS_BY_TIER[contest.contestTier].map((actionDef) => {
+      const availability = game.contestActionAvailability(actionDef)
+      return { ...actionDef, allowed: availability.allowed, disabledReason: availability.allowed ? undefined : describeDenial(availability.reason) }
+    })
   }
 
   function actOnContest(contestId: string, actionId: ContestActionId) {

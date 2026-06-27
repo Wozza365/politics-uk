@@ -46,9 +46,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p32--main-menu-loadnew-game-flow-and-safe-game-lifecycle)
 for the full record of what was built.
 
-### P3.3 — Campaign action economy
+### P3.3 — Campaign action economy `✅ DONE`
 
-See [`phase3/P3.3-action-economy.md`](./phase3/P3.3-action-economy.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p33--campaign-action-economy-)
+for the full record of what was built.
 
 ### P3.4 — Targeted campaigning and opponent strategy
 

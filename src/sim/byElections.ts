@@ -131,14 +131,19 @@ export function rollByElectionsForDay(
  * response to every contest". */
 export const CONTEST_ACTIONS_BY_TIER: Record<ContestTier, ContestActionDef[]> = {
   commons: [
-    { id: 'ignore', label: 'Ignore', description: 'Let the by-election run its course without intervening.' },
-    { id: 'local_push', label: 'Local push', description: 'Send activists and resource to fight for the seat directly.' },
-    { id: 'nationalise', label: 'Nationalise the race', description: "Turn it into a national story to test the country's mood — high risk, high reward." },
+    { id: 'ignore', label: 'Ignore', description: 'Let the by-election run its course without intervening.', cost: {} },
+    { id: 'local_push', label: 'Local push', description: 'Send activists and resource to fight for the seat directly.', cost: { money: 20_000, staff: 10 } },
+    {
+      id: 'nationalise',
+      label: 'Nationalise the race',
+      description: "Turn it into a national story to test the country's mood — high risk, high reward.",
+      cost: { money: 30_000, leadership: 25 },
+    },
   ],
   council: [
-    { id: 'ignore', label: 'Ignore', description: 'Leave the local party to fight it alone.' },
-    { id: 'token_effort', label: 'Token effort', description: 'Send a small amount of support to the local campaign.' },
-    { id: 'local_push', label: 'Local push', description: 'Make a real effort to win this ward.' },
+    { id: 'ignore', label: 'Ignore', description: 'Leave the local party to fight it alone.', cost: {} },
+    { id: 'token_effort', label: 'Token effort', description: 'Send a small amount of support to the local campaign.', cost: { money: 3_000 } },
+    { id: 'local_push', label: 'Local push', description: 'Make a real effort to win this ward.', cost: { money: 8_000, staff: 5 } },
   ],
 }
 

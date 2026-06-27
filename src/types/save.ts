@@ -1,3 +1,4 @@
+import type { ActiveCommitment } from './action'
 import type { Contest } from './election'
 import type { FeedEntry } from './event'
 import type { ISODate, PartyFinance, PartyId } from './party'
@@ -48,6 +49,13 @@ export interface GameSaveStateV1 {
   finance: Record<PartyId, PartyFinance>
   membership: Record<PartyId, number>
   leverCooldowns: Record<string, ISODate>
+  /** Permanent staff-capacity growth from completed "staffing" drives (P3.3) — see
+   * `sim/actions.ts`'s `STAFF_CAPACITY_BASE`/`STAFF_CAPACITY_MAX`. */
+  staffCapacityBonus: Record<PartyId, number>
+  /** Multi-day lever commitments in flight at save time (P3.3) — each carries its own
+   * already-resolved outcome, so resuming a save mid-commitment still applies exactly once, on
+   * the same in-game day, as an uninterrupted playthrough would. */
+  activeCommitments: ActiveCommitment[]
   feed: FeedEntry[]
   contests: Contest[]
   /** `pendingEvents` are entries straight out of the authored event pool (`sim/events.ts`), so

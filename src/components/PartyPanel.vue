@@ -14,8 +14,7 @@ const game = useGameStore()
 const ui = useUiStore()
 const isExpanded = ref(false)
 
-const { fundraisingCooldownDays, runFundraisingAppeal, socialMediaCooldownDays, runSocialMediaCampaign } =
-  usePartyLevers()
+const { levers } = usePartyLevers()
 
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
@@ -224,19 +223,16 @@ function formatMoney(value: PartyFinance | undefined) {
         </div>
 
         <LeverCard
-          label="Fundraising"
-          description="Run an appeal to raise party finance."
-          button-label="Launch appeal"
-          :cooldown-days="fundraisingCooldownDays"
-          @activate="runFundraisingAppeal"
-        />
-
-        <LeverCard
-          label="Social media"
-          description="Run a campaign to grow membership and reach."
-          button-label="Run campaign"
-          :cooldown-days="socialMediaCooldownDays"
-          @activate="runSocialMediaCampaign"
+          v-for="lever in levers"
+          :key="lever.id"
+          :label="lever.label"
+          :description="lever.description"
+          :forecast-summary="lever.forecastSummary"
+          :cooldown-days="lever.cooldownDays"
+          :allowed="lever.allowed"
+          :disabled-reason="lever.disabledReason"
+          :requires-confirmation="lever.requiresConfirmation"
+          @activate="lever.run"
         />
       </div>
     </div>

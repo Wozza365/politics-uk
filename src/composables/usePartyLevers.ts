@@ -1,20 +1,36 @@
 import { computed } from 'vue'
-import { useGameStore, type LeverId } from '@/stores/game'
+import { useGameStore } from '@/stores/game'
+import { LEVER_ACTIONS } from '@/sim/actions'
+import { describeDenial } from './useActionAvailability'
+import type { LeverId } from '@/types'
 
-/** Cooldown-aware bindings for the player levers (P2.9, spec §9.3) — backs PartyPanel.vue's
- * expanded body. Fundraising/social media are the two levers wired to real sim effects so far;
- * staffing/policy/campaigning/leadership remain future work (`docs/phase2/P2.9-*.md`). */
+const LEVER_IDS = Object.keys(LEVER_ACTIONS) as LeverId[]
+
+/** Cooldown/availability-aware bindings for every player lever (P2.9, spec §9.3; P3.3's shared
+ * action economy) — backs PartyPanel.vue's expanded body with one generic list instead of one
+ * hand-wired prop set per lever. */
 export function usePartyLevers() {
   const game = useGameStore()
 
-  function cooldownFor(leverId: LeverId) {
-    return computed(() => game.leverCooldownRemaining(leverId))
-  }
+  const levers = computed(() =>
+    LEVER_IDS.map((id) => {
+      const def = LEVER_ACTIONS[id]
+      const availability = game.leverAvailability(id)
+      return {
+        id,
+        label: def.label,
+        description: def.description,
+        forecastSummary: def.forecast.summary,
+        cooldownDays: game.leverCooldownRemaining(id),
+        allowed: availability.allowed,
+        disabledReason: availability.allowed ? undefined : describeDenial(availability.reason),
+        /** Multi-day commitments hold scarce capacity for days and aren't free to undo — worth a
+         * confirmation click; instant levers stay one-click brisk (spec step 6). */
+        requiresConfirmation: def.durationDays > 0,
+        run: () => game.runLeverAction(id),
+      }
+    }),
+  )
 
-  return {
-    fundraisingCooldownDays: cooldownFor('fundraising'),
-    runFundraisingAppeal: () => game.runFundraisingAppeal(),
-    socialMediaCooldownDays: cooldownFor('socialMedia'),
-    runSocialMediaCampaign: () => game.runSocialMediaCampaign(),
-  }
+  return { levers }
 }

@@ -3,6 +3,7 @@
 // `save/repository.ts` are the only callers. Untrusted bytes only ever become a trusted
 // `SaveGameV1` by passing through `decodeSaveGame`/`decodeSaveEnvelope`.
 import type {
+  ActiveCommitment,
   Contest,
   FeedEntry,
   GameSaveStateV1,
@@ -71,6 +72,27 @@ function isFeedEntryArray(value: unknown): value is FeedEntry[] {
   )
 }
 
+function isActiveCommitmentArray(value: unknown): value is ActiveCommitment[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (entry) =>
+        isPlainObject(entry) &&
+        isString(entry.id) &&
+        isString(entry.actionId) &&
+        isString(entry.partyId) &&
+        isString(entry.startedDate) &&
+        isString(entry.endsDate) &&
+        isNumber(entry.staffHeld) &&
+        isNumber(entry.leadershipHeld) &&
+        isPollingImpactArray(entry.pollingImpacts) &&
+        isNumber(entry.financeDelta) &&
+        isNumber(entry.membershipDelta) &&
+        isString(entry.resultLabel),
+    )
+  )
+}
+
 function isContestArray(value: unknown): value is Contest[] {
   return (
     Array.isArray(value) &&
@@ -101,6 +123,8 @@ function isGameSaveState(value: unknown): value is GameSaveStateV1 {
     isRecordOf(value.finance, isPlainObject) &&
     isRecordOf(value.membership, isNumber) &&
     isRecordOf(value.leverCooldowns, isString) &&
+    isRecordOf(value.staffCapacityBonus, isNumber) &&
+    isActiveCommitmentArray(value.activeCommitments) &&
     isFeedEntryArray(value.feed) &&
     isContestArray(value.contests) &&
     isStringArray(value.pendingEventIds) &&
