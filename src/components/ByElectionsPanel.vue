@@ -45,6 +45,7 @@ function formatWeek(week: ISODate) {
             :actions="actionsFor(contest)"
             @action="(actionId) => actOnContest(contest.id, actionId)"
             @focus="focusOnMap(contest)"
+            @explain="ui.showExplanation"
           />
         </div>
       </div>
@@ -70,6 +71,7 @@ function formatWeek(week: ISODate) {
                 :actions="actionsFor(contest)"
                 @action="(actionId) => actOnContest(contest.id, actionId)"
                 @focus="focusOnMap(contest)"
+                @explain="ui.showExplanation"
               />
             </div>
           </div>

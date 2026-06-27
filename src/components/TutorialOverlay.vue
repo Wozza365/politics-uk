@@ -1,0 +1,70 @@
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useGameStore } from '@/stores/game'
+import type { TutorialMilestoneId } from '@/types'
+
+const game = useGameStore()
+
+const COPY: Record<TutorialMilestoneId, { title: string; body: string }> = {
+  'campaign-start': {
+    title: 'Start from the objective',
+    body: 'Your live objective, next election timing, unresolved decision, and pause reason are shown across the top of the campaign.',
+  },
+  'first-player-lever': {
+    title: 'Campaign action recorded',
+    body: 'Actions spend resources now or reserve staff until they resolve. Their polling effect appears at the next published poll.',
+  },
+  'first-paused-action-event': {
+    title: 'Decision needed',
+    body: 'The clock pauses when an event needs a choice. Save and menu controls remain available while you decide.',
+  },
+  'first-contest': {
+    title: 'Contest called',
+    body: 'By-elections and local contests sit in the elections panel. Resolved contests record a short cause summary.',
+  },
+  'first-targeted-commitment': {
+    title: 'Local campaign committed',
+    body: 'Targeted commitments build temporary local influence, visible on the map and considered by contests and elections.',
+  },
+  'first-poll-release': {
+    title: 'Poll released',
+    body: 'Poll movements combine recorded events, campaign actions, policy alignment, and bounded variance.',
+  },
+  'first-election-result': {
+    title: 'Election resolved',
+    body: 'The result ledger shows the model, decisive seats, and local-commitment contributions.',
+  },
+}
+
+const active = computed(() => game.activeTutorialMilestone)
+const copy = computed(() => (active.value ? COPY[active.value] : null))
+
+function dismiss() {
+  if (active.value) game.dismissTutorialMilestone(active.value)
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') dismiss()
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+</script>
+
+<template>
+  <aside
+    v-if="active && copy"
+    class="absolute left-4 bottom-4 z-40 w-[min(24rem,calc(100vw-2rem))] rounded-lg border border-sky-500/40 bg-zinc-950/95 p-4 text-sm text-zinc-200 shadow-2xl"
+    aria-live="polite"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="font-semibold text-sky-100">{{ copy.title }}</p>
+        <p class="mt-1 text-xs leading-5 text-zinc-400">{{ copy.body }}</p>
+      </div>
+      <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="dismiss">
+        Skip
+      </button>
+    </div>
+  </aside>
+</template>

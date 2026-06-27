@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useGameStore } from '@/stores/game'
+import { useUiStore } from '@/stores/ui'
 import type { ISODate } from '@/types'
 
 const game = useGameStore()
+const ui = useUiStore()
 const scrollEl = ref<HTMLElement | null>(null)
 
 // Newest entry is appended at the bottom (spec §13 resolved: chronological == newest-at-bottom)
@@ -37,6 +39,14 @@ function formatDate(date: ISODate) {
       <template v-if="entry.status === 'actioned'">
         <p v-if="entry.actionTaken" class="mt-1 text-zinc-300">{{ entry.actionTaken }}</p>
         <p v-if="entry.effect" class="mt-0.5 text-xs text-zinc-500">{{ entry.effect }}</p>
+        <button
+          v-if="entry.explanationId"
+          type="button"
+          class="mt-2 rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
+          @click="ui.showExplanation(entry.explanationId)"
+        >
+          Why?
+        </button>
       </template>
 
       <div v-else class="mt-2 flex flex-wrap gap-2">

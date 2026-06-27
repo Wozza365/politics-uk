@@ -5,6 +5,7 @@ import type { FeedEntry } from './event'
 import type { CampaignObjectiveRecord } from './objective'
 import type { ISODate, PartyFinance, PartyId } from './party'
 import type { PollingSnapshot } from './scenario'
+import type { ExplanationRecord, TutorialState } from './tutorial'
 import type { PollingImpact } from '@/sim/poll'
 
 // P3.0 versioned save-game contract (spec — autosave/load UI groundwork). A `SaveGameV1` is the
@@ -71,6 +72,10 @@ export interface GameSaveStateV1 {
    * freshly evaluated campaign state. */
   campaignObjectives?: CampaignObjectiveRecord[]
   campaignArcs?: CampaignArcRecord[]
+  /** P3.7 first-run guidance and recorded "why did this change?" explanations. Optional so older
+   * saves hydrate into a fresh, unseen tutorial state and empty explanation ledger. */
+  tutorial?: TutorialState
+  explanations?: ExplanationRecord[]
   /** `pendingEvents` are entries straight out of the authored event pool (`sim/events.ts`), so
    * only their ids are saved; hydration looks them back up rather than duplicating authored
    * content into every save. */

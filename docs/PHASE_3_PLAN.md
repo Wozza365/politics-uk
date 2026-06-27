@@ -69,9 +69,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p36---campaign-objectives-scenario-arcs-and-replayable-content-done)
 for the full record of what was built.
 
-### P3.7 — Onboarding and simulation explainability
+### P3.7 — Onboarding and simulation explainability `DONE`
 
-See [`phase3/P3.7-onboarding-explainability.md`](./phase3/P3.7-onboarding-explainability.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p37---onboarding-and-simulation-explainability-done)
+for the full record of what was built.
 
 ### P3.8 — Player controls, accessibility, and responsive play
 

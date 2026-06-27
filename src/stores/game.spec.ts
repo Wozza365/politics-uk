@@ -161,6 +161,24 @@ describe('useGameStore.resolveFeedAction', () => {
     expect(game.pollingHistory).toHaveLength(2)
     expect(game.pollingHistory.at(-1)?.polling).toEqual(game.polling)
     expect(game.pendingPollImpacts).toEqual([])
+    expect(game.feed[0].explanationId).toBeTruthy()
+    expect(game.explanationById(game.feed[0].explanationId!)?.groups.map((group) => group.id)).toContain('events')
+  })
+
+  it('does not surface a dismissed milestone again after save restore', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    expect(game.activeTutorialMilestone).toBe('campaign-start')
+
+    game.dismissTutorialMilestone('campaign-start')
+    const snapshot = game.toSaveState()
+
+    setActivePinia(createPinia())
+    const fresh = useGameStore()
+    fresh.hydrateFromSaveState(snapshot)
+
+    expect(fresh.activeTutorialMilestone).toBeNull()
+    expect(fresh.tutorial.milestones['campaign-start'].dismissedAt).toBe(snapshot.date)
   })
 })
 
@@ -202,6 +220,8 @@ describe('useGameStore.checkElectionResult — P2.0', () => {
     expect(game.latestCommonsElectionOutcome?.winners).toHaveLength(scenario.commonsRegions.length)
     expect(game.playerSeatCount).toBe(projectedBeforeResolution)
     expect(Object.values(game.commonsSeatsByParty).reduce((sum, count) => sum + count, 0)).toBe(scenario.commonsRegions.length)
+    expect(game.latestCommonsElectionOutcome?.explanationId).toBeTruthy()
+    expect(game.explanationById(game.latestCommonsElectionOutcome!.explanationId!)?.kind).toBe('election')
   })
 
   it('does not re-evaluate once a result is already recorded', () => {
@@ -455,6 +475,8 @@ describe('useGameStore by-elections — P2.8', () => {
     expect(entry.status).toBe('actioned')
     expect(entry.actionTaken).toBe('Local push')
     expect(entry.effect).toBe(contest.resultLabel)
+    expect(entry.explanationId).toBe(contest.explanationId)
+    expect(game.explanationById(contest.explanationId!)?.kind).toBe('contest')
   })
 
   it('actionContest is a no-op on an already-resolved contest', () => {

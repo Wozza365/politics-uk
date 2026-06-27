@@ -491,3 +491,32 @@ file.
   authored event choices record arc consequences into the feed and journal; objective/arc state
   persists through save/load; hidden objective content stays hidden until its consequence exists;
   invalid campaign relationships fail data validation.
+
+## P3.7 - Onboarding and simulation explainability DONE
+
+- `src/types/tutorial.ts` (new) - added tutorial milestone and explanation-record contracts.
+  Milestones cover campaign start, first lever, first paused event, first contest, first targeted
+  commitment, first poll, and first election result. Explanation records group contributors into
+  player-meaningful causes: events/actions, policy alignment, local commitments, bounded variance,
+  and election model output.
+- `src/sim/explanations.ts` (new) - pure builders for poll, contest, and election explanations.
+  They use recorded polling impacts, contest results, election winners, provenance, and decisive
+  seats without inventing false precision.
+- `src/stores/game.ts` and `src/types/save.ts` - tutorial completion/dismissal state and explanation
+  records are mutable campaign state, reset on new campaign, persisted through saves, restored with
+  safe defaults for old saves, and linked from feed entries, contests, and election outcomes.
+- `src/components/GoalStatusStrip.vue`, `TutorialOverlay.vue`, `HelpPanel.vue`, and
+  `ExplanationDetails.vue` (new) - added a compact HUD strip for objective/election/decision/pause
+  status, a dismissible non-blocking guide overlay with Escape support, a small glossary, and a
+  reusable explanation modal. `GameScreen.vue`, `EventFeed.vue`, `ContestCard.vue`,
+  `ByElectionsPanel.vue`, and `ResultScreen.vue` mount the surfaces and expose "Why?" drill-downs.
+- `src/stores/ui.ts` - added transient help-panel and active-explanation UI state, cleared on save
+  hydration like other open-panel state.
+- Covered by new store tests in `src/stores/game.spec.ts`: poll releases attach explanation records,
+  tutorial dismissal survives save/restore without duplicate guidance, contest explanations are
+  linked from resolved contests, and election explanations are linked from applied outcomes. Full
+  verification: 213 tests pass; `npm run build` passes.
+- **Acceptance:** a first-time player sees the current objective, next GE countdown, highest-priority
+  decision, and pause reason without reading external docs; guidance can be skipped and stays
+  dismissed after save/load; poll, contest, and election outcomes expose concise recorded
+  explanations of the factors the simulation actually used.

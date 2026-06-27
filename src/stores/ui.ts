@@ -53,6 +53,8 @@ export const useUiStore = defineStore('ui', {
     saveManagementPanelOpen: false,
     targetingPanelOpen: false,
     gameMenuOpen: false,
+    helpPanelOpen: false,
+    activeExplanationId: null as string | null,
     mapFocusRequest: null as MapFocusRequest | null,
     // P3.4 map overlay toggles — transient display preferences for `MapView.vue`'s targeting
     // tinting pass, never persisted (see `hydrateFromSaveState`, which always resets to defaults).
@@ -95,6 +97,18 @@ export const useUiStore = defineStore('ui', {
     },
     closeGameMenu() {
       this.gameMenuOpen = false
+    },
+    toggleHelpPanel() {
+      this.helpPanelOpen = !this.helpPanelOpen
+    },
+    closeHelpPanel() {
+      this.helpPanelOpen = false
+    },
+    showExplanation(id: string) {
+      this.activeExplanationId = id
+    },
+    closeExplanation() {
+      this.activeExplanationId = null
     },
     requestMapFocus(request: MapFocusRequest) {
       this.mapFocusRequest = request
@@ -172,6 +186,8 @@ export const useUiStore = defineStore('ui', {
       this.saveManagementPanelOpen = false
       this.targetingPanelOpen = false
       this.gameMenuOpen = false
+      this.helpPanelOpen = false
+      this.activeExplanationId = null
       this.mapFocusRequest = null
       this.confirmModal = null
       this.mapOverlays = { commitments: true, contests: true, opponentActivity: true }

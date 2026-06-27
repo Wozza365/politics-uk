@@ -110,6 +110,7 @@ export interface FeedEntry {
   actionTakenId?: string
   actionTaken?: string
   effect?: string
+  explanationId?: string
   /** Choices rendered as buttons while `status` is 'unactioned'. */
   actions?: FeedEntryAction[]
 }

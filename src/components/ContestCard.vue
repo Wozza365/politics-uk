@@ -12,7 +12,7 @@ interface AvailableContestAction {
 }
 
 const props = defineProps<{ contest: Contest; actions: AvailableContestAction[] }>()
-const emit = defineEmits<{ action: [actionId: ContestActionId]; focus: [] }>()
+const emit = defineEmits<{ action: [actionId: ContestActionId]; focus: []; explain: [explanationId: string] }>()
 
 const scenario = useScenarioStore()
 const awaitingConfirmationFor = ref<ContestActionId | null>(null)
@@ -64,7 +64,17 @@ function actionLabel(action: AvailableContestAction) {
     </div>
     <p class="text-xs text-zinc-400">Held by {{ partyName(contest.incumbentParty) }} · called {{ formatDate(contest.calledDate) }}</p>
 
-    <p v-if="contest.status === 'resolved'" class="mt-2 text-sm text-zinc-300">Result: {{ contest.resultLabel }}</p>
+    <div v-if="contest.status === 'resolved'" class="mt-2 flex items-center justify-between gap-2">
+      <p class="text-sm text-zinc-300">Result: {{ contest.resultLabel }}</p>
+      <button
+        v-if="contest.explanationId"
+        type="button"
+        class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
+        @click="$emit('explain', contest.explanationId)"
+      >
+        Why?
+      </button>
+    </div>
     <div v-else class="mt-2 flex flex-wrap gap-2">
       <button
         v-for="action in props.actions"

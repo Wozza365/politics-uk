@@ -22,6 +22,7 @@ export interface Contest {
   status: 'pending' | 'resolved'
   actionId?: ContestActionId
   resultLabel?: string // set once resolved, e.g. "Labour hold" / "Conservative gain"
+  explanationId?: string
 }
 
 export type ElectionTier = 'commons'
@@ -65,6 +66,7 @@ export interface ElectionOutcome {
   decisiveSeats: ElectionSeatWinner[]
   playerObjective?: 'won' | 'lost'
   summary: string
+  explanationId?: string
 }
 
 export type ContestActionId = 'ignore' | 'token_effort' | 'local_push' | 'nationalise'

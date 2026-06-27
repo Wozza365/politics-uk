@@ -13,6 +13,7 @@ import type {
   ElectionOutcome,
   ElectionSeatWinner,
   EventCallbackContext,
+  ExplanationRecord,
   FeedEntry,
   GameEvent,
   GameSaveStateV1,
@@ -22,6 +23,8 @@ import type {
   PartyId,
   PollingSnapshot,
   TargetScope,
+  TutorialMilestoneId,
+  TutorialState,
 } from '@/types'
 import { useScenarioStore } from './scenario'
 import { useUiStore } from './ui'
@@ -53,6 +56,7 @@ import { isOpponentCadenceDay, rankTargetingMoves, selectOpponentMove } from '@/
 import { resolveCommonsElection } from '@/sim/elections/commons'
 import { applyArcChoice, evaluateArcAvailability, initialiseArcRecords } from '@/sim/arcs'
 import { evaluateObjectiveRecords, flattenObjectives, initialiseObjectiveRecords, type ObjectiveEvaluationContext } from '@/sim/objectives'
+import { buildContestExplanation, buildElectionExplanation, buildPollExplanation } from '@/sim/explanations'
 
 /** Polling bonus a targeting commitment's accumulated local influence contributes to that party's
  * effort if they also action a by-election contest in the same region (P3.4 step 3 — "translate it
@@ -60,6 +64,15 @@ import { evaluateObjectiveRecords, flattenObjectives, initialiseObjectiveRecords
  * itself, never the influence value applied wholesale, so the contest bonus stays bounded and
  * small relative to the contest action's own effect. */
 const CONTEST_INFLUENCE_BONUS_FACTOR = 0.5
+const TUTORIAL_MILESTONES: TutorialMilestoneId[] = [
+  'campaign-start',
+  'first-player-lever',
+  'first-paused-action-event',
+  'first-contest',
+  'first-targeted-commitment',
+  'first-poll-release',
+  'first-election-result',
+]
 
 export type { LeverId }
 
@@ -85,6 +98,21 @@ function generatePlaythroughSeed(): number {
   const bytes = new Uint32Array(1)
   crypto.getRandomValues(bytes)
   return bytes[0]
+}
+
+function createTutorialState(): TutorialState {
+  return {
+    milestones: Object.fromEntries(TUTORIAL_MILESTONES.map((id) => [id, { id }])) as TutorialState['milestones'],
+  }
+}
+
+function hydrateTutorialState(state?: TutorialState): TutorialState {
+  const next = createTutorialState()
+  for (const id of TUTORIAL_MILESTONES) {
+    const saved = state?.milestones?.[id]
+    if (saved) next.milestones[id] = { id, completedAt: saved.completedAt, dismissedAt: saved.dismissedAt }
+  }
+  return next
 }
 
 /** A `Record<PartyId, T>`-shaped save field, filtered down to ids the live scenario still
@@ -211,6 +239,8 @@ export const useGameStore = defineStore('game', {
     result: null as 'won' | 'lost' | null,
     // Drawn once per playthrough (P3.0) — see `generatePlaythroughSeed`'s header comment.
     playthroughSeed: 0,
+    tutorial: createTutorialState(),
+    explanations: [] as ExplanationRecord[],
   }),
   getters: {
     selectedParty(state) {
@@ -388,6 +418,17 @@ export const useGameStore = defineStore('game', {
       const scenario = useScenarioStore()
       return flattenObjectives(scenario.scenario.campaign?.primaryObjectives, scenario.scenario.campaign?.optionalObjectives)
     },
+    activeTutorialMilestone(state): TutorialMilestoneId | null {
+      return (
+        TUTORIAL_MILESTONES.find((id) => {
+          const milestone = state.tutorial.milestones[id]
+          return milestone.completedAt && !milestone.dismissedAt
+        }) ?? null
+      )
+    },
+    explanationById(state): (id: string) => ExplanationRecord | undefined {
+      return (id) => state.explanations.find((record) => record.id === id)
+    },
   },
   actions: {
     startGame(partyId: PartyId) {
@@ -416,7 +457,26 @@ export const useGameStore = defineStore('game', {
       this.salience = { ...WORLD_SALIENCE }
       this.result = null
       this.playthroughSeed = generatePlaythroughSeed()
+      this.tutorial = createTutorialState()
+      this.explanations = []
       this.campaignObjectives = initialiseObjectiveRecords(this.campaignObjectiveDefinitions, this.objectiveInitialisationContext())
+      this.completeTutorialMilestone('campaign-start')
+    },
+    completeTutorialMilestone(id: TutorialMilestoneId) {
+      const milestone = this.tutorial.milestones[id]
+      if (!milestone || milestone.completedAt) return
+      milestone.completedAt = this.date
+    },
+    dismissTutorialMilestone(id: TutorialMilestoneId) {
+      const milestone = this.tutorial.milestones[id]
+      if (!milestone) return
+      milestone.completedAt ??= this.date
+      milestone.dismissedAt = this.date
+    },
+    recordExplanation(record: ExplanationRecord) {
+      const index = this.explanations.findIndex((existing) => existing.id === record.id)
+      if (index >= 0) this.explanations[index] = record
+      else this.explanations.push(record)
     },
     objectiveInitialisationContext(): ObjectiveEvaluationContext {
       return {
@@ -515,6 +575,7 @@ export const useGameStore = defineStore('game', {
             actions: rolled.actions.map((action) => ({ id: action.id, label: action.label })),
           })
           this.pauseClock()
+          this.completeTutorialMilestone('first-paused-action-event')
         } else {
           this.firedEventIds.push(rolled.id)
           const summary: string[] = []
@@ -522,13 +583,14 @@ export const useGameStore = defineStore('game', {
           this.pendingPollImpacts.push(...impacts)
           if (rolled.effects?.salienceShift) this.applySalienceShift(rolled.effects.salienceShift)
           runEventCallback(rolled.callbackId, this.buildCallbackContext(rolled, undefined, summary))
-          if (rolled.publishesPoll) this.publishPoll(summary)
+          const explanationId = rolled.publishesPoll ? this.publishPoll(summary) : undefined
           this.recordFeedEntry({
             id: rolled.id,
             date: this.date,
             headline: rolled.headline,
             status: 'actioned',
             effect: [rolled.effects?.summary, ...summary].filter(Boolean).join(' ') || undefined,
+            explanationId,
           })
         }
       }
@@ -567,11 +629,12 @@ export const useGameStore = defineStore('game', {
     },
     applyElectionOutcome(outcome: ElectionOutcome) {
       if (this.electionOutcomes.some((existing) => existing.id === outcome.id && existing.status === 'applied')) return
-      const applied: ElectionOutcome = { ...outcome, status: 'applied', appliedAt: this.date }
+      const applied: ElectionOutcome = { ...outcome, status: 'applied', appliedAt: this.date, explanationId: `${outcome.id}:explanation` }
       this.electionOutcomes.push(applied)
+      const scenario = useScenarioStore()
+      this.recordExplanation(buildElectionExplanation({ id: applied.explanationId!, outcome: applied, parties: scenario.scenario.parties }))
       this.result = applied.playerObjective ?? (this.projectedPlayerSeatCount >= this.winThresholdSeats ? 'won' : 'lost')
 
-      const scenario = useScenarioStore()
       const partyName = this.selectedPartyId ? scenario.party(this.selectedPartyId)?.shortName ?? this.selectedPartyId : 'Player party'
       const playerSeats = this.selectedPartyId ? applied.countsByParty[this.selectedPartyId] ?? 0 : 0
       this.recordFeedEntry({
@@ -580,8 +643,10 @@ export const useGameStore = defineStore('game', {
         headline: `General election resolved: ${partyName} wins ${playerSeats} Commons seats.`,
         status: 'actioned',
         effect: applied.provenance,
+        explanationId: applied.explanationId,
       })
       this.evaluateCampaignProgress()
+      this.completeTutorialMilestone('first-election-result')
     },
     /** The GE result is a headline moment, not a finale (spec §11.2 doesn't define what happens
      * after) — `ResultScreen.vue` calls this to drop the player back into live play with the
@@ -600,6 +665,7 @@ export const useGameStore = defineStore('game', {
       const rolled = rollByElectionsForDay(this.date, scenario.commonsRegions, scenario.councilWardRegions, this.contests)
       if (!rolled.length) return
       this.contests.push(...rolled)
+      this.completeTutorialMilestone('first-contest')
 
       for (const contest of rolled) {
         if (contest.contestTier !== 'commons') continue
@@ -650,7 +716,9 @@ export const useGameStore = defineStore('game', {
       contest.status = 'resolved'
       contest.actionId = actionId
       contest.resultLabel = resultLabel
+      contest.explanationId = `${contest.id}:explanation`
       this.pendingPollImpacts.push(...pollingImpacts)
+      let influenceBonusApplied = false
 
       // P3.4: a targeted campaign already running in this contest's region gives the acting
       // party's response a defined, bounded boost — "translate it into contest probability...
@@ -659,6 +727,7 @@ export const useGameStore = defineStore('game', {
       if (this.selectedPartyId && actionId !== 'ignore') {
         const influence = this.localInfluenceAt(contest.regionId)[this.selectedPartyId] ?? 0
         if (influence > 0) {
+          influenceBonusApplied = true
           this.pendingPollImpacts.push({
             partyId: this.selectedPartyId,
             magnitude: influence * CONTEST_INFLUENCE_BONUS_FACTOR,
@@ -674,17 +743,33 @@ export const useGameStore = defineStore('game', {
           entry.actionTakenId = actionId
           entry.actionTaken = CONTEST_ACTIONS_BY_TIER[contest.contestTier].find((action) => action.id === actionId)?.label
           entry.effect = resultLabel
+          entry.explanationId = contest.explanationId
           entry.actions = undefined
         }
       }
+      const scenario = useScenarioStore()
+      this.recordExplanation(
+        buildContestExplanation({
+          id: contest.explanationId,
+          date: this.date,
+          contest,
+          actionLabel: actionDef.label,
+          resultLabel,
+          impacts: pollingImpacts,
+          influenceBonusApplied,
+          parties: scenario.scenario.parties,
+        }),
+      )
       this.evaluateCampaignProgress()
     },
     /** Folds every impact accumulated since the last release (plus this release's own
      * alignment/variance/trend) into a new polling snapshot, makes it the live number, and
      * appends it to history (spec — "set to the current poll, and the current poll added to the
      * history"). `summary` collects a feed-text line describing the movement. */
-    publishPoll(summary: string[]) {
+    publishPoll(summary: string[]): string {
       const scenario = useScenarioStore()
+      const before = { ...this.polling }
+      const impacts = this.pendingPollImpacts.map((impact) => ({ ...impact }))
       const polling = nextPollingSnapshot(scenario.scenario.parties, this.pollingHistory, this.date, {
         extraImpacts: this.pendingPollImpacts,
         alignment: { salience: this.salience },
@@ -692,7 +777,20 @@ export const useGameStore = defineStore('game', {
       summary.push(describePollMovement(this.polling, polling, scenario))
       this.polling = polling
       this.pollingHistory.push({ date: this.date, polling: { ...polling } })
+      const explanationId = `poll:${this.date}:${this.pollingHistory.length}:explanation`
+      this.recordExplanation(
+        buildPollExplanation({
+          id: explanationId,
+          date: this.date,
+          before,
+          after: polling,
+          impacts,
+          parties: scenario.scenario.parties,
+        }),
+      )
       this.pendingPollImpacts = []
+      this.completeTutorialMilestone('first-poll-release')
+      return explanationId
     },
     /** Deducts an action's upfront `cost.money` from a party's finance — the only part of a cost
      * that's ever permanently spent immediately; `staff`/`leadership` are either a momentary
@@ -746,6 +844,7 @@ export const useGameStore = defineStore('game', {
           status: 'actioned',
         })
         this.evaluateCampaignProgress()
+        this.completeTutorialMilestone('first-player-lever')
         return
       }
 
@@ -757,6 +856,7 @@ export const useGameStore = defineStore('game', {
         status: 'actioned',
       })
       this.evaluateCampaignProgress()
+      this.completeTutorialMilestone('first-player-lever')
     },
     /** Adds `magnitude` (negative to reverse) to every region in `scope`'s `localInfluence`,
      * clamped to the bounded range a single campaign can ever swing a region by (P3.4 step 3 —
@@ -795,6 +895,7 @@ export const useGameStore = defineStore('game', {
         headline: rationale ? `${partyName}: ${rationale}` : `${partyName} launches a targeted campaign in ${scope.label}.`,
         status: 'actioned',
       })
+      if (partyId === this.selectedPartyId) this.completeTutorialMilestone('first-targeted-commitment')
     },
     /** Every eligible non-player party's deterministic targeting move for today (P3.4 step 4),
      * run on a fixed cadence (`OPPONENT_CADENCE_DAYS`) so this isn't re-evaluated every single
@@ -904,12 +1005,13 @@ export const useGameStore = defineStore('game', {
       }
       if (action.effects?.salienceShift) this.applySalienceShift(action.effects.salienceShift)
       runEventCallback(action.callbackId, this.buildCallbackContext(event, action.id, summary))
-      if (event.publishesPoll) this.publishPoll(summary)
+      const explanationId = event.publishesPoll ? this.publishPoll(summary) : undefined
 
       entry.status = 'actioned'
       entry.actionTakenId = action.id
       entry.actionTaken = action.label
       entry.effect = [action.effects?.summary, ...summary].filter(Boolean).join(' ') || undefined
+      entry.explanationId = explanationId
       entry.actions = undefined
 
       const scenario = useScenarioStore()
@@ -982,6 +1084,14 @@ export const useGameStore = defineStore('game', {
           ...record,
           consequences: record.consequences.map((consequence) => ({ ...consequence })),
         })),
+        tutorial: hydrateTutorialState(this.tutorial),
+        explanations: this.explanations.map((record) => ({
+          ...record,
+          groups: record.groups.map((group) => ({
+            ...group,
+            contributors: group.contributors.map((contributor) => ({ ...contributor })),
+          })),
+        })),
         pendingEventIds: this.pendingEvents.map((event) => event.id),
         firedEventIds: [...this.firedEventIds],
         salience: { ...this.salience },
@@ -1051,6 +1161,14 @@ export const useGameStore = defineStore('game', {
       this.campaignObjectives = (state.campaignObjectives ?? initialiseObjectiveRecords(this.campaignObjectiveDefinitions, this.objectiveEvaluationContext()))
         .filter((record) => knownCampaignObjectiveIds.has(record.objectiveId))
         .map((record) => ({ ...record }))
+      this.tutorial = hydrateTutorialState(state.tutorial)
+      this.explanations = (state.explanations ?? []).map((record) => ({
+        ...record,
+        groups: record.groups.map((group) => ({
+          ...group,
+          contributors: group.contributors.map((contributor) => ({ ...contributor })),
+        })),
+      }))
       this.pendingEvents = state.pendingEventIds
         .map((id) => EVENT_POOL.find((event) => event.id === id))
         .filter((event): event is GameEvent => !!event)

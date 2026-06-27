@@ -14,6 +14,10 @@ import GameMenuPanel from '@/components/GameMenuPanel.vue'
 import TargetingPanel from '@/components/TargetingPanel.vue'
 import CampaignJournal from '@/components/CampaignJournal.vue'
 import ViewSwitcher from '@/components/ViewSwitcher.vue'
+import GoalStatusStrip from '@/components/GoalStatusStrip.vue'
+import TutorialOverlay from '@/components/TutorialOverlay.vue'
+import HelpPanel from '@/components/HelpPanel.vue'
+import ExplanationDetails from '@/components/ExplanationDetails.vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 
@@ -52,6 +56,10 @@ watch(
     <CampaignJournal />
     <SaveManagementPanel />
     <GameMenuPanel />
+    <GoalStatusStrip />
+    <HelpPanel />
+    <TutorialOverlay />
+    <ExplanationDetails />
 
     <section
       class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"

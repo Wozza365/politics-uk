@@ -4,6 +4,7 @@ import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { useSaveStore } from '@/stores/save'
+import ExplanationDetails from '@/components/ExplanationDetails.vue'
 
 const game = useGameStore()
 const scenario = useScenarioStore()
@@ -89,6 +90,15 @@ async function backToMainMenu() {
       {{ outcome?.provenance ?? 'Projection applied from live campaign state.' }}
     </p>
 
+    <button
+      v-if="outcome?.explanationId"
+      type="button"
+      class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+      @click="ui.showExplanation(outcome.explanationId)"
+    >
+      Why?
+    </button>
+
     <div class="flex gap-3">
       <button
         type="button"
@@ -105,5 +115,6 @@ async function backToMainMenu() {
         Main menu
       </button>
     </div>
+    <ExplanationDetails />
   </main>
 </template>
