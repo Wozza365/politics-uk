@@ -20,7 +20,7 @@ function toggleExpanded() {
   isExpanded.value = !isExpanded.value
   if (isExpanded.value) {
     ui.openMenu()
-    game.pauseClock()
+    game.pauseClock('menu')
   } else {
     ui.closeMenu()
     game.resumeClockIfClear()

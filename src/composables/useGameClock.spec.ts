@@ -79,6 +79,24 @@ describe('useGameClock', () => {
     scope.stop()
   })
 
+  it('reschedules the current tick when the player changes speed while running', () => {
+    const game = useGameStore()
+    game.date = '2025-01-01'
+    game.clock.running = true
+    const scope = effectScope()
+    scope.run(() => useGameClock())
+
+    vi.advanceTimersByTime(1000)
+    game.setClockSpeed(7500)
+    vi.advanceTimersByTime(7499)
+    expect(game.date).toBe('2025-01-01')
+
+    vi.advanceTimersByTime(1)
+    expect(game.date).toBe('2025-01-02')
+
+    scope.stop()
+  })
+
   it('auto-pauses the clock as soon as an event is pending, and stops ticking', () => {
     const game = useGameStore()
     game.date = '2025-01-01'

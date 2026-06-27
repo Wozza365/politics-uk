@@ -520,3 +520,32 @@ file.
   decision, and pause reason without reading external docs; guidance can be skipped and stays
   dismissed after save/load; poll, contest, and election outcomes expose concise recorded
   explanations of the factors the simulation actually used.
+
+## P3.8 - Player controls, accessibility, and responsive play DONE
+
+- `src/stores/game.ts` and `src/composables/useGameClock.ts` - replaced the single clock boolean
+  with typed pause reasons for pending actions, open menus, election results, player pause, and
+  restored saves. The clock store now owns supported speed choices, status labels, player
+  pause/resume, and safe resume logic that cannot clear an unresolved higher-priority pause gate.
+- `src/components/GameClock.vue` - added explicit pause/resume, Slow/Normal/Fast controls, current
+  state text, and a keyboard-reachable skip-day control. New campaigns start after loading;
+  restored campaigns remain paused until the player resumes.
+- `src/composables/useFocusTrap.ts`, `ConfirmDialog.vue`, `GameMenuPanel.vue`,
+  `SaveManagementPanel.vue`, `TargetingPanel.vue`, `HelpPanel.vue`, and `ExplanationDetails.vue` -
+  added reusable focus trapping, initial focus, Escape handling, focus return, dialog semantics,
+  and visible close paths for the main overlay surfaces.
+- `src/screens/GameScreen.vue`, `src/style.css`, `HemicycleView.vue`, and `PartyPanel.vue` - added
+  responsive HUD regions, visible focus styling, touch-friendly minimum controls, reduced-motion
+  handling, and consistent menu pause gates for expandable surfaces.
+- `src/components/PollingHistoryChart.vue` - added a latest-poll text summary so polling movement
+  is available without relying on chart colour alone.
+- `docs/P3.8-QA.md` - documented the manual browser, keyboard-only, reduced-motion, zoom,
+  screen-reader, and high-contrast QA matrix.
+- Covered by new store/composable tests for speed rescheduling, independent pause gates, and
+  restored-save pause behavior. Full verification: 216 tests pass; `npm run build` passes;
+  `npm run validate:data` passes.
+- **Acceptance:** the player can pause, resume, change speed, save/load, resolve an event choice,
+  and launch a targeted campaign from keyboard-accessible controls. Automatic pauses report a
+  human-readable reason, loaded campaigns restore paused, open panels cannot accidentally resume
+  through pending decisions, reduced-motion users avoid unnecessary animation, and the HUD remains
+  reachable at narrow widths with scroll-safe overlays.

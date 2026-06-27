@@ -15,6 +15,7 @@ const accentColour = computed(() => game.selectedParty?.colours.primary ?? '#FFF
 
 onMounted(async () => {
   await new Promise((resolve) => setTimeout(resolve, 750))
+  game.resumeClockIfClear()
   ui.goToGame()
 })
 </script>

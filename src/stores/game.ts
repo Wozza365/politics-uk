@@ -64,6 +64,7 @@ import { buildContestExplanation, buildElectionExplanation, buildPollExplanation
  * itself, never the influence value applied wholesale, so the contest bonus stays bounded and
  * small relative to the contest action's own effect. */
 const CONTEST_INFLUENCE_BONUS_FACTOR = 0.5
+const CLOCK_SPEEDS_MS = [30000, 15000, 7500] as const
 const TUTORIAL_MILESTONES: TutorialMilestoneId[] = [
   'campaign-start',
   'first-player-lever',
@@ -75,6 +76,31 @@ const TUTORIAL_MILESTONES: TutorialMilestoneId[] = [
 ]
 
 export type { LeverId }
+export type ClockSpeedMs = (typeof CLOCK_SPEEDS_MS)[number]
+export type PauseReason = 'pendingAction' | 'menu' | 'electionResult' | 'player' | 'restoring'
+
+const PAUSE_REASON_PRIORITY: PauseReason[] = ['pendingAction', 'electionResult', 'menu', 'restoring', 'player']
+const PAUSE_REASON_LABELS: Record<PauseReason, string> = {
+  pendingAction: 'Paused for a decision',
+  electionResult: 'Paused for election results',
+  menu: 'Paused while a panel is open',
+  restoring: 'Restored campaign paused',
+  player: 'Paused by player',
+}
+
+function createPauseReasonCounts(): Record<PauseReason, number> {
+  return {
+    pendingAction: 0,
+    menu: 0,
+    electionResult: 0,
+    player: 0,
+    restoring: 0,
+  }
+}
+
+function normaliseClockSpeed(msPerDay: number): ClockSpeedMs {
+  return CLOCK_SPEEDS_MS.includes(msPerDay as ClockSpeedMs) ? (msPerDay as ClockSpeedMs) : 15000
+}
 
 /** Adds `days` whole days to an ISO date string ("2025-01-01" + 1 -> "2025-01-02"). */
 function addDays(date: ISODate, days: number): ISODate {
@@ -189,7 +215,7 @@ export const useGameStore = defineStore('game', {
   state: () => ({
     selectedPartyId: null as PartyId | null,
     date: '' as ISODate,
-    clock: { running: false, msPerDay: 15000 },
+    clock: { running: false, msPerDay: 15000 as ClockSpeedMs, pauseReasons: createPauseReasonCounts() },
     polling: {} as Record<PartyId, number>,
     pollingHistory: [] as PollingSnapshot[],
     // Polling impacts (from events, action choices, callbacks) accumulated since the last
@@ -429,6 +455,20 @@ export const useGameStore = defineStore('game', {
     explanationById(state): (id: string) => ExplanationRecord | undefined {
       return (id) => state.explanations.find((record) => record.id === id)
     },
+    hasPauseReasons(state): boolean {
+      return Object.values(state.clock.pauseReasons).some((count) => count > 0)
+    },
+    activePauseReason(state): PauseReason | null {
+      return PAUSE_REASON_PRIORITY.find((reason) => state.clock.pauseReasons[reason] > 0) ?? null
+    },
+    clockStatusLabel(): string {
+      if (this.clock.running) {
+        const speed = CLOCK_SPEEDS_MS.find((ms) => ms === this.clock.msPerDay)
+        const label = speed === 30000 ? 'Slow' : speed === 7500 ? 'Fast' : 'Normal'
+        return `Running (${label})`
+      }
+      return this.activePauseReason ? PAUSE_REASON_LABELS[this.activePauseReason] : 'Paused'
+    },
   },
   actions: {
     startGame(partyId: PartyId) {
@@ -440,7 +480,7 @@ export const useGameStore = defineStore('game', {
         date: snapshot.date,
         polling: { ...snapshot.polling },
       }))
-      this.clock.running = false
+      this.clock = { running: false, msPerDay: this.clock.msPerDay, pauseReasons: createPauseReasonCounts() }
       this.pendingEvents = []
       this.firedEventIds = []
       this.contests = []
@@ -574,7 +614,7 @@ export const useGameStore = defineStore('game', {
             status: 'unactioned',
             actions: rolled.actions.map((action) => ({ id: action.id, label: action.label })),
           })
-          this.pauseClock()
+          this.pauseClock('pendingAction')
           this.completeTutorialMilestone('first-paused-action-event')
         } else {
           this.firedEventIds.push(rolled.id)
@@ -611,7 +651,7 @@ export const useGameStore = defineStore('game', {
       const existing = this.electionOutcomes.find((outcome) => outcome.tier === 'commons' && outcome.date === electionDate)
       if (existing) {
         this.result = existing.playerObjective ?? (this.projectedPlayerSeatCount >= this.winThresholdSeats ? 'won' : 'lost')
-        this.pauseClock()
+        this.pauseClock('electionResult')
         return
       }
 
@@ -625,7 +665,7 @@ export const useGameStore = defineStore('game', {
         majorityThreshold: this.winThresholdSeats,
       })
       this.applyElectionOutcome(outcome)
-      this.pauseClock()
+      this.pauseClock('electionResult')
     },
     applyElectionOutcome(outcome: ElectionOutcome) {
       if (this.electionOutcomes.some((existing) => existing.id === outcome.id && existing.status === 'applied')) return
@@ -653,7 +693,7 @@ export const useGameStore = defineStore('game', {
      * clock running again, rather than only offering a full restart. `result` is left set so
      * `checkElectionResult`'s guard above keeps it from re-firing for the same election. */
     continuePlaying() {
-      this.resumeClock()
+      this.resumeClock('electionResult')
     },
     /** Generates this day's by-election/minor-election vacancies (P2.8, spec §9.5) and turns them
      * into feed entries. Parliamentary contests get one feed entry each; council contests are
@@ -974,11 +1014,28 @@ export const useGameStore = defineStore('game', {
         })
       }
     },
-    pauseClock() {
-      this.clock.running = false
+    syncClockRunning() {
+      this.clock.running = !this.hasPauseReasons
     },
-    resumeClock() {
-      this.clock.running = true
+    pauseClock(reason: PauseReason = 'player') {
+      this.clock.pauseReasons[reason]++
+      this.syncClockRunning()
+    },
+    resumeClock(reason: PauseReason = 'player') {
+      this.clock.pauseReasons[reason] = Math.max(0, this.clock.pauseReasons[reason] - 1)
+      this.syncClockRunning()
+    },
+    togglePlayerPause() {
+      if (this.clock.running) {
+        this.pauseClock('player')
+        return
+      }
+      if (this.clock.pauseReasons.restoring > 0) this.clock.pauseReasons.restoring = 0
+      else this.clock.pauseReasons.player = 0
+      this.syncClockRunning()
+    },
+    setClockSpeed(msPerDay: number) {
+      this.clock.msPerDay = normaliseClockSpeed(msPerDay)
     },
     recordFeedEntry(entry: FeedEntry) {
       this.feed.push(entry)
@@ -1047,7 +1104,9 @@ export const useGameStore = defineStore('game', {
      * other is still open). */
     resumeClockIfClear() {
       const ui = useUiStore()
-      if (this.pendingEvents.length === 0 && ui.openMenus === 0) this.resumeClock()
+      if (this.pendingEvents.length === 0) this.clock.pauseReasons.pendingAction = 0
+      if (ui.openMenus === 0) this.clock.pauseReasons.menu = 0
+      this.syncClockRunning()
     },
     /** Projects this store's mutable state into the P3.0 save payload — the only thing
      * `stores/save.ts` is allowed to persist. `pendingEvents` are saved by id only (see
@@ -1118,7 +1177,8 @@ export const useGameStore = defineStore('game', {
 
       this.selectedPartyId = state.selectedPartyId && knownPartyIds.has(state.selectedPartyId) ? state.selectedPartyId : null
       this.date = state.date
-      this.clock = { running: false, msPerDay: state.clockMsPerDay }
+      this.clock = { running: false, msPerDay: normaliseClockSpeed(state.clockMsPerDay), pauseReasons: createPauseReasonCounts() }
+      this.clock.pauseReasons.restoring = 1
       this.polling = pickKnownParties(state.polling, knownPartyIds)
       this.pollingHistory = state.pollingHistory.map((snapshot) => ({
         date: snapshot.date,

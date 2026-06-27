@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useUiStore } from '@/stores/ui'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 
 const ui = useUiStore()
+const panel = ref<HTMLElement | null>(null)
+useFocusTrap(panel, () => ui.closeHelpPanel(), computed(() => ui.helpPanelOpen))
 
 const entries = [
   ['Polling vs projection', 'Polling is the current vote share snapshot. Projection converts polling into Commons seats.'],
@@ -15,7 +19,10 @@ const entries = [
 <template>
   <section
     v-if="ui.helpPanelOpen"
+    ref="panel"
     class="absolute left-1/2 top-20 z-40 max-h-[calc(100vh-7rem)] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-950/95 p-4 text-sm text-zinc-200 shadow-2xl"
+    role="dialog"
+    aria-modal="false"
     aria-label="Glossary"
   >
     <header class="mb-3 flex items-center justify-between gap-3">

@@ -2,7 +2,7 @@ import { onScopeDispose, watch } from 'vue'
 import { useGameStore } from '@/stores/game'
 
 /** Drives `game.tickDay()` once per `game.clock.msPerDay` while `game.clock.running`,
- * and auto-pauses whenever an action-required event is pending (spec §9.5). Uses a single
+ * and adds the pending-action pause reason whenever an action-required event is pending. Uses a single
  * timer with a remaining-time carry-over so pausing/resuming doesn't lose or double-count
  * progress towards the next tick. */
 export function useGameClock() {
@@ -10,7 +10,7 @@ export function useGameClock() {
 
   let timeoutId: ReturnType<typeof setTimeout> | null = null
   let tickStartedAt = 0
-  let remainingMs = game.clock.msPerDay
+  let remainingMs: number = game.clock.msPerDay
 
   function clearTimer() {
     if (timeoutId !== null) {
@@ -46,9 +46,20 @@ export function useGameClock() {
   )
 
   watch(
+    () => game.clock.msPerDay,
+    (msPerDay) => {
+      remainingMs = msPerDay
+      if (!game.clock.running) return
+      clearTimer()
+      scheduleNext()
+    },
+    { flush: 'sync' },
+  )
+
+  watch(
     () => game.pendingEvents.length > 0,
     (hasPendingEvent) => {
-      if (hasPendingEvent) game.pauseClock()
+      if (hasPendingEvent && game.clock.pauseReasons.pendingAction === 0) game.pauseClock('pendingAction')
     },
     { flush: 'sync' },
   )

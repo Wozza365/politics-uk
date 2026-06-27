@@ -52,10 +52,31 @@ const chartOption = computed(() => ({
     }
   }),
 }))
+
+const latestPollingSummary = computed(() => {
+  const latest = game.pollingHistory.at(-1)
+  if (!latest) return []
+  return chartedPartyIds.value
+    .map((partyId) => ({
+      id: partyId,
+      name: scenario.party(partyId)?.shortName ?? partyId,
+      value: latest.polling[partyId] ?? 0,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5)
+})
 </script>
 
 <template>
-  <div class="h-[160px] w-full">
-    <v-chart :option="chartOption" autoresize />
+  <div>
+    <div class="h-[160px] w-full" role="img" aria-label="Polling history line chart">
+      <v-chart :option="chartOption" autoresize />
+    </div>
+    <p class="mt-2 text-xs leading-5 text-zinc-400">
+      Latest:
+      <span v-for="(party, index) in latestPollingSummary" :key="party.id">
+        {{ index ? ', ' : '' }}{{ party.name }} {{ party.value.toFixed(1) }}%
+      </span>
+    </p>
   </div>
 </template>

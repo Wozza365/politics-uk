@@ -8,3 +8,82 @@ body,
   overflow: hidden;
   background-color: #18181b;
 }
+
+button,
+input,
+select,
+textarea,
+[tabindex] {
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid #7dd3fc;
+  box-shadow: 0 0 0 4px rgb(14 165 233 / 0.22);
+}
+
+button,
+input,
+select,
+textarea {
+  min-height: 2.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 48rem) {
+  .hud-feed {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: 0.5rem;
+    bottom: auto;
+    width: auto;
+    max-height: 34vh;
+  }
+
+  .hud-clock {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: calc(34vh + 1rem);
+    width: auto;
+  }
+
+  .hud-map {
+    top: calc(34vh + 11rem);
+    bottom: 10rem;
+    padding-inline: 0.5rem;
+  }
+
+  .hud-hemicycle {
+    bottom: 5.25rem;
+    width: calc(100vw - 1rem);
+  }
+
+  .hud-switcher {
+    bottom: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+}
+
+@media (max-width: 24rem) {
+  .hud-feed {
+    max-height: 28vh;
+  }
+
+  .hud-clock {
+    top: calc(28vh + 1rem);
+  }
+
+  .hud-map {
+    top: calc(28vh + 12rem);
+  }
+}

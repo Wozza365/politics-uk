@@ -75,9 +75,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p37---onboarding-and-simulation-explainability-done)
 for the full record of what was built.
 
-### P3.8 — Player controls, accessibility, and responsive play
+### P3.8 — Player controls, accessibility, and responsive play `DONE`
 
-See [`phase3/P3.8-accessibility-controls.md`](./phase3/P3.8-accessibility-controls.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p38---player-controls-accessibility-and-responsive-play-done)
+for the full record of what was built.
 
 ### P3.9 — Balance, deterministic regression, and performance hardening
 

@@ -6,10 +6,14 @@
 import { useGameStore } from '@/stores/game'
 import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
+import { useFocusTrap } from '@/composables/useFocusTrap'
+import { computed, ref } from 'vue'
 
 const game = useGameStore()
 const save = useSaveStore()
 const ui = useUiStore()
+const panel = ref<HTMLElement | null>(null)
+useFocusTrap(panel, resume, computed(() => ui.gameMenuOpen))
 
 function resume() {
   ui.closeGameMenu()
@@ -54,6 +58,7 @@ async function restart() {
 <template>
   <section
     v-if="ui.gameMenuOpen"
+    ref="panel"
     class="absolute left-1/2 top-24 z-30 w-[min(20rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
     aria-label="Game menu"
   >

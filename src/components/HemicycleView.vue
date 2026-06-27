@@ -243,10 +243,12 @@ const isExpanded = ref(false)
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
   if (isExpanded.value) {
-    gameStore.pauseClock()
+    uiStore.openMenu()
+    gameStore.pauseClock('menu')
   } else {
     clearSelection()
-    gameStore.resumeClock()
+    uiStore.closeMenu()
+    gameStore.resumeClockIfClear()
   }
 }
 

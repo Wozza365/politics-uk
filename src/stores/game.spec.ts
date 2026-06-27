@@ -495,8 +495,8 @@ describe('useGameStore by-elections — P2.8', () => {
     const game = useGameStore()
     const ui = useUiStore()
     game.startGame('labour')
-    game.pauseClock()
     ui.openMenu()
+    game.pauseClock('menu')
 
     game.resumeClockIfClear()
     expect(game.clock.running).toBe(false)
@@ -504,6 +504,57 @@ describe('useGameStore by-elections — P2.8', () => {
     ui.closeMenu()
     game.resumeClockIfClear()
     expect(game.clock.running).toBe(true)
+  })
+
+  it('keeps player pause independent from menu and pending-action gates', () => {
+    const game = useGameStore()
+    const ui = useUiStore()
+    game.startGame('labour')
+
+    game.pauseClock('player')
+    ui.openMenu()
+    game.pauseClock('menu')
+    game.pendingEvents.push({
+      id: 'evt-1',
+      headline: 'Decision',
+      scope: 'national',
+      severity: 'minor',
+      weight: 1,
+      actions: [{ id: 'choice', label: 'Choose' }],
+    })
+    game.pauseClock('pendingAction')
+
+    ui.closeMenu()
+    game.resumeClockIfClear()
+    expect(game.clock.running).toBe(false)
+    expect(game.activePauseReason).toBe('pendingAction')
+
+    game.pendingEvents = []
+    game.resumeClockIfClear()
+    expect(game.clock.running).toBe(false)
+    expect(game.activePauseReason).toBe('player')
+
+    game.resumeClock('player')
+    expect(game.clock.running).toBe(true)
+  })
+
+  it('persists the preferred speed but restores a loaded campaign paused', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.setClockSpeed(7500)
+    game.resumeClockIfClear()
+    const snapshot = game.toSaveState()
+
+    setActivePinia(createPinia())
+    const fresh = useGameStore()
+    fresh.hydrateFromSaveState(snapshot)
+
+    expect(fresh.clock.msPerDay).toBe(7500)
+    expect(fresh.clock.running).toBe(false)
+    expect(fresh.activePauseReason).toBe('restoring')
+
+    fresh.togglePlayerPause()
+    expect(fresh.clock.running).toBe(true)
   })
 })
 
