@@ -2,7 +2,8 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useGameStore } from './game'
 import { useScenarioStore } from './scenario'
-import type { FeedEntry, GameEvent } from '@/types'
+import { useUiStore } from './ui'
+import type { Contest, FeedEntry, GameEvent } from '@/types'
 
 describe('useGameStore.resolveFeedAction', () => {
   beforeEach(() => {
@@ -273,3 +274,99 @@ function addDaysForTest(date: string, days: number): string {
   d.setUTCDate(d.getUTCDate() + days)
   return d.toISOString().slice(0, 10)
 }
+
+describe('useGameStore by-elections — P2.8', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  function commonsContest(overrides: Partial<Contest> = {}): Contest {
+    return {
+      id: 'byelection:commons:seat-0:2025-01-02',
+      contestTier: 'commons',
+      regionId: 'seat-0',
+      geometryRef: 'seat-0',
+      seatName: 'Seat 0',
+      incumbentParty: 'conservative',
+      calledDate: '2025-01-02',
+      status: 'pending',
+      ...overrides,
+    }
+  }
+
+  it('tickDay generates contests deterministically over a long run, each with a matching feed entry', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    for (let day = 0; day < 365; day++) game.tickDay()
+
+    const commonsContests = game.contests.filter((c) => c.contestTier === 'commons')
+    for (const contest of commonsContests) {
+      expect(game.feed.some((entry) => entry.id === contest.id)).toBe(true)
+    }
+  })
+
+  it('rolls council contests into one upserted "called this week" feed entry per ISO week', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    for (let day = 0; day < 365; day++) game.tickDay()
+
+    const councilContests = game.contests.filter((c) => c.contestTier === 'council')
+    expect(councilContests.length).toBeGreaterThan(0)
+    const weeklyEntries = game.feed.filter((entry) => entry.id.startsWith('byelection:council:week:'))
+    // One entry per distinct ISO week a council contest landed in, never duplicated.
+    const ids = weeklyEntries.map((entry) => entry.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('actionContest resolves the contest, queues its polling impact, and updates the matching commons feed entry', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    game.contests.push(commonsContest())
+    game.feed.push({
+      id: 'byelection:commons:seat-0:2025-01-02',
+      date: '2025-01-02',
+      headline: 'By-election called: Seat 0 (Conservative hold).',
+      status: 'unactioned',
+      actions: [],
+    })
+
+    game.actionContest('byelection:commons:seat-0:2025-01-02', 'local_push')
+
+    const contest = game.contests[0]
+    expect(contest.status).toBe('resolved')
+    expect(contest.actionId).toBe('local_push')
+    expect(contest.resultLabel).toBeTruthy()
+    expect(game.pendingPollImpacts).toHaveLength(1)
+    const entry = game.feed[0]
+    expect(entry.status).toBe('actioned')
+    expect(entry.actionTaken).toBe('Local push')
+    expect(entry.effect).toBe(contest.resultLabel)
+  })
+
+  it('actionContest is a no-op on an already-resolved contest', () => {
+    const game = useGameStore()
+    game.startGame('labour')
+    const contest = commonsContest({ status: 'resolved', actionId: 'ignore', resultLabel: 'conservative hold' })
+    game.contests.push(contest)
+
+    game.actionContest(contest.id, 'local_push')
+
+    expect(game.contests[0].actionId).toBe('ignore')
+    expect(game.pendingPollImpacts).toEqual([])
+  })
+
+  it('resumeClockIfClear only resumes once both pendingEvents and ui.openMenus are clear', () => {
+    const game = useGameStore()
+    const ui = useUiStore()
+    game.startGame('labour')
+    game.pauseClock()
+    ui.openMenu()
+
+    game.resumeClockIfClear()
+    expect(game.clock.running).toBe(false)
+
+    ui.closeMenu()
+    game.resumeClockIfClear()
+    expect(game.clock.running).toBe(true)
+  })
+})

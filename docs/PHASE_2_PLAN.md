@@ -92,9 +92,11 @@ See [`phase2/P2.6-event-library.md`](./phase2/P2.6-event-library.md).
 
 See [`phase2/P2.7-hemicycle-drilldown.md`](./phase2/P2.7-hemicycle-drilldown.md).
 
-### P2.8 — Expandable clock / by-elections panel
+### P2.8 — Expandable clock / by-elections panel `✅ DONE`
 
-See [`phase2/P2.8-clock-panel.md`](./phase2/P2.8-clock-panel.md).
+See
+[`PHASE_2_COMPLETED.md`](./PHASE_2_COMPLETED.md#p28--expandable-clock--by-elections-panel-)
+for the full record of what was built.
 
 ### P2.9 — Deeper Democracy-3-style menus & charts (expanded party panel) `✅ DONE`
 

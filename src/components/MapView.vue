@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { COUNCIL_LEVELS, councilWardObjectKey, useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
 import { HexMapRenderer } from '@/map/HexMapRenderer'
@@ -442,6 +442,19 @@ watch(() => ui.activeCouncilLevel, () => {
   councilWardFocusRegion.value = null
   resetZoom()
   draw()
+})
+// External focus requests (P2.8's by-elections panel, possibly others later) — the only seam
+// outside code uses to drive the map. `ui.activeView`/`activeCouncilLevel` changes above reset
+// activeRegion/councilWardFocusRegion via their own watchers first; `nextTick` waits for that
+// flush before calling the same internal `activate()` a direct region click would use, so this
+// request doesn't get immediately undone by those resets.
+watch(() => ui.mapFocusRequest, async (request) => {
+  if (!request) return
+  ui.setActiveView(request.view)
+  if (request.view === 'councils' && request.councilLevel) ui.setActiveCouncilLevel(request.councilLevel)
+  await nextTick()
+  activate(request.geometryRef)
+  ui.clearMapFocus()
 })
 onUnmounted(() => {
   clearCouncilWardFocusTimer()

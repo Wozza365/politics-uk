@@ -8,6 +8,7 @@ import PartyPanel from '@/components/PartyPanel.vue'
 import HemicycleView from '@/components/HemicycleView.vue'
 import EventFeed from '@/components/EventFeed.vue'
 import GameClock from '@/components/GameClock.vue'
+import ByElectionsPanel from '@/components/ByElectionsPanel.vue'
 import ViewSwitcher from '@/components/ViewSwitcher.vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
@@ -42,6 +43,7 @@ watch(
     </section>
 
     <PartyPanel />
+    <ByElectionsPanel />
 
     <section
       class="absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"

@@ -1,11 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/game'
+import { useUiStore } from '@/stores/ui'
 import { useGameClock } from '@/composables/useGameClock'
 import type { ISODate } from '@/types'
 
 const game = useGameStore()
+const ui = useUiStore()
 useGameClock()
+
+/** Opening the panel pauses the clock through the shared `ui.openMenus` gate (P2.8) so it
+ * cooperates with PartyPanel's own pause/resume rather than fighting over a single boolean. */
+function toggleByElectionsPanel() {
+  ui.toggleByElectionsPanel()
+  if (ui.byElectionsPanelOpen) {
+    ui.openMenu()
+    game.pauseClock()
+  } else {
+    ui.closeMenu()
+    game.resumeClockIfClear()
+  }
+}
 
 // Nothing else starts the clock yet — kick it off once the game screen is up, unless an
 // event is already pending (shouldn't happen this early, but keeps the rule in one place).
@@ -39,9 +54,10 @@ const clockIconStyle = computed(() => ({
   <div class="flex w-full items-center gap-3 px-4 py-3">
     <button
       type="button"
-      disabled
       class="flex min-w-0 flex-1 items-center gap-3 text-left"
-      aria-label="By-elections and other minor elections — coming soon"
+      :aria-expanded="ui.byElectionsPanelOpen"
+      aria-label="Open by-elections and other minor elections panel"
+      @click="toggleByElectionsPanel"
     >
       <span class="clock-icon shrink-0" :style="clockIconStyle" aria-hidden="true" />
       <span class="min-w-0">

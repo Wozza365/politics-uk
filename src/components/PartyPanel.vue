@@ -5,11 +5,13 @@ import PartyStatCard from '@/components/PartyStatCard.vue'
 import LeverCard from '@/components/LeverCard.vue'
 import PollingHistoryChart from '@/components/PollingHistoryChart.vue'
 import { useGameStore } from '@/stores/game'
+import { useUiStore } from '@/stores/ui'
 import { usePartyStats } from '@/composables/usePartyStats'
 import { usePartyLevers } from '@/composables/usePartyLevers'
 import type { PartyFinance } from '@/types'
 
 const game = useGameStore()
+const ui = useUiStore()
 const isExpanded = ref(false)
 
 const { fundraisingCooldownDays, runFundraisingAppeal, socialMediaCooldownDays, runSocialMediaCampaign } =
@@ -18,9 +20,11 @@ const { fundraisingCooldownDays, runFundraisingAppeal, socialMediaCooldownDays, 
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
   if (isExpanded.value) {
+    ui.openMenu()
     game.pauseClock()
   } else {
-    game.resumeClock()
+    ui.closeMenu()
+    game.resumeClockIfClear()
   }
 }
 
