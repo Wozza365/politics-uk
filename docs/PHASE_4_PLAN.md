@@ -30,7 +30,7 @@ Phase 4's additional definition of done:
 
 ## 1. Phase 4 - visual premium pass
 
-### P4.0 - Visual audit, art direction, and design tokens `TODO`
+### P4.0 - Visual audit, art direction, and design tokens `DONE`
 
 See [`phase4/P4.0-visual-audit-art-direction.md`](./phase4/P4.0-visual-audit-art-direction.md).
 

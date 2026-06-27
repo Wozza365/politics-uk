@@ -1,12 +1,105 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+
+  --puk-color-app-bg: #101114;
+  --puk-color-map-backdrop: #16181a;
+  --puk-color-surface: #111318;
+  --puk-color-surface-raised: #181b21;
+  --puk-color-border: #30343b;
+  --puk-color-border-subtle: #24272d;
+  --puk-color-text: #f4f1e8;
+  --puk-color-text-muted: #b9c0c6;
+  --puk-color-text-disabled: #6f7680;
+  --puk-color-player-focus: #38bdf8;
+  --puk-color-opponent: #f97316;
+  --puk-color-contest: #c084fc;
+  --puk-color-success: #3fb950;
+  --puk-color-warning: #f2cc60;
+  --puk-color-danger: #ff6b6b;
+  --puk-color-data-neutral: #8fa3ad;
+  --puk-color-institutional: #1f6f50;
+  --puk-color-premium-accent: #d6a84f;
+  --puk-party-accent-surface-mix: 14%;
+  --puk-party-accent-border-mix: 42%;
+  --puk-party-accent-text-min-contrast: 4.5;
+
+  --puk-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --puk-font-number: var(--puk-font-ui);
+  --puk-type-screen-title: 2rem;
+  --puk-type-panel-title: 0.875rem;
+  --puk-type-section-title: 0.75rem;
+  --puk-type-body: 0.875rem;
+  --puk-type-dense: 0.75rem;
+  --puk-type-micro: 0.6875rem;
+  --puk-line-tight: 1.2;
+  --puk-line-body: 1.55;
+
+  --puk-space-1: 0.25rem;
+  --puk-space-2: 0.5rem;
+  --puk-space-3: 0.75rem;
+  --puk-space-4: 1rem;
+  --puk-space-5: 1.25rem;
+  --puk-space-6: 1.5rem;
+  --puk-space-8: 2rem;
+
+  --puk-radius-card: 6px;
+  --puk-radius-panel: 8px;
+  --puk-radius-control: 6px;
+  --puk-radius-modal: 10px;
+  --puk-border-width: 1px;
+  --puk-control-height-sm: 2.25rem;
+  --puk-control-height-md: 2.5rem;
+  --puk-control-icon: 2.25rem;
+
+  --puk-shadow-raised: 0 14px 38px rgb(0 0 0 / 0.34);
+  --puk-shadow-panel: 0 24px 70px rgb(0 0 0 / 0.42);
+  --puk-shadow-modal: 0 32px 96px rgb(0 0 0 / 0.58);
+
+  --puk-duration-control: 120ms;
+  --puk-duration-panel: 180ms;
+  --puk-duration-map-snap: 320ms;
+  --puk-duration-result: 520ms;
+  --puk-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --puk-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --puk-z-map: 10;
+  --puk-z-hud: 20;
+  --puk-z-popover: 35;
+  --puk-z-dialog: 50;
+  --puk-z-toast: 60;
+}
+
+@theme {
+  --color-puk-app-bg: var(--puk-color-app-bg);
+  --color-puk-map-backdrop: var(--puk-color-map-backdrop);
+  --color-puk-surface: var(--puk-color-surface);
+  --color-puk-surface-raised: var(--puk-color-surface-raised);
+  --color-puk-border: var(--puk-color-border);
+  --color-puk-border-subtle: var(--puk-color-border-subtle);
+  --color-puk-text: var(--puk-color-text);
+  --color-puk-text-muted: var(--puk-color-text-muted);
+  --color-puk-text-disabled: var(--puk-color-text-disabled);
+  --color-puk-player-focus: var(--puk-color-player-focus);
+  --color-puk-opponent: var(--puk-color-opponent);
+  --color-puk-contest: var(--puk-color-contest);
+  --color-puk-success: var(--puk-color-success);
+  --color-puk-warning: var(--puk-color-warning);
+  --color-puk-danger: var(--puk-color-danger);
+  --color-puk-data-neutral: var(--puk-color-data-neutral);
+  --font-puk-ui: var(--puk-font-ui);
+}
+
 html,
 body,
 #app {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background-color: #18181b;
+  background-color: var(--puk-color-app-bg);
+  color: var(--puk-color-text);
+  font-family: var(--puk-font-ui);
 }
 
 button,
@@ -18,7 +111,7 @@ textarea,
 }
 
 :focus-visible {
-  outline: 2px solid #7dd3fc;
+  outline: 2px solid var(--puk-color-player-focus);
   box-shadow: 0 0 0 4px rgb(14 165 233 / 0.22);
 }
 
