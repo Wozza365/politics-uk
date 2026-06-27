@@ -81,9 +81,11 @@ See
 [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p38---player-controls-accessibility-and-responsive-play-done)
 for the full record of what was built.
 
-### P3.9 — Balance, deterministic regression, and performance hardening
+### P3.9 — Balance, deterministic regression, and performance hardening `DONE`
 
-See [`phase3/P3.9-balance-quality.md`](./phase3/P3.9-balance-quality.md).
+See
+[`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p39---balance-deterministic-regression-and-performance-hardening-done)
+for the full record of what was built.
 
 ## 2. Scope and ordering
 

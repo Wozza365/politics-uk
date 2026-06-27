@@ -476,10 +476,12 @@ export const useGameStore = defineStore('game', {
       this.selectedPartyId = partyId
       this.date = scenario.scenario.date
       this.polling = { ...scenario.scenario.polling }
-      this.pollingHistory = scenario.scenario.pollingHistory.map((snapshot) => ({
-        date: snapshot.date,
-        polling: { ...snapshot.polling },
-      }))
+      this.pollingHistory = scenario.scenario.pollingHistory.length
+        ? scenario.scenario.pollingHistory.map((snapshot) => ({
+            date: snapshot.date,
+            polling: { ...snapshot.polling },
+          }))
+        : [{ date: scenario.scenario.date, polling: { ...scenario.scenario.polling } }]
       this.clock = { running: false, msPerDay: this.clock.msPerDay, pauseReasons: createPauseReasonCounts() }
       this.pendingEvents = []
       this.firedEventIds = []

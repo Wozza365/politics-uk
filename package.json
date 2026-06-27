@@ -8,6 +8,7 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run --exclude .claude/**",
+    "test:campaign": "vitest run --exclude .claude/** src/sim/campaignRunner.spec.ts",
     "data:fetch-boundaries": "node scripts/data/fetch-commons-boundaries.mjs",
     "data:simplify-boundaries": "mapshaper src/data/scenarios/uk-2025-01-01/boundaries.commons.json -simplify 10% keep-shapes -o format=topojson force src/data/scenarios/uk-2025-01-01/boundaries.commons.json",
     "data:fetch-composition": "node scripts/data/fetch-commons-composition.mjs",

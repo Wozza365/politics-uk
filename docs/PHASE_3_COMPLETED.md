@@ -549,3 +549,28 @@ file.
   human-readable reason, loaded campaigns restore paused, open panels cannot accidentally resume
   through pending decisions, reduced-motion users avoid unnecessary animation, and the HUD remains
   reachable at narrow widths with scroll-safe overlays.
+
+## P3.9 - Balance, deterministic regression, and performance hardening DONE
+
+- `src/sim/campaignRunner.ts` - added a headless deterministic campaign runner built on the same
+  Pinia game/scenario stores used by the app. It starts real campaigns, ticks days, resolves
+  scripted levers/events/contests/targeting, can save/restore mid-run, and emits compact outcome
+  reports with deterministic hashes.
+- `src/sim/campaignRunner.spec.ts` and `src/sim/campaignRunner.fixtures.json` - committed replay
+  fixtures for the first campaign month, generated P2.8 contests, large-party vs small-party
+  balance indicators, save/restore continuity, and a full general-election resolution. Tests assert
+  stable summaries, invariant checks, and balance indicators rather than brittle feed wording.
+- `src/stores/game.ts` - new campaigns now seed `pollingHistory` from scenario-start polling when
+  scenario data has no historical poll snapshots. This keeps the first published poll anchored to
+  the live field and prevents an empty polling history from collapsing the poll report.
+- `package.json` - added `npm run test:campaign` as a focused replay/balance regression command;
+  the suite is still included in the normal `npm test` run.
+- `docs/P3.9-QUALITY.md` - added the release checklist, current fixture hashes, measurable balance
+  indicators, and performance budgets for initial load, campaign start, view switch, map
+  interaction, autosave, restore, and memory. Optimization guidance explicitly preserves the
+  `MapRenderer` abstraction unless measurements justify deeper work.
+- **Acceptance:** fixed-seed campaign fixtures replay deterministically in automated tests; reports
+  expose resource solvency, action availability, polling ranges, contest win rates, election
+  outcomes, objective completion, and save/restore checks; invariant failures catch polling/seat
+  reconciliation, unknown references, duplicate election application, stale commitments, and
+  resource bounds before release.

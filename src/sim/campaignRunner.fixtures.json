@@ -1,0 +1,21 @@
+{
+  "firstMonthLabour": {
+    "deterministicHash": "a6938fe2"
+  },
+  "balanceBatch": [
+    {
+      "partyId": "labour",
+      "difficulty": 1
+    },
+    {
+      "partyId": "workers_party",
+      "difficulty": 4
+    }
+  ],
+  "contestWindowLiberalDemocrat": {
+    "deterministicHash": "bcf1d9d6"
+  },
+  "generalElectionConservative": {
+    "deterministicHash": "54194623"
+  }
+}
