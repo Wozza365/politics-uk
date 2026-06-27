@@ -54,9 +54,10 @@ function groupedPartyId(partyId: string) {
 }
 
 function seatDetail(region: Region, seat: Seat, seatIndex: number): SeatDetail {
+  const party = region.tier === 'commons' ? gameStore.currentCommonsSeatHolder(region.id, seatIndex) ?? seat.party : seat.party
   return {
     id: `${region.tier}:${region.id}:${seatIndex}`,
-    party: groupedPartyId(seat.party),
+    party: groupedPartyId(party),
     regionName: region.name,
     tier: region.tier,
     memberName: seat.memberName,

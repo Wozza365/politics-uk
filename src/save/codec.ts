@@ -5,6 +5,7 @@
 import type {
   ActiveCommitment,
   Contest,
+  ElectionOutcome,
   FeedEntry,
   GameSaveStateV1,
   PollingSnapshot,
@@ -111,6 +112,51 @@ function isContestArray(value: unknown): value is Contest[] {
   )
 }
 
+function isElectionOutcomeArray(value: unknown): value is ElectionOutcome[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (entry) =>
+        isPlainObject(entry) &&
+        isString(entry.id) &&
+        isString(entry.instanceId) &&
+        entry.tier === 'commons' &&
+        isString(entry.date) &&
+        (entry.status === 'pending' || entry.status === 'applied') &&
+        (entry.appliedAt === undefined || isString(entry.appliedAt)) &&
+        entry.model === 'uniform-national-swing-local-commitments' &&
+        isString(entry.provenance) &&
+        isNumber(entry.eligibleSeatCount) &&
+        isRecordOf(entry.countsByParty, isNumber) &&
+        isRecordOf(entry.changesByParty, isNumber) &&
+        isString(entry.summary) &&
+        (entry.playerObjective === undefined || entry.playerObjective === 'won' || entry.playerObjective === 'lost') &&
+        isElectionSeatWinnerArray(entry.winners) &&
+        isElectionSeatWinnerArray(entry.decisiveSeats),
+    )
+  )
+}
+
+function isElectionSeatWinnerArray(value: unknown): value is ElectionOutcome['winners'] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (entry) =>
+        isPlainObject(entry) &&
+        isString(entry.regionId) &&
+        isString(entry.geometryRef) &&
+        isNumber(entry.seatIndex) &&
+        isString(entry.seatName) &&
+        isString(entry.previousParty) &&
+        isString(entry.winnerParty) &&
+        (entry.source === 'national-swing' || entry.source === 'local-commitment' || entry.source === 'incumbent-fallback') &&
+        (entry.projectedShare === undefined || isNumber(entry.projectedShare)) &&
+        (entry.runnerUpParty === undefined || isString(entry.runnerUpParty)) &&
+        (entry.runnerUpProjectedShare === undefined || isNumber(entry.runnerUpProjectedShare)),
+    )
+  )
+}
+
 function isGameSaveState(value: unknown): value is GameSaveStateV1 {
   if (!isPlainObject(value)) return false
   return (
@@ -128,6 +174,7 @@ function isGameSaveState(value: unknown): value is GameSaveStateV1 {
     (value.localInfluence === undefined || isRecordOf(value.localInfluence, (v): v is Record<string, number> => isRecordOf(v, isNumber))) &&
     isFeedEntryArray(value.feed) &&
     isContestArray(value.contests) &&
+    (value.electionOutcomes === undefined || isElectionOutcomeArray(value.electionOutcomes)) &&
     isStringArray(value.pendingEventIds) &&
     isStringArray(value.firedEventIds) &&
     isRecordOf(value.salience, isNumber) &&

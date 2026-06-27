@@ -5,6 +5,7 @@ import type { RegionDisplayState } from '@/map/MapRenderer'
 export interface SeatRegionStateContext {
   partyColour: (partyId: string) => string
   partyName: (partyId: string) => string | undefined
+  currentParty?: (region: Region, seatIndex: number) => string | undefined
   hoveredGeometryRef: string | null
   activeGeometryRef: string | null
   liftPx: number
@@ -15,9 +16,10 @@ const UNHELD_FILL = '#9ca3af'
 /** Fill/selection/tooltip state for one region, by its current seat-holder (seats[0]). */
 export function buildSeatRegionState(region: Region, ctx: SeatRegionStateContext): RegionDisplayState {
   const holder = region.seats[0]
+  const holderParty = ctx.currentParty?.(region, 0) ?? holder?.party
   const isActiveRegion = ctx.activeGeometryRef === region.geometryRef
   return {
-    fill: holder ? ctx.partyColour(holder.party) : UNHELD_FILL,
+    fill: holderParty ? ctx.partyColour(holderParty) : UNHELD_FILL,
     selected: ctx.hoveredGeometryRef === region.geometryRef,
     strokeWidth: 0.1,
     selectedStrokeWidth: 0.2,
@@ -25,7 +27,7 @@ export function buildSeatRegionState(region: Region, ctx: SeatRegionStateContext
     liftPx: isActiveRegion ? ctx.liftPx : undefined,
     tooltip: {
       name: region.name,
-      party: holder ? ctx.partyName(holder.party) : undefined,
+      party: holderParty ? ctx.partyName(holderParty) : undefined,
       member: holder?.memberName,
     },
   }

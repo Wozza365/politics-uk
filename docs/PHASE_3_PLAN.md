@@ -57,9 +57,11 @@ for the full record of what was built.
 See [`PHASE_3_COMPLETED.md`](./PHASE_3_COMPLETED.md#p34--targeted-campaigning-and-opponent-strategy-)
 for the full record of what was built.
 
-### P3.5 — Election resolution and changing political world state
+### P3.5 — Election resolution and changing political world state `DONE`
 
-See [`phase3/P3.5-election-resolution.md`](./phase3/P3.5-election-resolution.md).
+See
+[PHASE_3_COMPLETED.md](./PHASE_3_COMPLETED.md#p35--election-resolution-and-changing-political-world-state)
+for the full record of what was built.
 
 ### P3.6 — Campaign objectives, scenario arcs, and replayable content
 

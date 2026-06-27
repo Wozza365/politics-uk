@@ -129,6 +129,8 @@ function draw() {
   const ctx: SeatRegionStateContext = {
     partyColour,
     partyName: (partyId) => scenario.party(partyId)?.name,
+    currentParty: (region, seatIndex) =>
+      region.tier === 'commons' ? game.currentCommonsSeatHolder(region.id, seatIndex) ?? region.seats[seatIndex]?.party : region.seats[seatIndex]?.party,
     hoveredGeometryRef: hovered.value,
     activeGeometryRef: activeRegion.value,
     liftPx: LIFT_PX,
@@ -486,6 +488,7 @@ watch(() => ui.activeCouncilLevel, () => {
 watch(() => ui.mapOverlays, draw, { deep: true })
 watch(() => game.activeTargetingCommitments, draw, { deep: true })
 watch(() => game.contests, draw, { deep: true })
+watch(() => game.electionOutcomes, draw, { deep: true })
 // External focus requests (P2.8's by-elections panel, possibly others later) — the only seam
 // outside code uses to drive the map. `ui.activeView`/`activeCouncilLevel` changes above reset
 // activeRegion/councilWardFocusRegion via their own watchers first; `nextTick` waits for that
@@ -517,6 +520,11 @@ const hoveredRegion = () =>
       : scenario.commonsRegions.find((r) => r.geometryRef === hovered.value)
 
 const hoveredSeat = computed(() => hoveredRegion()?.seats[0])
+const hoveredSeatParty = computed(() => {
+  const region = hoveredRegion()
+  if (!region) return undefined
+  return region.tier === 'commons' ? game.currentCommonsSeatHolder(region.id) ?? hoveredSeat.value?.party : hoveredSeat.value?.party
+})
 const hoveredDemographics = computed(() => {
   if (ui.activeView !== 'westminster') return undefined
   const region = hoveredRegion()
@@ -590,7 +598,7 @@ const twistDeg = computed(() => (isActive.value ? ACTIVE_TWIST_DEG : DEFAULT_TWI
         </span>
       </p>
       <p v-else class="text-zinc-300">
-        {{ scenario.party(hoveredSeat?.party ?? '')?.name }} —
+        {{ scenario.party(hoveredSeatParty ?? '')?.name }} —
         {{ hoveredSeat?.memberName }}
       </p>
 

@@ -24,6 +24,49 @@ export interface Contest {
   resultLabel?: string // set once resolved, e.g. "Labour hold" / "Conservative gain"
 }
 
+export type ElectionTier = 'commons'
+export type ElectionStatus = 'pending' | 'applied'
+export type ElectionModel = 'uniform-national-swing-local-commitments'
+
+export interface ElectionInstance {
+  id: string
+  tier: ElectionTier
+  date: ISODate
+  eligibleSeatCount: number
+  status: ElectionStatus
+}
+
+export interface ElectionSeatWinner {
+  regionId: string
+  geometryRef: string
+  seatIndex: number
+  seatName: string
+  previousParty: PartyId
+  winnerParty: PartyId
+  source: 'national-swing' | 'local-commitment' | 'incumbent-fallback'
+  projectedShare?: number
+  runnerUpParty?: PartyId
+  runnerUpProjectedShare?: number
+}
+
+export interface ElectionOutcome {
+  id: string
+  instanceId: string
+  tier: ElectionTier
+  date: ISODate
+  status: ElectionStatus
+  appliedAt?: ISODate
+  model: ElectionModel
+  provenance: string
+  eligibleSeatCount: number
+  winners: ElectionSeatWinner[]
+  countsByParty: Record<PartyId, number>
+  changesByParty: Record<PartyId, number>
+  decisiveSeats: ElectionSeatWinner[]
+  playerObjective?: 'won' | 'lost'
+  summary: string
+}
+
 export type ContestActionId = 'ignore' | 'token_effort' | 'local_push' | 'nationalise'
 
 export interface ContestActionDef {

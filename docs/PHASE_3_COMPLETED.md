@@ -415,3 +415,46 @@ file.
   gate the player is held to, so an under-resourced party simply sits a cadence tick out. The map
   shows targeting/contest/opponent activity through toggleable overlays without the per-tier
   `regionState/` builders ever knowing P3.4 exists.
+
+## P3.5 - Election resolution and changing political world state DONE
+
+- `src/types/election.ts` — added the P3.5 Commons election contracts:
+  `ElectionInstance`, `ElectionOutcome`, and `ElectionSeatWinner`. Outcomes identify tier/date,
+  status, model/provenance, eligible seats, per-seat winners, party totals, changes from the
+  starting Parliament, decisive seats, and the selected party's objective result. P2.8 `Contest`
+  remains the runtime vacancy type; the new outcome ledger is the mutable representation overlay.
+- `src/sim/elections/commons.ts` (new) — pure Commons resolver. It combines the existing P2.0
+  uniform-national-swing baseline with P3.4 local commitments (`leadingPartyNetInfluence`) and
+  emits a deterministic, inspectable `ElectionOutcome` rather than only a count map. Every eligible
+  seat gets exactly one winner, counts reconcile to the seat total, seats without result breakdowns
+  fall back to their incumbent, and local commitments are recorded as their own winner source.
+- `src/stores/game.ts` — added `electionOutcomes` as the applied outcome ledger, reset on new
+  campaigns and persisted through `toSaveState()`/`hydrateFromSaveState()`. `checkElectionResult()`
+  now resolves the Commons election once, applies it atomically, records a feed entry, pauses the
+  clock, and sets the existing win/loss flag from the applied outcome. Re-running the check cannot
+  double-apply the same election. `commonsSeatsByParty`, `playerSeatCount`, and
+  `currentCommonsSeatHolder(regionId, seatIndex)` now read from the latest applied Commons outcome
+  before falling back to immutable scenario composition.
+- `src/types/save.ts` / `src/save/codec.ts` — added optional `electionOutcomes` to the v1 game save
+  state (additive, no version bump) and runtime validation for outcomes/winner rows. Hydration
+  validates outcome seat ids against the current Commons regions and accepts representation party
+  ids found in Commons seat/result data, not just playable party ids, so real local/independent
+  constituency parties survive a save round trip.
+- `src/map/regionState/buildSeatRegionState.ts`, `src/components/MapView.vue`, and
+  `src/components/HemicycleView.vue` — Westminster map fill/tooltips and the party makeup
+  hemicycle now use `game.currentCommonsSeatHolder()` after an election. Regional, council, and
+  Lords views deliberately continue to use static scenario composition until their electoral
+  systems are modelled.
+- `src/screens/ResultScreen.vue` — expanded from a simple win/loss screen into an election result
+  moment: player seats, change from the starting Parliament, majority threshold, model/provenance,
+  reconciliation count, and the first decisive seat changes. Existing Continue and Main menu flows
+  remain, with Main menu still flushing a save first.
+- Covered by `src/sim/elections/commons.spec.ts` (winner/count reconciliation, local-commitment
+  override, same-input determinism) and new P3.5 blocks in `src/stores/game.spec.ts` (applied
+  outcome becomes current Commons composition, no double application, and save/hydrate preserves
+  outcomes/current holders). Full suite: 207 tests pass with a 20s Vitest timeout for the existing
+  long-run by-election tests; `npm run build` and `npm run validate:data` pass.
+- **Acceptance:** resolving the eligible Commons election produces one deterministic, inspectable
+  applied outcome. The map, hemicycle, party statistics, feed, save game, and objective result all
+  reflect the applied outcome after refresh. The same election cannot be applied twice, and seat
+  totals reconcile to the Commons total.

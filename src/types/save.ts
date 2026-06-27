@@ -1,5 +1,5 @@
 import type { ActiveCommitment } from './action'
-import type { Contest } from './election'
+import type { Contest, ElectionOutcome } from './election'
 import type { FeedEntry } from './event'
 import type { ISODate, PartyFinance, PartyId } from './party'
 import type { PollingSnapshot } from './scenario'
@@ -62,6 +62,9 @@ export interface GameSaveStateV1 {
   localInfluence?: Record<string, Record<PartyId, number>>
   feed: FeedEntry[]
   contests: Contest[]
+  /** P3.5 applied election outcome ledger. This is the mutable representation overlay: scenario
+   * composition is still only the historical starting snapshot. Optional for pre-P3.5 saves. */
+  electionOutcomes?: ElectionOutcome[]
   /** `pendingEvents` are entries straight out of the authored event pool (`sim/events.ts`), so
    * only their ids are saved; hydration looks them back up rather than duplicating authored
    * content into every save. */

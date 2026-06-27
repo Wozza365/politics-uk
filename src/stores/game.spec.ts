@@ -174,6 +174,7 @@ describe('useGameStore.checkElectionResult — P2.0', () => {
     const scenario = useScenarioStore()
     game.startGame('labour')
     scenario.scenario.nextElectionDate = game.date // election is "today"
+    const startingSeatCount = game.playerSeatCount
 
     // Crash Labour's live polling relative to its scenario-start polling so the uniform-swing
     // projection should cost it seats versus the unprojected starting composition.
@@ -182,7 +183,25 @@ describe('useGameStore.checkElectionResult — P2.0', () => {
     game.checkElectionResult()
 
     expect(game.result).not.toBeNull()
-    expect(game.projectedPlayerSeatCount).toBeLessThan(game.playerSeatCount)
+    expect(game.playerSeatCount).toBeLessThan(startingSeatCount)
+  })
+
+  it('applies an election outcome ledger that becomes the current Commons composition', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date
+
+    game.polling.labour = Math.max(0.1, (scenario.scenario.polling.labour ?? 0) - 30)
+    const projectedBeforeResolution = game.projectedPlayerSeatCount
+
+    game.checkElectionResult()
+
+    expect(game.electionOutcomes).toHaveLength(1)
+    expect(game.latestCommonsElectionOutcome?.status).toBe('applied')
+    expect(game.latestCommonsElectionOutcome?.winners).toHaveLength(scenario.commonsRegions.length)
+    expect(game.playerSeatCount).toBe(projectedBeforeResolution)
+    expect(Object.values(game.commonsSeatsByParty).reduce((sum, count) => sum + count, 0)).toBe(scenario.commonsRegions.length)
   })
 
   it('does not re-evaluate once a result is already recorded', () => {
@@ -197,6 +216,19 @@ describe('useGameStore.checkElectionResult — P2.0', () => {
     game.checkElectionResult()
 
     expect(game.result).toBe(firstResult)
+  })
+
+  it('does not apply the same Commons election twice', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date
+
+    game.checkElectionResult()
+    game.result = null
+    game.checkElectionResult()
+
+    expect(game.electionOutcomes).toHaveLength(1)
   })
 
   it('continuePlaying resumes the clock without clearing the recorded result', () => {
@@ -470,6 +502,23 @@ describe('useGameStore.toSaveState / hydrateFromSaveState — P3.0', () => {
 
     expect(fresh.toSaveState()).toEqual(snapshot)
     expect(fresh.clock.running).toBe(false)
+  })
+
+  it('round-trips applied election outcomes and their current Commons holders', () => {
+    const game = useGameStore()
+    const scenario = useScenarioStore()
+    game.startGame('labour')
+    scenario.scenario.nextElectionDate = game.date
+    game.polling.labour = Math.max(0.1, (scenario.scenario.polling.labour ?? 0) - 30)
+    game.checkElectionResult()
+    const snapshot = game.toSaveState()
+
+    setActivePinia(createPinia())
+    const fresh = useGameStore()
+    fresh.hydrateFromSaveState(snapshot)
+
+    expect(fresh.electionOutcomes).toEqual(game.electionOutcomes)
+    expect(fresh.commonsSeatsByParty).toEqual(game.commonsSeatsByParty)
   })
 
   it('drops a contest referencing a party id the current scenario no longer recognises', () => {
