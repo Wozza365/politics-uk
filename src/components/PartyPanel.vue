@@ -76,7 +76,8 @@ function formatMoney(value: PartyFinance | undefined) {
 
 <template>
   <section
-    class="hud-party absolute left-1/2 top-4 z-20 w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+    class="hud-party absolute left-1/2 top-4 z-20 flex w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+    :class="{ 'hud-party-expanded': isExpanded }"
     :style="{
       borderColor: selectedParty?.colours.primary ?? '#52525b',
       borderWidth: '2px',
@@ -118,7 +119,8 @@ function formatMoney(value: PartyFinance | undefined) {
       </div>
     </button>
 
-    <div class="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_240px]" v-if="isExpanded">
+    <div v-if="isExpanded" class="min-h-0 flex-1 overflow-y-auto">
+      <div class="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_240px]">
       <div class="space-y-3">
         <div class="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
           <PartyStatCard label="Polling">
@@ -234,6 +236,7 @@ function formatMoney(value: PartyFinance | undefined) {
           :requires-confirmation="lever.requiresConfirmation"
           @activate="lever.run"
         />
+      </div>
       </div>
     </div>
   </section>

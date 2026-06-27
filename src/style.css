@@ -29,6 +29,12 @@ textarea {
   min-height: 2.5rem;
 }
 
+.hud-party-expanded {
+  top: 9rem;
+  max-height: calc(100vh - 22rem);
+  z-index: 35;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

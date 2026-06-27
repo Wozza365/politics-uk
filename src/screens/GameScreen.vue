@@ -35,7 +35,7 @@ watch(
 <template>
   <main class="relative h-screen w-screen overflow-hidden bg-zinc-900 text-zinc-100">
     <section
-      class="hud-feed absolute left-4 top-4 bottom-44 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+      class="hud-feed absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
       aria-label="Event feed"
     >
       <header class="border-b border-zinc-800/80 px-4 py-3">
