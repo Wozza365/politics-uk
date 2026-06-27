@@ -111,13 +111,17 @@ const toggleDisabled = computed(
         </svg>
       </button>
 
-      <div class="grid grid-cols-3 gap-1 rounded-md border border-zinc-700/70 p-1" role="radiogroup" aria-label="Clock speed">
+      <div
+        class="grid grid-cols-[repeat(3,minmax(3.75rem,1fr))] gap-1 rounded-md border border-zinc-700/70 p-1"
+        role="radiogroup"
+        aria-label="Clock speed"
+      >
         <button
           v-for="speed in speedOptions"
           :key="speed.ms"
           type="button"
           role="radio"
-          class="rounded px-2 py-1 text-xs font-semibold transition-colors"
+          class="min-w-0 whitespace-nowrap rounded px-1.5 py-1 text-xs font-semibold leading-none transition-colors"
           :class="game.clock.msPerDay === speed.ms ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'"
           :aria-checked="game.clock.msPerDay === speed.ms"
           @click="game.setClockSpeed(speed.ms)"

@@ -62,7 +62,7 @@ watch(
     <ExplanationDetails />
 
     <section
-      class="hud-clock absolute right-4 top-4 z-20 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
+      class="hud-clock absolute right-4 top-4 z-20 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
       aria-label="Game clock and election countdown"
     >
       <slot name="clock">
