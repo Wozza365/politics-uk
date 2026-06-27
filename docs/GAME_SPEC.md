@@ -581,6 +581,22 @@ weighted up; regional parties = special-cased (see below).
 - Deeper Democracy-3-style menus & charts.
 - More scenarios (real + custom-generated).
 
+### Phase 3 - persistence, strategy, elections, and polish
+- Versioned saves, autosave/manual slots, portable save import/export.
+- Main menu/load/new-game lifecycle.
+- Campaign action economy, targeting, opponent strategy, and election resolution.
+- Campaign objectives, scenario arcs, onboarding, explainability, accessibility, balance, and
+  deterministic regression coverage.
+
+### Phase 4 - visual premium pass
+- Art direction and design tokens for colour, typography, surfaces, elevation, icons, and motion.
+- Premium title/setup/loading/result screens.
+- HUD surface system, iconography, map polish, hemicycle/chart polish, and improved event
+  presentation.
+- Optional audio/ambience with player settings.
+- Visual QA across responsive layouts, contrast, reduced motion, colour-blind comprehension, and
+  production performance budgets.
+
 ---
 
 ## 13. Open questions
