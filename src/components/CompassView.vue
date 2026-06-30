@@ -29,6 +29,12 @@ const plottedItems = computed(() =>
     return { ...item, coords, radius }
   }),
 )
+
+const compassSummary = computed(() =>
+  plottedItems.value
+    .map((item) => `${item.label ?? 'Item'} economic ${item.position.economic.toFixed(2)}, social ${item.position.social.toFixed(2)}`)
+    .join('; '),
+)
 </script>
 
 <template>
@@ -37,8 +43,20 @@ const plottedItems = computed(() =>
     :height="size"
     :viewBox="`0 0 ${size} ${size}`"
     role="img"
-    :aria-label="compact ? 'Political compass (compact)' : 'Political compass'"
+    :aria-label="compact ? `Political compass compact: ${compassSummary}` : `Political compass: ${compassSummary}`"
+    class="data-compass"
   >
+    <defs>
+      <pattern id="compass-grid" width="12" height="12" patternUnits="userSpaceOnUse">
+        <path d="M 12 0 L 0 0 0 12" fill="none" stroke="currentColor" stroke-opacity="0.08" stroke-width="1" />
+      </pattern>
+    </defs>
+    <rect x="0" y="0" :width="size" :height="size" rx="8" fill="url(#compass-grid)" />
+    <rect x="0" y="0" :width="size / 2" :height="size / 2" fill="var(--puk-color-danger)" opacity="0.05" />
+    <rect :x="size / 2" y="0" :width="size / 2" :height="size / 2" fill="var(--puk-color-warning)" opacity="0.05" />
+    <rect x="0" :y="size / 2" :width="size / 2" :height="size / 2" fill="var(--puk-color-player-focus)" opacity="0.05" />
+    <rect :x="size / 2" :y="size / 2" :width="size / 2" :height="size / 2" fill="var(--puk-color-success)" opacity="0.05" />
+
     <!-- Quadrant gridlines -->
     <line
       :x1="size / 2"
@@ -90,10 +108,28 @@ const plottedItems = computed(() =>
         :cy="item.coords.y"
         :r="item.radius"
         :fill="item.colour"
-        fill-opacity="0.25"
+        fill-opacity="0.3"
         :stroke="item.colour"
-        stroke-width="1.5"
+        stroke-width="2"
       />
+      <circle
+        :cx="item.coords.x"
+        :cy="item.coords.y"
+        :r="Math.max(2, item.radius * 0.28)"
+        fill="var(--puk-color-text)"
+        fill-opacity="0.82"
+      />
+      <text
+        v-if="!compact && item.label"
+        :x="item.coords.x"
+        :y="item.coords.y - item.radius - 5"
+        text-anchor="middle"
+        font-size="9"
+        fill="currentColor"
+        opacity="0.74"
+      >
+        {{ item.label }}
+      </text>
     </g>
   </svg>
 </template>

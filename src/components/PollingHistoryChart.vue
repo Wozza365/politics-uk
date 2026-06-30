@@ -7,6 +7,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import VChart from 'vue-echarts'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
+import { DATA_VIZ_THEME, formatPercent, trendDelta } from './dataVizTheme'
 
 use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
@@ -25,18 +26,27 @@ const chartedPartyIds = computed(() =>
 
 const chartOption = computed(() => ({
   backgroundColor: 'transparent',
-  grid: { left: 32, right: 8, top: 8, bottom: 20 },
-  tooltip: { trigger: 'axis', valueFormatter: (value: number) => `${value.toFixed(1)}%` },
+  animationDuration: 220,
+  grid: { left: 34, right: 12, top: 12, bottom: 24 },
+  tooltip: {
+    trigger: 'axis',
+    backgroundColor: DATA_VIZ_THEME.tooltipBackground,
+    borderColor: DATA_VIZ_THEME.tooltipBorder,
+    textStyle: { color: DATA_VIZ_THEME.text, fontSize: 12 },
+    valueFormatter: (value: number) => `${formatPercent(value)}%`,
+  },
   xAxis: {
     type: 'category',
     data: game.pollingHistory.map((snapshot) => snapshot.date),
-    axisLabel: { color: '#a1a1aa', fontSize: 10 },
-    axisLine: { lineStyle: { color: '#3f3f46' } },
+    axisLabel: { color: DATA_VIZ_THEME.mutedText, fontSize: 10 },
+    axisLine: { lineStyle: { color: DATA_VIZ_THEME.axisLine } },
+    axisTick: { lineStyle: { color: DATA_VIZ_THEME.axisLine } },
   },
   yAxis: {
     type: 'value',
-    axisLabel: { color: '#a1a1aa', fontSize: 10, formatter: '{value}%' },
-    splitLine: { lineStyle: { color: '#27272a' } },
+    axisLabel: { color: DATA_VIZ_THEME.mutedText, fontSize: 10, formatter: '{value}%' },
+    axisLine: { lineStyle: { color: DATA_VIZ_THEME.axisLine } },
+    splitLine: { lineStyle: { color: DATA_VIZ_THEME.gridLine, type: 'dashed' } },
   },
   series: chartedPartyIds.value.map((partyId) => {
     const party = scenario.party(partyId)
@@ -44,9 +54,12 @@ const chartOption = computed(() => ({
     return {
       name: party?.shortName ?? partyId,
       type: 'line',
-      showSymbol: false,
-      lineStyle: { width: isHighlighted ? 3 : 1, color: party?.colours.primary },
+      showSymbol: isHighlighted,
+      symbolSize: isHighlighted ? 5 : 0,
+      smooth: 0.25,
+      lineStyle: { width: isHighlighted ? 3 : 1.5, color: party?.colours.primary },
       itemStyle: { color: party?.colours.primary },
+      emphasis: { focus: 'series' },
       opacity: !props.highlightPartyId || isHighlighted ? 1 : 0.35,
       data: game.pollingHistory.map((snapshot) => snapshot.polling[partyId] ?? null),
     }
@@ -55,28 +68,44 @@ const chartOption = computed(() => ({
 
 const latestPollingSummary = computed(() => {
   const latest = game.pollingHistory.at(-1)
+  const previous = game.pollingHistory.at(-2)
   if (!latest) return []
   return chartedPartyIds.value
     .map((partyId) => ({
       id: partyId,
       name: scenario.party(partyId)?.shortName ?? partyId,
       value: latest.polling[partyId] ?? 0,
+      colour: scenario.party(partyId)?.colours.primary ?? '#8fa3ad',
+      trend: trendDelta(latest.polling[partyId] ?? 0, previous?.polling[partyId]),
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 5)
 })
+
+const chartSummary = computed(() => {
+  if (!latestPollingSummary.value.length) return 'No polling history yet.'
+  const leader = latestPollingSummary.value[0]
+  return `${leader.name} leads the latest poll at ${formatPercent(leader.value)}%.`
+})
 </script>
 
 <template>
-  <div>
-    <div class="h-[160px] w-full" role="img" aria-label="Polling history line chart">
+  <div class="data-viz-panel" :aria-label="chartSummary">
+    <div class="h-[160px] w-full" role="img" :aria-label="chartSummary">
       <v-chart :option="chartOption" autoresize />
     </div>
-    <p class="mt-2 text-xs leading-5 text-zinc-400">
-      Latest:
-      <span v-for="(party, index) in latestPollingSummary" :key="party.id">
-        {{ index ? ', ' : '' }}{{ party.name }} {{ party.value.toFixed(1) }}%
-      </span>
-    </p>
+    <div class="mt-2 grid gap-1.5" aria-label="Latest polling table">
+      <div
+        v-for="party in latestPollingSummary"
+        :key="party.id"
+        class="data-viz-row"
+        :style="{ '--series-colour': party.colour }"
+      >
+        <span class="data-viz-mark" aria-hidden="true">{{ party.name.slice(0, 2) }}</span>
+        <span class="truncate font-semibold text-puk-text">{{ party.name }}</span>
+        <span class="tabular-nums text-puk-text">{{ formatPercent(party.value) }}%</span>
+        <span class="data-viz-delta" :data-direction="party.trend.direction">{{ party.trend.label }}</span>
+      </div>
+    </div>
   </div>
 </template>

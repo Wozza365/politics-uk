@@ -46,7 +46,7 @@ See [`phase4/P4.2-hud-surface-system.md`](./phase4/P4.2-hud-surface-system.md).
 
 See [`phase4/P4.3-map-geography-polish.md`](./phase4/P4.3-map-geography-polish.md).
 
-### P4.4 - Hemicycle, charts, stats, and data-visualisation polish `TODO`
+### P4.4 - Hemicycle, charts, stats, and data-visualisation polish `DONE`
 
 See [`phase4/P4.4-data-visualisation-polish.md`](./phase4/P4.4-data-visualisation-polish.md).
 

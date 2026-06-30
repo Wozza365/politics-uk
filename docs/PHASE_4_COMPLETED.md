@@ -69,6 +69,24 @@ Completed on 2026-06-30.
   [`phase4/P4.3-QA.md`](./phase4/P4.3-QA.md) and
   [`phase4/screenshots/p4-3/`](./phase4/screenshots/p4-3/).
 
+### P4.4 - Hemicycle, charts, stats, and data-visualisation polish
+
+Completed on 2026-06-30.
+
+- Added a shared data-visualisation theme and formatting helpers in
+  [`dataVizTheme.ts`](../src/components/dataVizTheme.ts), with focused tests in
+  [`dataVizTheme.spec.ts`](../src/components/dataVizTheme.spec.ts).
+- Polished [`PollingHistoryChart.vue`](../src/components/PollingHistoryChart.vue) with themed
+  axes/tooltips, series emphasis, trend deltas, and latest-poll text alternatives.
+- Rebuilt [`HemicycleView.vue`](../src/components/HemicycleView.vue) around labelled party chips,
+  top-party summaries, seats-per-dot explanation, non-colour grouping, and responsive SVG layout.
+- Upgraded [`CompassView.vue`](../src/components/CompassView.vue) and
+  [`ContestCard.vue`](../src/components/ContestCard.vue) with clearer analytical visuals and HUD
+  data/action surfaces.
+- Captured P4.4 screenshots and verification notes in
+  [`phase4/P4.4-QA.md`](./phase4/P4.4-QA.md) and
+  [`phase4/screenshots/p4-4/`](./phase4/screenshots/p4-4/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

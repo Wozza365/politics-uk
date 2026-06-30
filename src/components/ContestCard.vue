@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { HelpCircle, MapPinned } from '@lucide/vue'
 import { useScenarioStore } from '@/stores/scenario'
 import type { Contest, ContestActionId, ISODate } from '@/types'
 
@@ -25,8 +26,6 @@ function formatDate(date: ISODate) {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-/** "Nationalise the race" is the one high-cost, high-risk-or-reward contest response — worth a
- * confirming click, same as a multi-day lever commitment (P3.3). */
 function requiresConfirmation(actionId: ContestActionId) {
   return actionId === 'nationalise'
 }
@@ -43,50 +42,52 @@ function onActionClick(action: AvailableContestAction) {
 
 function actionLabel(action: AvailableContestAction) {
   if (!action.allowed) return action.disabledReason ?? action.label
-  if (awaitingConfirmationFor.value === action.id) return 'Confirm?'
+  if (awaitingConfirmationFor.value === action.id) return 'Confirm action'
   return action.label
 }
 </script>
 
 <template>
-  <div class="rounded-lg border border-zinc-800/80 bg-zinc-900/60 p-3">
+  <div class="hud-record p-3">
     <div class="flex items-center justify-between gap-2">
-      <p class="font-semibold text-zinc-100">{{ contest.seatName }}</p>
-      <!-- .stop: without it, MapView's window "click elsewhere deactivates" listener sees this
-      same click's bubble pass after activate() has already run and immediately undoes it. -->
-      <button
-        type="button"
-        class="shrink-0 text-xs text-zinc-400 underline transition hover:text-zinc-200"
-        @click.stop="$emit('focus')"
-      >
-        View on map
+      <div class="min-w-0">
+        <p class="truncate font-semibold text-puk-text">{{ contest.seatName }}</p>
+        <p class="mt-1 text-xs text-puk-text-muted">
+          Held by {{ partyName(contest.incumbentParty) }} / called {{ formatDate(contest.calledDate) }}
+        </p>
+      </div>
+      <button type="button" class="hud-action-button shrink-0" @click.stop="$emit('focus')">
+        <MapPinned class="h-4 w-4" aria-hidden="true" />
+        Map
       </button>
     </div>
-    <p class="text-xs text-zinc-400">Held by {{ partyName(contest.incumbentParty) }} · called {{ formatDate(contest.calledDate) }}</p>
 
     <div v-if="contest.status === 'resolved'" class="mt-2 flex items-center justify-between gap-2">
-      <p class="text-sm text-zinc-300">Result: {{ contest.resultLabel }}</p>
-      <button
-        v-if="contest.explanationId"
-        type="button"
-        class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
-        @click="$emit('explain', contest.explanationId)"
-      >
-        Why?
+      <p class="text-sm text-puk-text-muted">
+        Result: <span class="font-semibold text-puk-text">{{ contest.resultLabel }}</span>
+      </p>
+      <button v-if="contest.explanationId" type="button" class="hud-action-button" @click="$emit('explain', contest.explanationId)">
+        <HelpCircle class="h-4 w-4" aria-hidden="true" />
+        Why
       </button>
     </div>
-    <div v-else class="mt-2 flex flex-wrap gap-2">
+
+    <div v-else class="mt-3 grid gap-2">
       <button
         v-for="action in props.actions"
         :key="action.id"
         type="button"
         :title="action.allowed ? action.description : action.disabledReason"
         :disabled="!action.allowed"
-        class="rounded-lg border border-zinc-500 px-2 py-1 text-xs text-zinc-100 transition hover:bg-zinc-100 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-zinc-100"
+        class="hud-action-button justify-between text-left"
+        :class="{ 'hud-action-button--primary': awaitingConfirmationFor === action.id }"
         @click="onActionClick(action)"
         @blur="awaitingConfirmationFor = null"
       >
-        {{ actionLabel(action) }}
+        <span class="min-w-0">
+          <span class="block truncate">{{ actionLabel(action) }}</span>
+          <span class="block truncate text-[0.7rem] font-normal opacity-75">{{ action.description }}</span>
+        </span>
       </button>
     </div>
   </div>

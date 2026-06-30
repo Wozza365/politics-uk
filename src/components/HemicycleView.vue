@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { ChevronsUpDown, Grid2X2, Landmark, X } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
 import { useUiStore } from '@/stores/ui'
@@ -112,7 +113,7 @@ const partiesWithSeats = computed(() => {
 
   const parties: PartyWithSeats[] = []
   for (const party of scenarioStore.scenario.parties) {
-    if (NI_PARTY_IDS.includes(party.id) || party.id === SPEAKER_PARTY_ID) continue
+    if (NI_PARTY_IDS.includes(party.id) || party.id === SPEAKER_PARTY_ID || party.id === INDEPENDENT_PARTY_ID) continue
     const seatDetails = seatsByParty.get(party.id) ?? []
     if (seatDetails.length === 0) continue
 
@@ -256,56 +257,85 @@ const largestParty = computed(() => {
   const list = [...partiesWithSeats.value].sort((a, b) => b.seats - a.seats)
   return list[0] ?? null
 })
+
+const partySummary = computed(() =>
+  [...partiesWithSeats.value]
+    .sort((a, b) => b.seats - a.seats)
+    .slice(0, 5),
+)
+
+function partyInitials(name: string, shortName: string) {
+  const compact = shortName.replace(/[^A-Za-z0-9]/g, '')
+  if (compact.length <= 4) return compact
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((part) => part[0])
+    .join('')
+}
 </script>
 
 <template>
   <div class="flex w-full flex-col">
     <button
       type="button"
-      class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-zinc-900/40"
+      class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-puk-surface-raised/70"
       :aria-expanded="isExpanded"
       aria-label="Toggle party makeup panel"
       @click="toggleExpanded"
     >
-      <p class="text-sm font-semibold tracking-wide text-zinc-100">Party makeup</p>
-      <p class="flex items-center gap-3 text-xs text-zinc-400">
+      <span class="flex min-w-0 items-center gap-2">
+        <Landmark class="h-4 w-4 text-puk-premium-accent" aria-hidden="true" />
+        <span class="truncate text-sm font-semibold tracking-wide text-puk-text">Party makeup</span>
+      </span>
+      <span class="flex items-center gap-3 text-xs text-puk-text-muted">
         <span v-if="largestParty">
-          Largest: <span class="font-semibold text-zinc-100">{{ largestParty.shortName }}</span>
+          Largest: <span class="font-semibold text-puk-text">{{ largestParty.shortName }}</span>
           ({{ largestParty.seats }})
         </span>
         <span>{{ totalSeatCount }} seats</span>
-        <span class="text-zinc-100">{{ isExpanded ? '˄' : '˅' }}</span>
-      </p>
+        <ChevronsUpDown class="h-4 w-4 text-puk-text" aria-hidden="true" />
+      </span>
     </button>
 
-    <div v-if="isExpanded" class="relative flex flex-col items-center justify-center gap-4 px-4 pb-4">
+    <div v-if="isExpanded" class="hemicycle-shell relative flex flex-col items-center justify-center gap-4 px-4 pb-4 pt-4">
       <button
         type="button"
         role="switch"
         :aria-checked="isHemicycleMode"
-        class="absolute left-2 top-2 z-10 inline-flex h-8 w-16 items-center rounded-full bg-zinc-800/80 px-1.5 transition-colors hover:bg-zinc-700/80"
+        class="absolute left-3 top-3 z-10 inline-flex h-9 items-center gap-2 rounded-md border border-puk-border bg-puk-surface-raised/90 px-2 text-xs font-bold text-puk-text-muted transition hover:text-puk-text"
         :aria-label="isHemicycleMode ? 'Switch to house view' : 'Switch to hemicycle view'"
         title="Switch view"
         @click="toggleViewMode"
       >
-        <span class="pointer-events-none flex w-full items-center justify-between px-2 text-base leading-none text-zinc-400">
-          <span>⌒</span>
-          <span>=</span>
-        </span>
-        <span
-          class="pointer-events-none absolute left-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-zinc-200 text-base leading-none text-zinc-900 shadow transition-transform"
-          :class="isHemicycleMode ? 'translate-x-0' : 'translate-x-[2.25rem]'"
-        >
-          {{ isHemicycleMode ? '⌒' : '=' }}
-        </span>
+        <component :is="isHemicycleMode ? Grid2X2 : Landmark" class="h-4 w-4" aria-hidden="true" />
+        {{ isHemicycleMode ? 'House' : 'Arc' }}
       </button>
+
+      <div class="grid w-full grid-cols-3 gap-2 self-stretch text-xs md:grid-cols-5">
+        <div v-for="party in partySummary" :key="party.id" class="hud-stat-tile p-2">
+          <p class="hud-stat-label truncate">{{ party.shortName }}</p>
+          <p class="hud-stat-value mt-1 text-base font-semibold">{{ party.seats.toLocaleString() }}</p>
+        </div>
+      </div>
 
       <svg
         :width="VIEWPORT_WIDTH"
         :height="VIEWPORT_HEIGHT"
         viewBox="0 0 500 200"
-        class="drop-shadow-lg"
+        class="hemicycle-svg"
+        role="img"
+        :aria-label="`${activeViewLabel} party makeup, ${totalSeatCount.toLocaleString()} seats, ${seatsPerDot} seats per dot`"
       >
+        <path
+          v-if="isHemicycleMode"
+          d="M 24 178 A 226 176 0 0 1 476 178"
+          fill="none"
+          stroke="currentColor"
+          stroke-opacity="0.12"
+          stroke-width="2"
+        />
         <g class="hemicycle-dots">
           <g v-for="dot of dots" :key="dot.id">
             <circle
@@ -324,14 +354,14 @@ const largestParty = computed(() => {
               @mouseenter="hoveredPartyId = dot.partyId"
               @mouseleave="hoveredPartyId = null"
             >
-              <title>{{ dot.partyName }} · {{ dot.partySeatTotal }} seats</title>
+              <title>{{ dot.partyName }} / {{ dot.partySeatTotal }} seats</title>
             </circle>
             <circle
               :cx="dot.x"
               :cy="dot.y"
               :r="DOT_RADIUS"
               :fill="dot.colour"
-              class="pointer-events-none transition-[opacity,filter,transform] duration-100 [transform-box:fill-box] [transform-origin:center]"
+              class="hemicycle-dot pointer-events-none transition-[opacity,filter,transform] duration-100 [transform-box:fill-box] [transform-origin:center]"
               :class="
                 selectedPartyId === dot.partyId
                   ? 'scale-[1.25] opacity-100'
@@ -347,43 +377,46 @@ const largestParty = computed(() => {
         </g>
       </svg>
 
-      <div class="flex flex-wrap items-center justify-center gap-4">
+      <p class="self-start text-xs text-puk-text-muted">
+        {{ seatsPerDot }} seat{{ seatsPerDot === 1 ? '' : 's' }} per dot. Parties are labelled for non-colour reading.
+      </p>
+
+      <div class="grid w-full grid-cols-2 gap-2 md:grid-cols-4">
         <button
           v-for="party of partiesWithSeats"
           :key="party.id"
           type="button"
-          class="flex items-center gap-2 rounded px-1.5 py-1 text-left transition hover:bg-zinc-800/70"
-          :class="selectedPartyId === party.id ? 'bg-zinc-800/90 text-zinc-100' : ''"
+          class="hemicycle-party-chip"
+          :class="{ 'hemicycle-party-chip--selected': selectedPartyId === party.id }"
+          :style="{ '--party-colour': party.colour }"
           @click="selectedPartyId = party.id"
         >
-          <span :style="{ backgroundColor: party.colour }" class="h-3 w-3 rounded-full"></span>
-          <span class="text-xs font-medium">{{ party.shortName }} ({{ party.seats }})</span>
+          <span class="hemicycle-party-mark">{{ partyInitials(party.name, party.shortName) }}</span>
+          <span class="min-w-0 truncate text-xs font-semibold">{{ party.shortName }}</span>
+          <span class="tabular-nums text-xs">{{ party.seats }}</span>
         </button>
       </div>
 
-      <div
-        v-if="selectedParty"
-        class="w-full rounded border border-zinc-800 bg-zinc-950/80 text-left shadow-xl"
-      >
-        <div class="flex items-start justify-between gap-3 border-b border-zinc-800 px-3 py-2">
+      <div v-if="selectedParty" class="hud-record w-full text-left shadow-xl">
+        <div class="flex items-start justify-between gap-3 border-b border-puk-border-subtle px-3 py-2">
           <div>
-            <p class="text-sm font-semibold text-zinc-100">{{ selectedParty.name }}</p>
-            <p class="text-xs text-zinc-400">
-              {{ selectedParty.seats.toLocaleString() }} seats · {{ activeViewLabel }}
-              <span v-if="seatsPerDot > 1"> · {{ seatsPerDot }} seats per dot</span>
+            <p class="text-sm font-semibold text-puk-text">{{ selectedParty.name }}</p>
+            <p class="text-xs text-puk-text-muted">
+              {{ selectedParty.seats.toLocaleString() }} seats / {{ activeViewLabel }}
+              <span v-if="seatsPerDot > 1"> / {{ seatsPerDot }} seats per dot</span>
             </p>
           </div>
           <button
             type="button"
-            class="rounded px-2 py-1 text-xs text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
+            class="hud-icon-button hud-icon-button--sm"
             aria-label="Close seat breakdown"
             @click="clearSelection"
           >
-            Close
+            <X class="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
-        <div v-if="selectedDotSeats.length > 1" class="border-b border-zinc-800 px-3 py-2 text-xs text-zinc-300">
+        <div v-if="selectedDotSeats.length > 1" class="border-b border-puk-border-subtle px-3 py-2 text-xs text-puk-text-muted">
           Selected dot:
           {{ selectedDotSeats[0]?.regionName }}
           <span v-if="selectedDotSeats.length > 1">
@@ -393,37 +426,31 @@ const largestParty = computed(() => {
         </div>
 
         <div class="max-h-64 overflow-y-auto px-3 py-2">
-          <div
-            v-for="detail of visibleSelectedSeats"
-            :key="detail.id"
-            class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-b border-zinc-900 py-1.5 last:border-b-0"
-          >
+          <div v-for="detail of visibleSelectedSeats" :key="detail.id" class="hemicycle-summary-row">
             <div class="min-w-0">
-              <p class="truncate text-xs font-medium text-zinc-100">
+              <p class="truncate text-xs font-medium text-puk-text">
                 {{ detail.wardName ?? detail.regionName }}
               </p>
-              <p class="truncate text-xs text-zinc-400">
+              <p class="truncate text-xs text-puk-text-muted">
                 <span v-if="detail.memberName">{{ detail.memberName }}</span>
                 <span v-else>{{ detail.tier }}</span>
               </p>
             </div>
-            <div class="text-right text-xs text-zinc-400">
+            <div class="text-right text-xs text-puk-text-muted">
               <p v-if="detail.majority">Maj {{ detail.majority.toLocaleString() }}</p>
               <p v-else-if="detail.voteShare">{{ detail.voteShare.toFixed(1) }}%</p>
               <p v-else-if="selectedTopResult(detail)">{{ selectedTopResult(detail)?.voteShare.toFixed(1) }}%</p>
               <p v-if="detail.nextElection">Next {{ detail.nextElection }}</p>
             </div>
           </div>
-          <p v-if="selectedSeats.length > visibleSelectedSeats.length" class="pt-2 text-xs text-zinc-500">
+          <p v-if="selectedSeats.length > visibleSelectedSeats.length" class="pt-2 text-xs text-puk-text-disabled">
             Showing first {{ visibleSelectedSeats.length.toLocaleString() }} of
             {{ selectedSeats.length.toLocaleString() }} seats.
           </p>
         </div>
       </div>
 
-      <p class="text-xs text-zinc-500">
-        Total: {{ totalSeatCount.toLocaleString() }} seats
-      </p>
+      <p class="text-xs text-puk-text-disabled">Total: {{ totalSeatCount.toLocaleString() }} seats</p>
     </div>
   </div>
 </template>
