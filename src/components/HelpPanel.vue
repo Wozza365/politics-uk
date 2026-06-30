@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { X } from '@lucide/vue'
 import { useUiStore } from '@/stores/ui'
 import { useFocusTrap } from '@/composables/useFocusTrap'
+import HudPanel from '@/components/HudPanel.vue'
+import IconButton from '@/components/IconButton.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 
 const ui = useUiStore()
 const panel = ref<HTMLElement | null>(null)
@@ -17,25 +21,27 @@ const entries = [
 </script>
 
 <template>
-  <section
+  <HudPanel
     v-if="ui.helpPanelOpen"
-    ref="panel"
-    class="absolute left-1/2 top-20 z-40 max-h-[calc(100vh-7rem)] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-950/95 p-4 text-sm text-zinc-200 shadow-2xl"
+    class="absolute left-1/2 top-20 z-40 max-h-[calc(100vh-7rem)] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto text-sm"
     role="dialog"
     aria-modal="false"
     aria-label="Glossary"
   >
-    <header class="mb-3 flex items-center justify-between gap-3">
-      <p class="font-semibold text-zinc-100">Glossary</p>
-      <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="ui.closeHelpPanel()">
-        Close
-      </button>
-    </header>
-    <dl class="space-y-3">
-      <div v-for="[term, definition] in entries" :key="term" class="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
-        <dt class="font-medium text-zinc-100">{{ term }}</dt>
-        <dd class="mt-1 text-xs leading-5 text-zinc-400">{{ definition }}</dd>
-      </div>
-    </dl>
-  </section>
+    <div ref="panel" class="contents">
+      <PanelHeader title="Glossary">
+        <template #actions>
+          <IconButton label="Close glossary" size="sm" @click="ui.closeHelpPanel()">
+            <X class="h-4 w-4" aria-hidden="true" />
+          </IconButton>
+        </template>
+      </PanelHeader>
+      <dl class="hud-panel-body space-y-3">
+        <div v-for="[term, definition] in entries" :key="term" class="border-t border-puk-border-subtle pt-3 first:border-t-0 first:pt-0">
+          <dt class="font-semibold text-puk-text">{{ term }}</dt>
+          <dd class="mt-1 text-xs leading-5 text-puk-text-muted">{{ definition }}</dd>
+        </div>
+      </dl>
+    </div>
+  </HudPanel>
 </template>

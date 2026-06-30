@@ -38,7 +38,7 @@ See [`phase4/P4.0-visual-audit-art-direction.md`](./phase4/P4.0-visual-audit-art
 
 See [`phase4/P4.1-premium-screen-flow.md`](./phase4/P4.1-premium-screen-flow.md).
 
-### P4.2 - HUD surface system and shared interaction primitives `TODO`
+### P4.2 - HUD surface system and shared interaction primitives `DONE`
 
 See [`phase4/P4.2-hud-surface-system.md`](./phase4/P4.2-hud-surface-system.md).
 

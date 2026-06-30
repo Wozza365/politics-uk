@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { X } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { useTargeting } from '@/composables/useTargeting'
 import { useFocusTrap } from '@/composables/useFocusTrap'
 import TargetOptionRow from '@/components/TargetOptionRow.vue'
+import HudPanel from '@/components/HudPanel.vue'
+import IconButton from '@/components/IconButton.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 
 const game = useGameStore()
 const ui = useUiStore()
@@ -21,39 +25,38 @@ useFocusTrap(panel, close, computed(() => ui.targetingPanelOpen))
 </script>
 
 <template>
-  <section
+  <HudPanel
     v-if="ui.targetingPanelOpen"
-    ref="panel"
-    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
+    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
     role="dialog"
     aria-modal="false"
     aria-label="Targeted campaigning panel"
   >
-    <header class="flex items-start justify-between gap-3 border-b border-zinc-800/80 px-4 py-3">
-      <div>
-        <p class="text-sm font-semibold tracking-wide text-zinc-100">Targeted campaigning</p>
-        <p class="text-xs text-zinc-400">Commit staff and money to a specific place for two weeks.</p>
-      </div>
-      <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="close">
-        Close
-      </button>
-    </header>
+    <div ref="panel" class="contents">
+      <PanelHeader title="Targeted campaigning" subtitle="Commit staff and money to a specific place for two weeks.">
+        <template #actions>
+          <IconButton label="Close targeted campaigning panel" size="sm" @click="close">
+            <X class="h-4 w-4" aria-hidden="true" />
+          </IconButton>
+        </template>
+      </PanelHeader>
 
-    <div class="space-y-2 px-4 py-4">
-      <TargetOptionRow
-        v-for="option in options"
-        :key="`${option.scope.kind}:${option.scope.tierId ?? option.scope.regionId ?? option.scope.contestId ?? ''}`"
-        :label="option.label"
-        :description="option.description"
-        :forecast-summary="option.forecastSummary"
-        :cooldown-days="option.cooldownDays"
-        :allowed="option.allowed"
-        :disabled-reason="option.disabledReason"
-        :requires-confirmation="option.requiresConfirmation"
-        :focus-geometry-ref="option.focusGeometryRef"
-        @activate="option.run"
-        @focus="option.focusGeometryRef && focusOnMap(option.focusGeometryRef)"
-      />
+      <div class="hud-panel-body space-y-2">
+        <TargetOptionRow
+          v-for="option in options"
+          :key="`${option.scope.kind}:${option.scope.tierId ?? option.scope.regionId ?? option.scope.contestId ?? ''}`"
+          :label="option.label"
+          :description="option.description"
+          :forecast-summary="option.forecastSummary"
+          :cooldown-days="option.cooldownDays"
+          :allowed="option.allowed"
+          :disabled-reason="option.disabledReason"
+          :requires-confirmation="option.requiresConfirmation"
+          :focus-geometry-ref="option.focusGeometryRef"
+          @activate="option.run"
+          @focus="option.focusGeometryRef && focusOnMap(option.focusGeometryRef)"
+        />
+      </div>
     </div>
-  </section>
+  </HudPanel>
 </template>

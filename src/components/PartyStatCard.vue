@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import StatTile from './StatTile.vue'
+
 defineProps<{ label: string }>()
 </script>
 
 <template>
-  <div class="rounded-xl border border-zinc-800/80 bg-zinc-900/60 px-3 py-2">
-    <p class="text-xs uppercase tracking-wide text-zinc-500">{{ label }}</p>
+  <StatTile :label="label">
     <slot />
-    <p v-if="$slots.hint" class="mt-1 text-xs text-zinc-400"><slot name="hint" /></p>
-  </div>
+    <template v-if="$slots.hint" #hint>
+      <slot name="hint" />
+    </template>
+  </StatTile>
 </template>

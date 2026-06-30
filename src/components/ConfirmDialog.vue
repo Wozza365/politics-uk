@@ -22,21 +22,21 @@ useFocusTrap(dialog, () => emit('cancel'))
       role="alertdialog"
       aria-modal="true"
       :aria-label="props.title"
-      class="max-h-[calc(100vh-2rem)] w-[min(24rem,100%)] overflow-y-auto rounded-lg border border-zinc-700/70 bg-zinc-950 p-5 shadow-2xl"
+      class="hud-modal-surface max-h-[calc(100vh-2rem)] !w-[min(24rem,100%)] p-5"
     >
-      <p class="text-sm font-semibold text-zinc-100">{{ props.title }}</p>
-      <p class="mt-2 text-sm text-zinc-400">{{ props.message }}</p>
+      <p class="text-sm font-semibold text-puk-text">{{ props.title }}</p>
+      <p class="mt-2 text-sm text-puk-text-muted">{{ props.message }}</p>
       <div class="mt-4 flex flex-wrap justify-end gap-2">
         <button
           type="button"
-          class="min-h-10 rounded-md px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800"
+          class="hud-action-button"
           @click="emit('cancel')"
         >
           {{ props.cancelLabel ?? 'Cancel' }}
         </button>
         <button
           type="button"
-          class="min-h-10 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-500"
+          class="hud-action-button hud-action-button--danger"
           @click="emit('confirm')"
         >
           {{ props.confirmLabel ?? 'Confirm' }}

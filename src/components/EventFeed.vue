@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
+import { HelpCircle } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import type { ISODate } from '@/types'
@@ -29,22 +30,23 @@ function formatDate(date: ISODate) {
 
 <template>
   <div ref="scrollEl" class="flex h-full flex-col gap-4 overflow-y-auto text-sm">
-    <p v-if="!game.feed.length" class="text-zinc-500">
+    <p v-if="!game.feed.length" class="text-puk-text-disabled">
       Awaiting the first tick. Events will appear here as they happen.
     </p>
 
-    <article v-for="entry in game.feed" :key="entry.id">
-      <p class="font-bold text-zinc-100">{{ entry.headline }}</p>
+    <article v-for="entry in game.feed" :key="entry.id" class="hud-record p-3">
+      <p class="font-bold text-puk-text">{{ entry.headline }}</p>
 
       <template v-if="entry.status === 'actioned'">
-        <p v-if="entry.actionTaken" class="mt-1 text-zinc-300">{{ entry.actionTaken }}</p>
-        <p v-if="entry.effect" class="mt-0.5 text-xs text-zinc-500">{{ entry.effect }}</p>
+        <p v-if="entry.actionTaken" class="mt-1 text-puk-text-muted">{{ entry.actionTaken }}</p>
+        <p v-if="entry.effect" class="mt-0.5 text-xs text-puk-text-disabled">{{ entry.effect }}</p>
         <button
           v-if="entry.explanationId"
           type="button"
-          class="mt-2 rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 transition hover:bg-zinc-800 hover:text-zinc-100"
+          class="hud-action-button mt-2"
           @click="ui.showExplanation(entry.explanationId)"
         >
+          <HelpCircle class="h-4 w-4" aria-hidden="true" />
           Why?
         </button>
       </template>
@@ -54,14 +56,14 @@ function formatDate(date: ISODate) {
           v-for="action in entry.actions"
           :key="action.id"
           type="button"
-          class="rounded-lg border border-zinc-500 px-2 py-1 text-xs text-zinc-100 transition hover:bg-zinc-100 hover:text-zinc-900"
+          class="hud-action-button hud-action-button--primary"
           @click="game.resolveFeedAction(entry.id, action.id)"
         >
           {{ action.label }}
         </button>
       </div>
 
-      <p class="mt-1 text-xs text-zinc-500">{{ formatDate(entry.date) }}</p>
+      <p class="mt-2 text-xs text-puk-text-disabled">{{ formatDate(entry.date) }}</p>
     </article>
   </div>
 </template>

@@ -18,6 +18,8 @@ import GoalStatusStrip from '@/components/GoalStatusStrip.vue'
 import TutorialOverlay from '@/components/TutorialOverlay.vue'
 import HelpPanel from '@/components/HelpPanel.vue'
 import ExplanationDetails from '@/components/ExplanationDetails.vue'
+import HudPanel from '@/components/HudPanel.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 
@@ -33,22 +35,19 @@ watch(
 </script>
 
 <template>
-  <main class="relative h-screen w-screen overflow-hidden bg-zinc-900 text-zinc-100">
-    <section
-      class="hud-feed absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+  <main class="relative h-screen w-screen overflow-hidden bg-puk-app-bg text-puk-text">
+    <HudPanel
+      class="hud-feed absolute left-4 top-4 bottom-4 z-20 flex w-80 max-w-[calc(100vw-2rem)] flex-col"
       aria-label="Event feed"
     >
-      <header class="border-b border-zinc-800/80 px-4 py-3">
-        <p class="text-sm font-semibold tracking-wide text-zinc-100">Event feed</p>
-        <p class="text-xs text-zinc-400">Chronological log</p>
-      </header>
+      <PanelHeader title="Event feed" subtitle="Chronological log" />
 
-      <div class="min-h-0 flex-1 px-4 py-4 text-sm">
+      <div class="hud-panel-body min-h-0 flex-1 text-sm">
         <slot name="event-feed">
           <EventFeed />
         </slot>
       </div>
-    </section>
+    </HudPanel>
 
     <PartyPanel />
     <ByElectionsPanel />
@@ -61,14 +60,14 @@ watch(
     <TutorialOverlay />
     <ExplanationDetails />
 
-    <section
-      class="hud-clock absolute right-4 top-4 z-20 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
+    <HudPanel
+      class="hud-clock absolute right-4 top-4 z-20 w-80 max-w-[calc(100vw-2rem)] text-sm"
       aria-label="Game clock and election countdown"
     >
       <slot name="clock">
         <GameClock />
       </slot>
-    </section>
+    </HudPanel>
 
     <section
       class="hud-map absolute inset-x-0 bottom-52 top-36 z-10 flex items-center justify-center px-8"
@@ -81,22 +80,23 @@ watch(
       </div>
     </section>
 
-    <section
-      class="hud-hemicycle absolute bottom-28 left-1/2 z-20 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 text-sm shadow-2xl backdrop-blur-sm"
+    <HudPanel
+      class="hud-hemicycle absolute bottom-28 left-1/2 z-20 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 text-sm"
       aria-label="Party makeup"
     >
       <slot name="hemicycle">
         <HemicycleView />
       </slot>
-    </section>
+    </HudPanel>
 
-    <nav
-      class="hud-switcher absolute bottom-3 left-1/2 z-20 w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+    <HudPanel
+      as="nav"
+      class="hud-switcher absolute bottom-3 left-1/2 z-20 w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2"
       aria-label="View switcher"
     >
       <slot name="view-switcher">
         <ViewSwitcher />
       </slot>
-    </nav>
+    </HudPanel>
   </main>
 </template>

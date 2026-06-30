@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { ChevronDown, ChevronRight } from '@lucide/vue'
 import { useUiStore } from '@/stores/ui'
 import { useByElections } from '@/composables/useByElections'
 import ContestCard from '@/components/ContestCard.vue'
+import HudPanel from '@/components/HudPanel.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 import type { ISODate } from '@/types'
 
 const ui = useUiStore()
 const { commonsContests, councilContestsByWeek, actionsFor, actOnContest, focusOnMap } = useByElections()
 
-// Weeks start collapsed — council by-elections are high-frequency, so showing every contest by
-// default would bury the (much rarer, more newsworthy) parliamentary contests above.
 const expandedWeeks = ref(new Set<string>())
 function toggleWeek(week: string) {
   if (expandedWeeks.value.has(week)) expandedWeeks.value.delete(week)
@@ -22,21 +23,19 @@ function formatWeek(week: ISODate) {
 </script>
 
 <template>
-  <section
+  <HudPanel
     v-if="ui.byElectionsPanelOpen"
-    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
+    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
     aria-label="By-elections panel"
   >
-    <header class="border-b border-zinc-800/80 px-4 py-3">
-      <p class="text-sm font-semibold tracking-wide text-zinc-100">By-elections &amp; minor elections</p>
-      <p class="text-xs text-zinc-400">
-        {{ commonsContests.filter((c) => c.status === 'pending').length }} parliamentary contest(s) pending
-      </p>
-    </header>
+    <PanelHeader
+      title="By-elections & minor elections"
+      :subtitle="`${commonsContests.filter((contest) => contest.status === 'pending').length} parliamentary contest(s) pending`"
+    />
 
-    <div class="space-y-4 px-4 py-4">
+    <div class="hud-panel-body space-y-4">
       <div v-if="commonsContests.length">
-        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Parliamentary</p>
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-puk-text-muted">Parliamentary</p>
         <div class="space-y-2">
           <ContestCard
             v-for="contest in commonsContests"
@@ -51,19 +50,23 @@ function formatWeek(week: ISODate) {
       </div>
 
       <div v-if="councilContestsByWeek.length">
-        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Council</p>
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-puk-text-muted">Council</p>
         <div class="space-y-2">
-          <div v-for="group in councilContestsByWeek" :key="group.week" class="rounded-lg border border-zinc-800/80">
+          <div v-for="group in councilContestsByWeek" :key="group.week" class="hud-record">
             <button
               type="button"
-              class="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-zinc-100"
+              class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-puk-text"
               :aria-expanded="expandedWeeks.has(group.week)"
               @click="toggleWeek(group.week)"
             >
-              <span>{{ group.contests.length }} council by-election{{ group.contests.length === 1 ? '' : 's' }} — week of {{ formatWeek(group.week) }}</span>
-              <span>{{ expandedWeeks.has(group.week) ? '˄' : '˅' }}</span>
+              <span>
+                {{ group.contests.length }} council by-election{{ group.contests.length === 1 ? '' : 's' }} -
+                week of {{ formatWeek(group.week) }}
+              </span>
+              <ChevronDown v-if="expandedWeeks.has(group.week)" class="h-4 w-4 shrink-0" aria-hidden="true" />
+              <ChevronRight v-else class="h-4 w-4 shrink-0" aria-hidden="true" />
             </button>
-            <div v-if="expandedWeeks.has(group.week)" class="space-y-2 border-t border-zinc-800/80 px-3 py-2">
+            <div v-if="expandedWeeks.has(group.week)" class="space-y-2 border-t border-puk-border-subtle px-3 py-2">
               <ContestCard
                 v-for="contest in group.contests"
                 :key="contest.id"
@@ -78,9 +81,9 @@ function formatWeek(week: ISODate) {
         </div>
       </div>
 
-      <p v-if="!commonsContests.length && !councilContestsByWeek.length" class="text-sm text-zinc-500">
+      <p v-if="!commonsContests.length && !councilContestsByWeek.length" class="text-sm text-puk-text-disabled">
         No by-elections called yet.
       </p>
     </div>
-  </section>
+  </HudPanel>
 </template>

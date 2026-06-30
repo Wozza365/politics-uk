@@ -4,6 +4,9 @@ import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { useGameClock } from '@/composables/useGameClock'
 import SaveStatusIndicator from '@/components/SaveStatusIndicator.vue'
+import IconButton from '@/components/IconButton.vue'
+import SegmentedControl from '@/components/SegmentedControl.vue'
+import { Menu, Pause, Play, SkipForward, Target } from '@lucide/vue'
 import type { ISODate } from '@/types'
 
 const game = useGameStore()
@@ -15,6 +18,8 @@ const speedOptions = [
   { label: 'Normal', ms: 15000 },
   { label: 'Fast', ms: 7500 },
 ] as const
+
+const speedControlOptions = computed(() => speedOptions.map((speed) => ({ label: speed.label, value: speed.ms })))
 
 function toggleByElectionsPanel() {
   ui.toggleByElectionsPanel()
@@ -96,74 +101,50 @@ const toggleDisabled = computed(
     </button>
 
     <div class="grid grid-cols-[auto_1fr_auto] items-center gap-2">
-      <button
-        type="button"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-700/70 text-zinc-100 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-45"
+      <IconButton
         :disabled="toggleDisabled"
-        :aria-label="game.clock.running ? 'Pause campaign clock' : 'Resume campaign clock'"
+        :label="game.clock.running ? 'Pause campaign clock' : 'Resume campaign clock'"
         @click="game.togglePlayerPause()"
       >
-        <svg v-if="game.clock.running" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor" aria-hidden="true">
-          <path d="M7 5h3v14H7zM14 5h3v14h-3z" />
-        </svg>
-        <svg v-else viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor" aria-hidden="true">
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </button>
+        <Pause v-if="game.clock.running" class="h-4 w-4" aria-hidden="true" />
+        <Play v-else class="h-4 w-4" aria-hidden="true" />
+      </IconButton>
 
-      <div
-        class="grid grid-cols-[repeat(3,minmax(3.75rem,1fr))] gap-1 rounded-md border border-zinc-700/70 p-1"
-        role="radiogroup"
-        aria-label="Clock speed"
-      >
-        <button
-          v-for="speed in speedOptions"
-          :key="speed.ms"
-          type="button"
-          role="radio"
-          class="min-w-0 whitespace-nowrap rounded px-1.5 py-1 text-xs font-semibold leading-none transition-colors"
-          :class="game.clock.msPerDay === speed.ms ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'"
-          :aria-checked="game.clock.msPerDay === speed.ms"
-          @click="game.setClockSpeed(speed.ms)"
-        >
-          {{ speed.label }}
-        </button>
-      </div>
+      <SegmentedControl
+        :options="speedControlOptions"
+        :model-value="game.clock.msPerDay"
+        label="Clock speed"
+        @update:model-value="(value) => game.setClockSpeed(Number(value))"
+      />
 
-      <button
-        type="button"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-700/70 text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
+      <IconButton
         :disabled="!canSkipDay"
-        aria-label="Skip to next day"
+        label="Skip to next day"
         @click="game.tickDay()"
       >
-        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </button>
+        <SkipForward class="h-4 w-4" aria-hidden="true" />
+      </IconButton>
     </div>
 
     <div class="flex items-center justify-between gap-2">
       <SaveStatusIndicator />
       <div class="flex gap-1.5">
-        <button
-          type="button"
-          class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+        <IconButton
           :aria-expanded="ui.targetingPanelOpen"
-          aria-label="Open targeted campaigning panel"
+          label="Open targeted campaigning panel"
+          size="sm"
           @click="toggleTargetingPanel"
         >
-          Target
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-zinc-700/70 px-2 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+          <Target class="h-4 w-4" aria-hidden="true" />
+        </IconButton>
+        <IconButton
           :aria-expanded="ui.gameMenuOpen"
-          aria-label="Open game menu"
+          label="Open game menu"
+          size="sm"
           @click="toggleGameMenu"
         >
-          Menu
-        </button>
+          <Menu class="h-4 w-4" aria-hidden="true" />
+        </IconButton>
       </div>
     </div>
   </div>

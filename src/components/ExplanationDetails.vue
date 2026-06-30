@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { X } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { useFocusTrap } from '@/composables/useFocusTrap'
+import IconButton from '@/components/IconButton.vue'
+import ModalSurface from '@/components/ModalSurface.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 
 const game = useGameStore()
 const ui = useUiStore()
@@ -12,29 +16,27 @@ useFocusTrap(dialog, () => ui.closeExplanation(), computed(() => !!explanation.v
 </script>
 
 <template>
-  <div v-if="explanation" class="absolute inset-0 z-50 flex items-center justify-center bg-zinc-950/55 px-4" role="dialog" aria-modal="true">
-    <section ref="dialog" class="max-h-[calc(100vh-4rem)] w-[min(42rem,100%)] overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-950 p-5 text-sm text-zinc-200 shadow-2xl">
-      <header class="flex items-start justify-between gap-4">
-        <div>
-          <p class="font-semibold text-zinc-100">{{ explanation.title }}</p>
-          <p class="mt-1 text-xs text-zinc-400">{{ explanation.summary }}</p>
-        </div>
-        <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="ui.closeExplanation()">
-          Close
-        </button>
-      </header>
+  <ModalSurface v-if="explanation" aria-label="Explanation details">
+    <div ref="dialog" class="contents">
+      <PanelHeader :title="explanation.title" :subtitle="explanation.summary">
+        <template #actions>
+          <IconButton label="Close explanation" size="sm" @click="ui.closeExplanation()">
+            <X class="h-4 w-4" aria-hidden="true" />
+          </IconButton>
+        </template>
+      </PanelHeader>
 
-      <div class="mt-4 space-y-3">
-        <article v-for="group in explanation.groups" :key="group.id" class="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3">
-          <p class="font-medium text-zinc-100">{{ group.title }}</p>
-          <p class="mt-1 text-xs leading-5 text-zinc-400">{{ group.summary }}</p>
-          <ul v-if="group.contributors.length" class="mt-2 space-y-1 text-xs text-zinc-300">
+      <div class="hud-panel-body space-y-3">
+        <article v-for="group in explanation.groups" :key="group.id" class="hud-record p-3">
+          <p class="font-semibold text-puk-text">{{ group.title }}</p>
+          <p class="mt-1 text-xs leading-5 text-puk-text-muted">{{ group.summary }}</p>
+          <ul v-if="group.contributors.length" class="mt-2 space-y-1 text-xs text-puk-text-muted">
             <li v-for="contributor in group.contributors" :key="`${group.id}:${contributor.label}:${contributor.sourceId ?? ''}`">
-              <span class="font-medium text-zinc-100">{{ contributor.label }}:</span> {{ contributor.detail }}
+              <span class="font-semibold text-puk-text">{{ contributor.label }}:</span> {{ contributor.detail }}
             </li>
           </ul>
         </article>
       </div>
-    </section>
-  </div>
+    </div>
+  </ModalSurface>
 </template>

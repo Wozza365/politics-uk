@@ -1,12 +1,14 @@
 <script setup lang="ts">
-// In-game save-management surface (P3.1) — manual slots only; the rolling autosave is never
-// listed here since it isn't player-managed (spec: P3.2 owns the title-screen "Continue" flow).
 import { computed, ref } from 'vue'
+import { Download, Pencil, RotateCcw, Save, Trash2, Upload, X } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { useSaveManagement } from '@/composables/useSaveManagement'
 import { useFocusTrap } from '@/composables/useFocusTrap'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import HudPanel from '@/components/HudPanel.vue'
+import IconButton from '@/components/IconButton.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 import type { ImportConflict } from '@/stores/save'
 
 const ui = useUiStore()
@@ -95,82 +97,94 @@ function formatDate(iso: string) {
 </script>
 
 <template>
-  <section
+  <HudPanel
     v-if="ui.saveManagementPanelOpen"
-    ref="panel"
-    class="absolute left-1/2 top-24 z-30 max-h-[calc(100vh-7rem)] w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
+    class="absolute left-1/2 top-24 z-30 max-h-[calc(100vh-7rem)] w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto"
     role="dialog"
     aria-modal="false"
     aria-label="Save management panel"
   >
-    <header class="flex items-start justify-between gap-3 border-b border-zinc-800/80 px-4 py-3">
-      <div>
-      <p class="text-sm font-semibold tracking-wide text-zinc-100">Saved games</p>
-      <p class="text-xs text-zinc-400">Manual slots — the rolling autosave isn't shown here</p>
-      </div>
-      <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="closePanel">
-        Close
-      </button>
-    </header>
+    <div ref="panel" class="contents">
+      <PanelHeader title="Saved games" subtitle="Manual slots only">
+        <template #actions>
+          <IconButton label="Close save management panel" size="sm" @click="closePanel">
+            <X class="h-4 w-4" aria-hidden="true" />
+          </IconButton>
+        </template>
+      </PanelHeader>
 
-    <div class="space-y-4 px-4 py-4">
-      <div class="flex gap-2">
-        <input
-          v-model="newSaveLabel"
-          type="text"
-          placeholder="New save name…"
-          class="min-w-0 flex-1 rounded-md border border-zinc-700/70 bg-zinc-900 px-2 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500"
-          @keydown.enter="onCreateSave"
-        />
-        <button
-          type="button"
-          class="shrink-0 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-semibold text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
-          :disabled="!newSaveLabel.trim()"
-          @click="onCreateSave"
-        >
-          Save
-        </button>
-      </div>
-
-      <div class="space-y-2">
-        <div
-          v-for="entry in manualSaves"
-          :key="entry.id"
-          class="rounded-lg border border-zinc-800/80 px-3 py-2"
-        >
-          <div v-if="renamingId === entry.id" class="flex gap-2">
-            <input
-              v-model="renameLabel"
-              type="text"
-              class="min-w-0 flex-1 rounded-md border border-zinc-700/70 bg-zinc-900 px-2 py-1 text-sm text-zinc-100"
-              @keydown.enter="confirmRename"
-              @keydown.escape="renamingId = null"
-            />
-            <button type="button" class="rounded-md px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="confirmRename">Save</button>
-            <button type="button" class="rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800" @click="renamingId = null">Cancel</button>
-          </div>
-          <template v-else>
-            <p class="text-sm font-medium text-zinc-100">{{ entry.label || entry.id }}</p>
-            <p class="text-xs text-zinc-400">{{ entry.summary }}</p>
-            <p class="text-xs text-zinc-500">Updated {{ formatDate(entry.updatedAt) }}</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <button type="button" class="rounded-md px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="overwriteSave(entry.id)">Overwrite</button>
-              <button type="button" class="rounded-md px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="startRename(entry.id, entry.label)">Rename</button>
-              <button type="button" class="rounded-md px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="exportSave(entry.id)">Export</button>
-              <button type="button" class="rounded-md px-2 py-1 text-xs text-red-400 hover:bg-zinc-800" @click="pendingDeleteId = entry.id">Delete</button>
-            </div>
-          </template>
+      <div class="hud-panel-body space-y-4">
+        <div class="flex gap-2">
+          <input
+            v-model="newSaveLabel"
+            type="text"
+            placeholder="New save name..."
+            class="min-w-0 flex-1 rounded-[var(--puk-radius-control)] border border-puk-border bg-puk-surface px-2 py-1.5 text-sm text-puk-text placeholder:text-puk-text-disabled"
+            @keydown.enter="onCreateSave"
+          />
+          <button
+            type="button"
+            class="hud-action-button hud-action-button--primary shrink-0"
+            :disabled="!newSaveLabel.trim()"
+            @click="onCreateSave"
+          >
+            <Save class="h-4 w-4" aria-hidden="true" />
+            Save
+          </button>
         </div>
 
-        <p v-if="!manualSaves.length" class="text-sm text-zinc-500">No manual saves yet.</p>
-      </div>
+        <div class="space-y-2">
+          <div v-for="entry in manualSaves" :key="entry.id" class="hud-record px-3 py-2">
+            <div v-if="renamingId === entry.id" class="flex gap-2">
+              <input
+                v-model="renameLabel"
+                type="text"
+                class="min-w-0 flex-1 rounded-[var(--puk-radius-control)] border border-puk-border bg-puk-surface px-2 py-1 text-sm text-puk-text"
+                @keydown.enter="confirmRename"
+                @keydown.escape="renamingId = null"
+              />
+              <button type="button" class="hud-action-button hud-action-button--primary" @click="confirmRename">
+                <Save class="h-4 w-4" aria-hidden="true" />
+                Save
+              </button>
+              <button type="button" class="hud-action-button" @click="renamingId = null">Cancel</button>
+            </div>
+            <template v-else>
+              <p class="text-sm font-semibold text-puk-text">{{ entry.label || entry.id }}</p>
+              <p class="text-xs text-puk-text-muted">{{ entry.summary }}</p>
+              <p class="text-xs text-puk-text-disabled">Updated {{ formatDate(entry.updatedAt) }}</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button type="button" class="hud-action-button" @click="overwriteSave(entry.id)">
+                  <RotateCcw class="h-4 w-4" aria-hidden="true" />
+                  Overwrite
+                </button>
+                <button type="button" class="hud-action-button" @click="startRename(entry.id, entry.label)">
+                  <Pencil class="h-4 w-4" aria-hidden="true" />
+                  Rename
+                </button>
+                <button type="button" class="hud-action-button" @click="exportSave(entry.id)">
+                  <Download class="h-4 w-4" aria-hidden="true" />
+                  Export
+                </button>
+                <button type="button" class="hud-action-button hud-action-button--danger" @click="pendingDeleteId = entry.id">
+                  <Trash2 class="h-4 w-4" aria-hidden="true" />
+                  Delete
+                </button>
+              </div>
+            </template>
+          </div>
 
-      <div class="border-t border-zinc-800/80 pt-3">
-        <button type="button" class="rounded-md border border-zinc-700/70 px-3 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800" @click="triggerImport">
-          Import save…
-        </button>
-        <input ref="fileInput" type="file" accept="application/json" class="hidden" @change="onFileSelected" />
-        <p v-if="importError" class="mt-2 text-xs text-red-400">{{ importError }}</p>
+          <p v-if="!manualSaves.length" class="text-sm text-puk-text-disabled">No manual saves yet.</p>
+        </div>
+
+        <div class="border-t border-puk-border-subtle pt-3">
+          <button type="button" class="hud-action-button" @click="triggerImport">
+            <Upload class="h-4 w-4" aria-hidden="true" />
+            Import save
+          </button>
+          <input ref="fileInput" type="file" accept="application/json" class="hidden" @change="onFileSelected" />
+          <p v-if="importError" class="mt-2 text-xs text-puk-danger">{{ importError }}</p>
+        </div>
       </div>
     </div>
 
@@ -186,10 +200,10 @@ function formatDate(iso: string) {
     <ConfirmDialog
       v-if="importConflict"
       title="Overwrite existing save?"
-      :message="`A save already exists for this id${importConflict.existing?.label ? ` (“${importConflict.existing.label}”)` : ''}. Importing will overwrite it.`"
+      :message="`A save already exists for this id${importConflict.existing?.label ? ` (${importConflict.existing.label})` : ''}. Importing will overwrite it.`"
       confirm-label="Overwrite"
       @confirm="confirmImportOverwrite"
       @cancel="cancelImportOverwrite"
     />
-  </section>
+  </HudPanel>
 </template>

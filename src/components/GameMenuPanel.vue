@@ -1,13 +1,12 @@
 <script setup lang="ts">
-// In-game menu (P3.2 step 5): resume, manage saves, settings, return to main menu, restart.
-// Opening it reuses the shared P2.8 pause gate (`ui.openMenus`) like every other in-game panel.
-// "Manage saves" hands off to `SaveManagementPanel` without releasing the pause gate — the two
-// panels trade places under one held "something is open" count rather than each managing its own.
+import { computed, ref } from 'vue'
+import { Home, Play, RotateCcw, Save as SaveIcon, Settings } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import { useFocusTrap } from '@/composables/useFocusTrap'
-import { computed, ref } from 'vue'
+import HudPanel from '@/components/HudPanel.vue'
+import PanelHeader from '@/components/PanelHeader.vue'
 
 const game = useGameStore()
 const save = useSaveStore()
@@ -22,14 +21,14 @@ function resume() {
 }
 
 function manageSaves() {
-  ui.closeGameMenu() // hand off to SaveManagementPanel without releasing the shared pause gate
+  ui.closeGameMenu()
   ui.toggleSaveManagementPanel()
 }
 
 async function returnToMainMenu() {
   const confirmed = await ui.requestConfirm({
     title: 'Return to main menu?',
-    message: "Your campaign autosaves continuously, so nothing is lost. This pauses it at the title screen — pick Continue there to come back.",
+    message: "Your campaign autosaves continuously, so nothing is lost. This pauses it at the title screen - pick Continue there to come back.",
     confirmLabel: 'Return to main menu',
   })
   if (!confirmed) return
@@ -44,7 +43,7 @@ async function restart() {
   if (!partyId) return
   const confirmed = await ui.requestConfirm({
     title: 'Restart this campaign?',
-    message: "This starts a brand-new campaign as the same party from day one. The current campaign's autosave is replaced — any manual saves you made are unaffected.",
+    message: "This starts a brand-new campaign as the same party from day one. The current campaign's autosave is replaced - any manual saves you made are unaffected.",
     confirmLabel: 'Restart',
   })
   if (!confirmed) return
@@ -56,32 +55,36 @@ async function restart() {
 </script>
 
 <template>
-  <section
+  <HudPanel
     v-if="ui.gameMenuOpen"
-    ref="panel"
-    class="absolute left-1/2 top-24 z-30 w-[min(20rem,calc(100vw-2rem))] -translate-x-1/2 overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/90 shadow-2xl backdrop-blur-sm"
+    class="absolute left-1/2 top-24 z-30 w-[min(20rem,calc(100vw-2rem))] -translate-x-1/2"
     aria-label="Game menu"
   >
-    <header class="border-b border-zinc-800/80 px-4 py-3">
-      <p class="text-sm font-semibold tracking-wide text-zinc-100">Menu</p>
-    </header>
+    <div ref="panel" class="contents">
+      <PanelHeader title="Menu" />
 
-    <nav class="flex flex-col p-2" aria-label="Game menu actions">
-      <button type="button" class="rounded-md px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800" @click="resume">
-        Resume
-      </button>
-      <button type="button" class="rounded-md px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800" @click="manageSaves">
-        Manage saves
-      </button>
-      <button type="button" class="cursor-not-allowed rounded-md px-3 py-2 text-left text-sm text-zinc-500" disabled aria-disabled="true">
-        Settings
-      </button>
-      <button type="button" class="rounded-md px-3 py-2 text-left text-sm text-zinc-100 hover:bg-zinc-800" @click="returnToMainMenu">
-        Return to main menu
-      </button>
-      <button type="button" class="rounded-md px-3 py-2 text-left text-sm text-red-400 hover:bg-zinc-800" @click="restart">
-        Restart campaign
-      </button>
-    </nav>
-  </section>
+      <nav class="flex flex-col gap-1 p-2" aria-label="Game menu actions">
+        <button type="button" class="hud-action-button justify-start" @click="resume">
+          <Play class="h-4 w-4" aria-hidden="true" />
+          Resume
+        </button>
+        <button type="button" class="hud-action-button justify-start" @click="manageSaves">
+          <SaveIcon class="h-4 w-4" aria-hidden="true" />
+          Manage saves
+        </button>
+        <button type="button" class="hud-action-button justify-start" disabled aria-disabled="true">
+          <Settings class="h-4 w-4" aria-hidden="true" />
+          Settings
+        </button>
+        <button type="button" class="hud-action-button justify-start" @click="returnToMainMenu">
+          <Home class="h-4 w-4" aria-hidden="true" />
+          Return to main menu
+        </button>
+        <button type="button" class="hud-action-button hud-action-button--danger justify-start" @click="restart">
+          <RotateCcw class="h-4 w-4" aria-hidden="true" />
+          Restart campaign
+        </button>
+      </nav>
+    </div>
+  </HudPanel>
 </template>

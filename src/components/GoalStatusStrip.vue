@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { HelpCircle } from '@lucide/vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
+import HudPanel from '@/components/HudPanel.vue'
+import IconButton from '@/components/IconButton.vue'
 
 const game = useGameStore()
 const ui = useUiStore()
@@ -28,15 +31,18 @@ const pauseReason = computed(() => {
 </script>
 
 <template>
-  <section
-    class="hud-goal absolute right-4 top-56 z-20 grid w-80 max-w-[calc(100vw-2rem)] gap-2 rounded-lg border border-zinc-700/70 bg-zinc-950/85 px-3 py-2 text-xs text-zinc-300 shadow-2xl backdrop-blur-sm"
+  <HudPanel
+    class="hud-goal absolute right-4 top-56 z-20 grid w-80 max-w-[calc(100vw-2rem)] gap-2 px-3 py-2 text-xs text-puk-text-muted"
     aria-label="Campaign status"
   >
-    <button type="button" class="text-left font-semibold text-zinc-100 hover:text-sky-200" @click="ui.toggleHelpPanel()">
-      {{ primaryObjective }}
-    </button>
+    <div class="flex items-start justify-between gap-2">
+      <p class="font-semibold text-puk-text">{{ primaryObjective }}</p>
+      <IconButton label="Open glossary" size="sm" tone="ghost" @click="ui.toggleHelpPanel()">
+        <HelpCircle class="h-4 w-4" aria-hidden="true" />
+      </IconButton>
+    </div>
     <p>{{ game.daysUntilElection }} days to GE</p>
     <p class="truncate">{{ unresolvedDecision }}</p>
-    <p class="text-zinc-400">{{ pauseReason }}</p>
-  </section>
+    <p class="text-puk-text-disabled">{{ pauseReason }}</p>
+  </HudPanel>
 </template>

@@ -4,11 +4,13 @@ import CompassView from '@/components/CompassView.vue'
 import PartyStatCard from '@/components/PartyStatCard.vue'
 import LeverCard from '@/components/LeverCard.vue'
 import PollingHistoryChart from '@/components/PollingHistoryChart.vue'
+import HudPanel from '@/components/HudPanel.vue'
 import { useGameStore } from '@/stores/game'
 import { useUiStore } from '@/stores/ui'
 import { usePartyStats } from '@/composables/usePartyStats'
 import { usePartyLevers } from '@/composables/usePartyLevers'
 import type { PartyFinance } from '@/types'
+import { ChevronDown, ChevronUp } from '@lucide/vue'
 
 const game = useGameStore()
 const ui = useUiStore()
@@ -75,8 +77,8 @@ function formatMoney(value: PartyFinance | undefined) {
 </script>
 
 <template>
-  <section
-    class="hud-party absolute left-1/2 top-4 z-20 flex w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border border-zinc-700/70 bg-zinc-950/85 shadow-2xl backdrop-blur-sm"
+  <HudPanel
+    class="hud-party absolute left-1/2 top-4 z-20 flex w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 flex-col"
     :class="{ 'hud-party-expanded': isExpanded }"
     :style="{
       borderColor: selectedParty?.colours.primary ?? '#52525b',
@@ -86,27 +88,31 @@ function formatMoney(value: PartyFinance | undefined) {
   >
     <button
       type="button"
-      class="flex w-full items-center gap-3 border-b border-zinc-800/80 px-4 py-3 text-left transition hover:bg-zinc-900/40"
+      class="flex w-full items-center gap-3 border-b border-puk-border-subtle px-4 py-3 text-left transition hover:bg-puk-surface-raised/55"
       :aria-expanded="isExpanded"
       :aria-label="`${isExpanded ? 'Collapse' : 'Expand'} party statistics for ${selectedParty?.name ?? 'selected party'}`"
       @click="toggleExpanded"
     >
-      <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)] items-center gap-3 text-sm">
+      <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-sm sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)]">
         <div class="min-w-0 whitespace-nowrap text-left text-zinc-300">
           <span :class="['font-bold', pollingTrend.className]">
             {{ pollingTrend.arrow }} {{ formatPolling(currentPolling) }}
           </span>
           <span class="px-2 text-zinc-600">|</span>
           <span :class="['font-bold', commonsSeatClass]">{{ formatCount(commonsSeats) }}</span>
-          <span class="px-2 text-zinc-600">|</span>
-          <span class="font-bold text-zinc-100">{{ formatCount(otherElectedSeats) }}</span>
+          <span class="hidden sm:inline">
+            <span class="px-2 text-zinc-600">|</span>
+            <span class="font-bold text-zinc-100">{{ formatCount(otherElectedSeats) }}</span>
+          </span>
         </div>
 
-        <p class="truncate text-center font-semibold tracking-wide text-zinc-100">
+        <p class="truncate text-right font-semibold tracking-wide text-zinc-100 sm:text-center">
           {{ selectedParty?.name ?? 'Party stats' }}
+          <ChevronUp v-if="isExpanded" class="ml-2 inline h-4 w-4 text-puk-text sm:hidden" aria-hidden="true" />
+          <ChevronDown v-else class="ml-2 inline h-4 w-4 text-puk-text sm:hidden" aria-hidden="true" />
         </p>
 
-        <div class="min-w-0 whitespace-nowrap text-right text-zinc-300">
+        <div class="hidden min-w-0 whitespace-nowrap text-right text-zinc-300 sm:block">
           <span :class="['font-bold', membershipTrend.className]">
             {{ membershipTrend.arrow }} {{ formatCount(membership) }}
           </span>
@@ -114,7 +120,8 @@ function formatMoney(value: PartyFinance | undefined) {
           <span :class="['font-bold', financeTrend.className]">
             {{ financeTrend.arrow }} {{ formatMoney(finance) }}
           </span>
-          <span class="ml-3 text-zinc-100">{{ isExpanded ? '˄' : '˅' }}</span>
+          <ChevronUp v-if="isExpanded" class="ml-3 inline h-4 w-4 text-puk-text" aria-hidden="true" />
+          <ChevronDown v-else class="ml-3 inline h-4 w-4 text-puk-text" aria-hidden="true" />
         </div>
       </div>
     </button>
@@ -239,5 +246,5 @@ function formatMoney(value: PartyFinance | undefined) {
       </div>
       </div>
     </div>
-  </section>
+  </HudPanel>
 </template>

@@ -35,6 +35,22 @@ Completed on 2026-06-30.
   [`phase4/P4.1-QA.md`](./phase4/P4.1-QA.md) and
   [`phase4/screenshots/p4-1/`](./phase4/screenshots/p4-1/).
 
+### P4.2 - HUD surface system and shared interaction primitives
+
+Completed on 2026-06-30.
+
+- Added shared HUD primitives for panels, headers, icon buttons, segmented controls, status pills,
+  stat tiles, modal surfaces, drawer panels, and tooltips under [`src/components`](../src/components).
+- Centralised repeated HUD surface, button, segmented-control, status, stat-tile, modal, tooltip,
+  reduced-motion, and forced-colors styling in [`src/style.css`](../src/style.css).
+- Converted the game shell, event feed, party panel, clock, journal, goal strip, menu, save panel,
+  by-elections panel, targeting panel, help panel, explanation dialog, confirm dialog, and view
+  switcher onto shared primitives.
+- Added [`@lucide/vue`](https://www.npmjs.com/package/@lucide/vue) as the shared HUD icon library.
+- Captured P4.2 screenshots and verification notes in
+  [`phase4/P4.2-QA.md`](./phase4/P4.2-QA.md) and
+  [`phase4/screenshots/p4-2/`](./phase4/screenshots/p4-2/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

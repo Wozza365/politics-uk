@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import SegmentedControl from '@/components/SegmentedControl.vue'
 import { useUiStore } from '@/stores/ui'
 import type { GameView } from '@/stores/ui'
 import type { CouncilLevelId } from '@/stores/scenario'
@@ -14,10 +16,17 @@ type ViewTarget = {
 }
 
 const views: ViewTarget[] = [
-  { id: 'westminster', label: 'Westminster', available: true, view: 'westminster' },
+  { id: 'westminster', label: 'Commons', available: true, view: 'westminster' },
   { id: 'regional', label: 'Regional', available: true, view: 'regional' },
   { id: 'council-county', label: 'County', available: true, view: 'councils', councilLevel: 'county' },
   { id: 'council-local', label: 'Local', available: true, view: 'councils', councilLevel: 'local' },
+]
+
+const viewOptions = computed(() => views.map((view) => ({ value: view.id, label: view.label, disabled: !view.available })))
+const selectedViewId = computed(() => views.find((view) => isSelected(view))?.id ?? 'westminster')
+const rendererOptions = [
+  { value: 'geographic', label: 'Geo', title: 'Geographic Westminster map' },
+  { value: 'hex', label: 'Hex', title: 'Hex Westminster map' },
 ]
 
 function isSelected(view: ViewTarget) {
@@ -30,64 +39,35 @@ function selectView(view: ViewTarget) {
   ui.setActiveView(view.view)
 }
 
+function selectViewById(value: string | number) {
+  const view = views.find((candidate) => candidate.id === value)
+  if (view) selectView(view)
+}
+
 function setWestminsterRenderer(renderer: 'geographic' | 'hex') {
   ui.setWestminsterRenderer(renderer)
   ui.setActiveView('westminster')
+}
+
+function selectRenderer(value: string | number) {
+  setWestminsterRenderer(value === 'hex' ? 'hex' : 'geographic')
 }
 </script>
 
 <template>
   <div class="flex flex-wrap items-center justify-center gap-2 px-3 py-3 text-sm">
-    <div class="flex items-center justify-center gap-2" role="tablist" aria-label="Game views">
-      <button
-        v-for="view in views"
-        :key="view.id"
-        type="button"
-        role="tab"
-        :aria-selected="isSelected(view)"
-        :disabled="!view.available"
-        :title="view.available ? undefined : `${view.label} - coming soon`"
-        class="rounded-xl px-3 py-1 transition-colors disabled:cursor-not-allowed"
-        :class="
-          isSelected(view)
-            ? 'bg-zinc-100 text-zinc-900'
-            : view.available
-              ? 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'
-              : 'text-zinc-500'
-        "
-        @click="selectView(view)"
-      >
-        {{ view.label }}
-      </button>
-    </div>
+    <SegmentedControl
+      :options="viewOptions"
+      :model-value="selectedViewId"
+      label="Game views"
+      @update:model-value="selectViewById"
+    />
 
-    <div class="flex items-center gap-1 rounded-lg bg-zinc-950/70 p-1" aria-label="Westminster map renderer">
-      <button
-        type="button"
-        class="rounded-md px-2.5 py-1 transition-colors"
-        :class="
-          ui.activeView === 'westminster' && ui.westminsterRenderer === 'geographic'
-            ? 'bg-zinc-100 text-zinc-900'
-            : 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'
-        "
-        title="Geographic Westminster map"
-        @click="setWestminsterRenderer('geographic')"
-      >
-        Geo
-      </button>
-      <button
-        type="button"
-        class="rounded-md px-2.5 py-1 transition-colors"
-        :class="
-          ui.activeView === 'westminster' && ui.westminsterRenderer === 'hex'
-            ? 'bg-zinc-100 text-zinc-900'
-            : 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'
-        "
-        title="Hex Westminster map"
-        @click="setWestminsterRenderer('hex')"
-      >
-        Hex
-      </button>
-    </div>
+    <SegmentedControl
+      :options="rendererOptions"
+      :model-value="ui.westminsterRenderer"
+      label="Westminster map renderer"
+      @update:model-value="selectRenderer"
+    />
   </div>
 </template>
