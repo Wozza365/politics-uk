@@ -21,9 +21,9 @@ export function buildSeatRegionState(region: Region, ctx: SeatRegionStateContext
   return {
     fill: holderParty ? ctx.partyColour(holderParty) : UNHELD_FILL,
     selected: ctx.hoveredGeometryRef === region.geometryRef,
-    strokeWidth: 0.1,
-    selectedStrokeWidth: 0.2,
-    opacity: ctx.activeGeometryRef !== null && !isActiveRegion ? 0.5 : undefined,
+    strokeWidth: 0.35,
+    selectedStrokeWidth: 1.15,
+    opacity: ctx.activeGeometryRef !== null && !isActiveRegion ? 0.38 : undefined,
     liftPx: isActiveRegion ? ctx.liftPx : undefined,
     tooltip: {
       name: region.name,

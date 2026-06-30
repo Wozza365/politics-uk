@@ -42,7 +42,7 @@ See [`phase4/P4.1-premium-screen-flow.md`](./phase4/P4.1-premium-screen-flow.md)
 
 See [`phase4/P4.2-hud-surface-system.md`](./phase4/P4.2-hud-surface-system.md).
 
-### P4.3 - Map, geography, overlays, and region-detail polish `TODO`
+### P4.3 - Map, geography, overlays, and region-detail polish `DONE`
 
 See [`phase4/P4.3-map-geography-polish.md`](./phase4/P4.3-map-geography-polish.md).
 

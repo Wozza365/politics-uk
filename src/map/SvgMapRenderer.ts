@@ -12,6 +12,7 @@ import type {
 import { isHexBoundarySet } from './MapRenderer'
 
 const NS = 'http://www.w3.org/2000/svg'
+const DISABLED_HATCH_PATTERN_ID = 'puk-map-disabled-hatch'
 
 proj4.defs(
   'EPSG:27700',
@@ -164,13 +165,20 @@ export class SvgMapRenderer implements MapRenderer {
 
   private applyRoutineStyle(path: SVGPathElement, state: RegionState[string] | undefined): void {
     const strokeWidth = state?.selected ? state.selectedStrokeWidth ?? 2 : state?.strokeWidth ?? 0.5
-    const fill = state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af'
+    const fill = state?.disabled ? `url(#${DISABLED_HATCH_PATTERN_ID})` : state?.fill ?? '#9ca3af'
     path.setAttribute('fill', fill)
-    path.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : state?.strokeColor ?? '#1f2937')
+    path.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? '#8b9098' : 'none') : state?.strokeColor ?? '#1f2937')
     path.setAttribute('stroke-width', String(strokeWidth <= 0 && state?.disabled ? 0.75 : strokeWidth))
+    path.setAttribute('stroke-dasharray', state?.strokeDasharray ?? '')
+    path.setAttribute('stroke-linecap', state?.strokeDasharray ? 'round' : 'butt')
+    path.setAttribute('stroke-linejoin', 'round')
+    path.setAttribute('vector-effect', 'non-scaling-stroke')
     path.style.cursor = state?.disabled ? 'default' : 'pointer'
     path.style.pointerEvents = state?.disabled ? 'none' : 'auto'
     path.style.opacity = state?.opacity != null ? String(state.opacity) : ''
+    path.style.transition = 'opacity 160ms ease, filter 160ms ease'
+    path.style.filter =
+      state?.selected && !state.disabled ? 'drop-shadow(0 0 5px rgb(244 241 232 / 0.42))' : ''
   }
 
   // Moves the lift effect onto the overlay path (hiding the corresponding
@@ -208,6 +216,10 @@ export class SvgMapRenderer implements MapRenderer {
         : nextState.strokeWidth ?? 0.5
       this.overlayPath.setAttribute('stroke', strokeWidth <= 0 ? 'none' : nextState.strokeColor ?? '#1f2937')
       this.overlayPath.setAttribute('stroke-width', String(strokeWidth))
+      this.overlayPath.setAttribute('stroke-dasharray', nextState.strokeDasharray ?? '')
+      this.overlayPath.setAttribute('stroke-linecap', nextState.strokeDasharray ? 'round' : 'butt')
+      this.overlayPath.setAttribute('stroke-linejoin', 'round')
+      this.overlayPath.setAttribute('vector-effect', 'non-scaling-stroke')
       this.overlayPath.style.pointerEvents = 'auto'
       this.overlayPath.style.cursor = 'pointer'
       this.overlayPath.style.transition = 'transform 400ms ease-out, filter 400ms ease-out'
@@ -268,6 +280,7 @@ export class SvgMapRenderer implements MapRenderer {
 
     this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
     this.svg.replaceChildren()
+    this.svg.appendChild(this.createDefs())
     this.paths.clear()
     // Keep the overlay's coordinate space identical to the main map's so a
     // copied `d` attribute lands in exactly the same place.
@@ -336,6 +349,31 @@ export class SvgMapRenderer implements MapRenderer {
     this.overlayPath.onmouseenter = null
     this.overlayPath.onmouseleave = null
     this.overlayPath.onclick = null
+  }
+
+  private createDefs(): SVGDefsElement {
+    const defs = document.createElementNS(NS, 'defs')
+    const hatch = document.createElementNS(NS, 'pattern')
+    hatch.setAttribute('id', DISABLED_HATCH_PATTERN_ID)
+    hatch.setAttribute('patternUnits', 'userSpaceOnUse')
+    hatch.setAttribute('width', '7')
+    hatch.setAttribute('height', '7')
+
+    const base = document.createElementNS(NS, 'rect')
+    base.setAttribute('width', '7')
+    base.setAttribute('height', '7')
+    base.setAttribute('fill', '#575b63')
+    base.setAttribute('opacity', '0.58')
+
+    const line = document.createElementNS(NS, 'path')
+    line.setAttribute('d', 'M-1 7 L7 -1 M3 8 L8 3')
+    line.setAttribute('stroke', '#c8c1ad')
+    line.setAttribute('stroke-width', '1')
+    line.setAttribute('opacity', '0.42')
+
+    hatch.append(base, line)
+    defs.appendChild(hatch)
+    return defs
   }
 
   getRegionBounds(geometryRef: string): { x: number; y: number; width: number; height: number } | null {

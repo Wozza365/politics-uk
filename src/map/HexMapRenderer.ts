@@ -4,6 +4,7 @@ import { isHexBoundarySet } from './MapRenderer'
 const NS = 'http://www.w3.org/2000/svg'
 const PADDING_PX = 16
 const HEX_GAP_RATIO = 0.08
+const DISABLED_HATCH_PATTERN_ID = 'puk-map-hex-disabled-hatch'
 
 type Bounds = { x: number; y: number; width: number; height: number }
 type BuiltFor = { boundarySetId: string; width: number; height: number }
@@ -92,6 +93,7 @@ export class HexMapRenderer implements MapRenderer {
 
     this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`)
     this.svg.replaceChildren()
+    this.svg.appendChild(this.createDefs())
     this.polygons.clear()
     this.regionBounds.clear()
 
@@ -162,10 +164,13 @@ export class HexMapRenderer implements MapRenderer {
 
   private applyStyle(polygon: SVGPolygonElement, state: RegionState[string] | undefined): void {
     const strokeWidth = state?.selected ? state.selectedStrokeWidth ?? 2 : state?.strokeWidth ?? 0.5
-    const fill = state?.disabled ? '#d4d4d8' : state?.fill ?? '#9ca3af'
+    const fill = state?.disabled ? `url(#${DISABLED_HATCH_PATTERN_ID})` : state?.fill ?? '#9ca3af'
     polygon.setAttribute('fill', fill)
-    polygon.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? fill : 'none') : state?.strokeColor ?? '#1f2937')
+    polygon.setAttribute('stroke', strokeWidth <= 0 ? (state?.disabled ? '#8b9098' : 'none') : state?.strokeColor ?? '#1f2937')
     polygon.setAttribute('stroke-width', String(strokeWidth <= 0 && state?.disabled ? 0.75 : strokeWidth))
+    polygon.setAttribute('stroke-dasharray', state?.strokeDasharray ?? '')
+    polygon.setAttribute('stroke-linecap', state?.strokeDasharray ? 'round' : 'butt')
+    polygon.setAttribute('vector-effect', 'non-scaling-stroke')
     polygon.style.cursor = state?.disabled ? 'default' : 'pointer'
     polygon.style.pointerEvents = state?.disabled ? 'none' : 'auto'
     polygon.style.opacity = state?.opacity != null ? String(state.opacity) : ''
@@ -173,6 +178,35 @@ export class HexMapRenderer implements MapRenderer {
     polygon.style.transformOrigin = 'center'
     polygon.style.transition = 'transform 400ms ease-out, filter 400ms ease-out'
     polygon.style.transform = state?.liftPx ? `translateY(-${state.liftPx}px)` : ''
-    polygon.style.filter = state?.liftPx ? `drop-shadow(0 ${2 + state.liftPx}px 3px rgb(0 0 0 / 0.45))` : ''
+    polygon.style.filter = state?.liftPx
+      ? `drop-shadow(0 ${2 + state.liftPx}px 3px rgb(0 0 0 / 0.45))`
+      : state?.selected && !state.disabled
+        ? 'drop-shadow(0 0 5px rgb(244 241 232 / 0.42))'
+        : ''
+  }
+
+  private createDefs(): SVGDefsElement {
+    const defs = document.createElementNS(NS, 'defs')
+    const hatch = document.createElementNS(NS, 'pattern')
+    hatch.setAttribute('id', DISABLED_HATCH_PATTERN_ID)
+    hatch.setAttribute('patternUnits', 'userSpaceOnUse')
+    hatch.setAttribute('width', '7')
+    hatch.setAttribute('height', '7')
+
+    const base = document.createElementNS(NS, 'rect')
+    base.setAttribute('width', '7')
+    base.setAttribute('height', '7')
+    base.setAttribute('fill', '#575b63')
+    base.setAttribute('opacity', '0.58')
+
+    const line = document.createElementNS(NS, 'path')
+    line.setAttribute('d', 'M-1 7 L7 -1 M3 8 L8 3')
+    line.setAttribute('stroke', '#c8c1ad')
+    line.setAttribute('stroke-width', '1')
+    line.setAttribute('opacity', '0.42')
+
+    hatch.append(base, line)
+    defs.appendChild(hatch)
+    return defs
   }
 }

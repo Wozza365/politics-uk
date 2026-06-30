@@ -51,6 +51,24 @@ Completed on 2026-06-30.
   [`phase4/P4.2-QA.md`](./phase4/P4.2-QA.md) and
   [`phase4/screenshots/p4-2/`](./phase4/screenshots/p4-2/).
 
+### P4.3 - Map, geography, overlays, and region-detail polish
+
+Completed on 2026-06-30.
+
+- Reworked [`MapView.vue`](../src/components/MapView.vue) into a premium map-room surface with a
+  cartographic backdrop, selected-region detail sheet, compact overlay legend, icon zoom controls,
+  keyboard pan/zoom/reset support, and responsive narrow-screen collapse.
+- Extended the renderer display contract in [`MapRenderer.ts`](../src/map/MapRenderer.ts) with
+  stroke dash cues, then applied hatching, dashed/dotted overlay rails, hover highlights, and
+  active-region depth in both [`SvgMapRenderer.ts`](../src/map/SvgMapRenderer.ts) and
+  [`HexMapRenderer.ts`](../src/map/HexMapRenderer.ts).
+- Added shared overlay visual metadata and coverage in
+  [`visualState.ts`](../src/map/visualState.ts) and
+  [`visualState.spec.ts`](../src/map/visualState.spec.ts).
+- Captured P4.3 screenshots and verification notes in
+  [`phase4/P4.3-QA.md`](./phase4/P4.3-QA.md) and
+  [`phase4/screenshots/p4-3/`](./phase4/screenshots/p4-3/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

@@ -44,7 +44,9 @@ export function buildCouncilRegionState(
     state[geometryRef] = {
       fill: controlParty ? ctx.partyColour(controlParty) : UNHELD_FILL,
       selected: ctx.hoveredGeometryRef === geometryRef,
-      opacity: ctx.activeGeometryRef !== null && !isActiveRegion ? 0.5 : undefined,
+      strokeWidth: 0.35,
+      selectedStrokeWidth: 1.15,
+      opacity: ctx.activeGeometryRef !== null && !isActiveRegion ? 0.38 : undefined,
       liftPx: isActiveRegion ? ctx.liftPx : undefined,
       tooltip: {
         name: region.name,
@@ -66,8 +68,8 @@ export function buildCouncilWardRegionState(
     state[ward.geometryRef] = {
       fill: partyId ? ctx.partyColour(partyId) : UNHELD_FILL,
       selected: ctx.hoveredGeometryRef === ward.geometryRef,
-      strokeWidth: 0.1,
-      selectedStrokeWidth: 0.2,
+      strokeWidth: 0.35,
+      selectedStrokeWidth: 1.15,
       tooltip: {
         name: ward.name,
         party: partyId ? ctx.partyName(partyId) : undefined,
