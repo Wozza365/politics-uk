@@ -34,7 +34,7 @@ Phase 4's additional definition of done:
 
 See [`phase4/P4.0-visual-audit-art-direction.md`](./phase4/P4.0-visual-audit-art-direction.md).
 
-### P4.1 - Premium title, setup, loading, and result screens `TODO`
+### P4.1 - Premium title, setup, loading, and result screens `DONE`
 
 See [`phase4/P4.1-premium-screen-flow.md`](./phase4/P4.1-premium-screen-flow.md).
 

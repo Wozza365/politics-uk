@@ -88,6 +88,8 @@
   --color-puk-warning: var(--puk-color-warning);
   --color-puk-danger: var(--puk-color-danger);
   --color-puk-data-neutral: var(--puk-color-data-neutral);
+  --color-puk-institutional: var(--puk-color-institutional);
+  --color-puk-premium-accent: var(--puk-color-premium-accent);
   --font-puk-ui: var(--puk-font-ui);
 }
 
@@ -120,6 +122,304 @@ input,
 select,
 textarea {
   min-height: 2.5rem;
+}
+
+.puk-screen-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  background:
+    linear-gradient(180deg, rgb(16 17 20 / 0.96), rgb(12 13 15 / 1)),
+    var(--puk-color-app-bg);
+  color: var(--puk-color-text);
+}
+
+.puk-screen-shell::before,
+.puk-screen-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.puk-screen-shell::before {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    repeating-linear-gradient(112deg, transparent 0 5.25rem, rgb(214 168 79 / 0.12) 5.3rem 5.38rem);
+  background-size: 4rem 4rem, 4rem 4rem, 11rem 11rem;
+  mask-image: linear-gradient(90deg, rgb(0 0 0 / 0.82), rgb(0 0 0 / 0.24));
+  opacity: 0.5;
+}
+
+.puk-screen-shell::after {
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(31 111 80 / 0.16), transparent 38%),
+    linear-gradient(0deg, rgb(56 189 248 / 0.07), transparent 42%),
+    repeating-radial-gradient(ellipse at 78% 78%, transparent 0 3rem, rgb(244 241 232 / 0.045) 3.08rem 3.16rem);
+  opacity: 0.9;
+}
+
+.puk-screen-kicker {
+  color: var(--puk-color-premium-accent);
+  font-size: var(--puk-type-micro);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: var(--puk-line-tight);
+  text-transform: uppercase;
+}
+
+.puk-screen-panel {
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--puk-color-border) 86%, transparent);
+  border-radius: var(--puk-radius-panel);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--puk-color-surface-raised) 88%, transparent), color-mix(in srgb, var(--puk-color-surface) 94%, transparent));
+  box-shadow: var(--puk-shadow-raised);
+}
+
+.puk-command-action {
+  display: flex;
+  min-height: 3.25rem;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puk-space-3);
+  border-radius: var(--puk-radius-control);
+  border: var(--puk-border-width) solid var(--puk-color-border);
+  padding: 0.75rem 0.875rem;
+  text-align: left;
+  transition:
+    background-color var(--puk-duration-control) var(--puk-ease-standard),
+    border-color var(--puk-duration-control) var(--puk-ease-standard),
+    color var(--puk-duration-control) var(--puk-ease-standard),
+    transform var(--puk-duration-control) var(--puk-ease-standard);
+}
+
+.puk-command-action:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.puk-command-action--primary {
+  border-color: color-mix(in srgb, var(--puk-color-player-focus) 56%, var(--puk-color-border));
+  background: color-mix(in srgb, var(--puk-color-player-focus) 16%, var(--puk-color-surface-raised));
+  color: var(--puk-color-text);
+}
+
+.puk-command-action--secondary {
+  background: color-mix(in srgb, var(--puk-color-surface-raised) 78%, transparent);
+  color: var(--puk-color-text);
+}
+
+.puk-command-action--disabled {
+  cursor: not-allowed;
+  color: var(--puk-color-text-disabled);
+}
+
+.puk-stat-tile {
+  border: var(--puk-border-width) solid var(--puk-color-border-subtle);
+  border-radius: var(--puk-radius-card);
+  background: color-mix(in srgb, var(--puk-color-map-backdrop) 72%, transparent);
+  padding: 0.75rem;
+}
+
+.puk-stat-label {
+  color: var(--puk-color-text-muted);
+  font-size: var(--puk-type-micro);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: var(--puk-line-tight);
+  text-transform: uppercase;
+}
+
+.puk-stat-value {
+  color: var(--puk-color-text);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--puk-line-tight);
+}
+
+.puk-party-card {
+  position: relative;
+  min-height: 14.5rem;
+  overflow: hidden;
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--party-accent) 36%, var(--puk-color-border));
+  border-radius: var(--puk-radius-panel);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--party-accent) 14%, var(--puk-color-surface-raised)), var(--puk-color-surface));
+  color: var(--puk-color-text);
+  box-shadow: var(--puk-shadow-raised);
+  transition:
+    transform var(--puk-duration-control) var(--puk-ease-standard),
+    border-color var(--puk-duration-control) var(--puk-ease-standard),
+    box-shadow var(--puk-duration-control) var(--puk-ease-standard);
+}
+
+.puk-party-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.42rem;
+  background: var(--party-accent);
+}
+
+.puk-party-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, var(--party-accent) 18%, transparent), transparent 40%),
+    repeating-linear-gradient(0deg, transparent 0 1.45rem, rgb(255 255 255 / 0.035) 1.5rem 1.55rem);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.puk-party-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--party-accent) 70%, var(--puk-color-text));
+}
+
+.puk-party-card--selected {
+  border-color: var(--puk-color-player-focus);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--puk-color-player-focus) 45%, transparent),
+    var(--puk-shadow-panel);
+}
+
+.puk-party-mark {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--puk-radius-card);
+  background: var(--party-accent);
+  color: var(--party-on-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: var(--puk-line-tight);
+  text-align: center;
+}
+
+.puk-status-pill {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: var(--puk-border-width) solid var(--puk-color-border);
+  padding: 0.25rem 0.55rem;
+  color: var(--puk-color-text-muted);
+  font-size: var(--puk-type-micro);
+  font-weight: 700;
+  line-height: var(--puk-line-tight);
+}
+
+.puk-status-pill--selected {
+  border-color: color-mix(in srgb, var(--puk-color-player-focus) 72%, var(--puk-color-border));
+  color: var(--puk-color-text);
+}
+
+.puk-loading-map {
+  position: relative;
+  width: min(22rem, calc(100vw - 3rem));
+  aspect-ratio: 1.85;
+  overflow: hidden;
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--loading-accent, var(--puk-color-player-focus)) 42%, var(--puk-color-border));
+  border-radius: var(--puk-radius-panel);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--loading-accent, var(--puk-color-player-focus)) 12%, var(--puk-color-surface-raised)), var(--puk-color-surface)),
+    repeating-linear-gradient(90deg, transparent 0 2rem, rgb(255 255 255 / 0.06) 2.05rem 2.1rem),
+    repeating-linear-gradient(0deg, transparent 0 1.5rem, rgb(255 255 255 / 0.05) 1.55rem 1.6rem);
+  box-shadow: var(--puk-shadow-panel);
+}
+
+.puk-loading-map::before {
+  content: "";
+  position: absolute;
+  inset: 22% 10%;
+  border-top: 2px solid color-mix(in srgb, var(--loading-accent, var(--puk-color-player-focus)) 74%, transparent);
+  border-right: 2px solid color-mix(in srgb, var(--loading-accent, var(--puk-color-player-focus)) 40%, transparent);
+  border-radius: 50% 18% 42% 16%;
+  transform: rotate(-7deg);
+}
+
+.puk-loading-map::after {
+  content: "";
+  position: absolute;
+  top: 52%;
+  left: -30%;
+  height: 2px;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, var(--loading-accent, var(--puk-color-player-focus)), transparent);
+  animation: puk-map-trace 1.35s var(--puk-ease-standard) infinite;
+}
+
+@keyframes puk-map-trace {
+  from {
+    transform: translateX(0) rotate(-8deg);
+  }
+  to {
+    transform: translateX(320%) rotate(-8deg);
+  }
+}
+
+.puk-save-thumbnail {
+  position: relative;
+  display: grid;
+  min-height: 4.75rem;
+  min-width: 5.5rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--puk-radius-card);
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--party-accent, var(--puk-color-data-neutral)) 36%, var(--puk-color-border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--party-accent, var(--puk-color-data-neutral)) 24%, var(--puk-color-surface-raised)), var(--puk-color-surface)),
+    repeating-linear-gradient(90deg, transparent 0 1.1rem, rgb(255 255 255 / 0.05) 1.16rem 1.2rem);
+}
+
+.puk-save-thumbnail::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 0.35rem;
+  background: var(--party-accent, var(--puk-color-data-neutral));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puk-command-action:not(:disabled):hover,
+  .puk-party-card:hover {
+    transform: none;
+  }
+
+  .puk-loading-map::after {
+    animation: none;
+    left: 28%;
+  }
+}
+
+@media (forced-colors: active) {
+  .puk-screen-panel,
+  .puk-party-card,
+  .puk-stat-tile,
+  .puk-save-thumbnail,
+  .puk-command-action,
+  .puk-loading-map {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+  }
+
+  .puk-party-card::before,
+  .puk-party-card::after,
+  .puk-screen-shell::before,
+  .puk-screen-shell::after,
+  .puk-save-thumbnail::after {
+    display: none;
+  }
 }
 
 .hud-party-expanded {

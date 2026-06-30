@@ -13,7 +13,7 @@ const save = useSaveStore()
 
 const won = computed(() => game.result === 'won')
 const totalCommonsSeats = computed(() => scenario.commonsRegions.length)
-const accentColour = computed(() => game.selectedParty?.colours.primary ?? '#FFFFFF')
+const accentColour = computed(() => game.selectedParty?.colours.primary ?? 'var(--puk-color-player-focus)')
 const outcome = computed(() => game.latestCommonsElectionOutcome)
 const playerSeats = computed(() =>
   game.selectedPartyId ? outcome.value?.countsByParty[game.selectedPartyId] ?? game.projectedPlayerSeatCount : game.projectedPlayerSeatCount,
@@ -24,10 +24,29 @@ const seatChangeLabel = computed(() => {
   const sign = playerSeatChange.value > 0 ? '+' : ''
   return `${sign}${playerSeatChange.value}`
 })
-const decisiveSeats = computed(() => outcome.value?.decisiveSeats.slice(0, 5) ?? [])
+const decisiveSeats = computed(() => outcome.value?.decisiveSeats.slice(0, 6) ?? [])
+const majorityMargin = computed(() => playerSeats.value - game.winThresholdSeats)
+const majorityLabel = computed(() => {
+  if (majorityMargin.value >= 0) return `Majority path cleared by ${majorityMargin.value + 1} seats`
+  return `${Math.abs(majorityMargin.value)} seats short of a majority`
+})
+const seatShare = computed(() => `${Math.round((playerSeats.value / Math.max(1, totalCommonsSeats.value)) * 100)}%`)
+const topRows = computed(() => {
+  const rows = Object.entries(outcome.value?.countsByParty ?? {})
+    .map(([partyId, seats]) => ({ partyId, seats, label: partyShortName(partyId) }))
+    .sort((a, b) => b.seats - a.seats)
+    .slice(0, 5)
+  if (rows.length) return rows
+  return game.selectedPartyId ? [{ partyId: game.selectedPartyId, seats: playerSeats.value, label: partyShortName(game.selectedPartyId) }] : []
+})
 
 function partyShortName(partyId: string) {
   return scenario.party(partyId)?.shortName ?? partyId
+}
+
+function formatDate(date: string | undefined) {
+  if (!date) return 'Election night'
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function continuePlaying() {
@@ -42,79 +61,126 @@ async function backToMainMenu() {
 </script>
 
 <template>
-  <main class="flex h-screen w-screen flex-col items-center justify-center gap-5 bg-zinc-900 px-6 text-zinc-100">
-    <p class="text-sm uppercase tracking-widest text-zinc-400">General election result</p>
-    <h1 class="text-5xl font-bold" :style="{ color: accentColour }">
-      {{ won ? 'You won' : 'You lost' }}
-    </h1>
-    <p class="max-w-3xl text-center text-lg text-zinc-300">
-      {{ game.selectedParty?.shortName }} took
-      <span class="font-semibold text-zinc-100">{{ playerSeats }}</span>
-      of {{ totalCommonsSeats }} Commons seats
-      ({{ game.winThresholdSeats }} needed for a majority, {{ seatChangeLabel }} from the starting Parliament).
-    </p>
+  <main class="puk-screen-shell overflow-y-auto">
+    <section class="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-5 py-6 sm:px-8">
+      <header class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="puk-screen-kicker">General election result</p>
+          <h1 class="mt-2 text-4xl font-black leading-none text-puk-text sm:text-6xl">
+            {{ won ? 'Majority secured' : 'No route to Number 10' }}
+          </h1>
+        </div>
+        <p class="text-sm font-semibold text-puk-text-muted">{{ formatDate(outcome?.appliedAt ?? outcome?.date) }}</p>
+      </header>
 
-    <div
-      v-if="outcome"
-      class="grid w-full max-w-3xl gap-3 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 text-sm md:grid-cols-3"
-    >
-      <div>
-        <p class="text-xs uppercase tracking-wide text-zinc-500">Model</p>
-        <p class="font-medium text-zinc-200">National swing + local commitments</p>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-wide text-zinc-500">Applied</p>
-        <p class="font-medium text-zinc-200">{{ outcome.appliedAt ?? outcome.date }}</p>
-      </div>
-      <div>
-        <p class="text-xs uppercase tracking-wide text-zinc-500">Reconciled seats</p>
-        <p class="font-medium text-zinc-200">{{ outcome.winners.length }} / {{ outcome.eligibleSeatCount }}</p>
-      </div>
-    </div>
+      <section class="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(19rem,0.7fr)]">
+        <article class="puk-screen-panel overflow-hidden">
+          <div class="grid min-h-[24rem] gap-0 md:grid-cols-[minmax(0,1fr)_16rem]">
+            <div class="flex flex-col justify-between gap-8 p-5 sm:p-6">
+              <div>
+                <p class="text-sm font-semibold text-puk-text-muted">{{ game.selectedParty?.name ?? 'Your party' }}</p>
+                <p class="mt-4 text-[5rem] font-black leading-none tracking-normal sm:text-[7rem]" :style="{ color: accentColour }">
+                  {{ playerSeats }}
+                </p>
+                <p class="mt-2 text-lg font-semibold text-puk-text">
+                  of {{ totalCommonsSeats }} Commons seats / {{ seatShare }}
+                </p>
+              </div>
 
-    <div v-if="decisiveSeats.length" class="w-full max-w-3xl text-sm">
-      <p class="mb-2 text-xs uppercase tracking-wide text-zinc-500">Decisive places</p>
-      <div class="grid gap-2 md:grid-cols-2">
-        <p
-          v-for="seat in decisiveSeats"
-          :key="`${seat.regionId}:${seat.seatIndex}`"
-          class="rounded border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-300"
+              <div>
+                <p class="text-xl font-bold text-puk-text">{{ majorityLabel }}</p>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-puk-text-muted">
+                  {{ game.selectedParty?.shortName }} finished {{ seatChangeLabel }} from the starting Parliament.
+                  {{ game.winThresholdSeats }} seats were needed for a working majority.
+                </p>
+              </div>
+            </div>
+
+            <aside class="border-t border-puk-border-subtle bg-puk-map-backdrop/70 p-5 md:border-l md:border-t-0">
+              <p class="puk-stat-label">Election board</p>
+              <div class="mt-4 space-y-3">
+                <div
+                  v-for="row in topRows"
+                  :key="row.partyId"
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--puk-radius-card)] border border-puk-border-subtle bg-puk-surface/70 px-3 py-2"
+                >
+                  <span class="truncate text-sm font-semibold text-puk-text">{{ row.label }}</span>
+                  <span class="font-mono text-sm font-bold text-puk-text">{{ row.seats }}</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </article>
+
+        <aside class="puk-screen-panel p-5">
+          <p class="puk-screen-kicker">Model note</p>
+          <dl class="mt-4 grid gap-3">
+            <div class="puk-stat-tile">
+              <dt class="puk-stat-label">Model</dt>
+              <dd class="puk-stat-value mt-2 text-sm font-semibold">National swing + local commitments</dd>
+            </div>
+            <div class="puk-stat-tile">
+              <dt class="puk-stat-label">Applied</dt>
+              <dd class="puk-stat-value mt-2 text-sm font-semibold">{{ formatDate(outcome?.appliedAt ?? outcome?.date) }}</dd>
+            </div>
+            <div class="puk-stat-tile">
+              <dt class="puk-stat-label">Reconciled seats</dt>
+              <dd class="puk-stat-value mt-2 text-sm font-semibold">
+                {{ outcome?.winners.length ?? 0 }} / {{ outcome?.eligibleSeatCount ?? totalCommonsSeats }}
+              </dd>
+            </div>
+          </dl>
+          <p class="mt-4 text-sm leading-6 text-puk-text-muted">
+            {{ outcome?.provenance ?? 'Projection applied from live campaign state.' }}
+          </p>
+          <button
+            v-if="outcome?.explanationId"
+            type="button"
+            class="mt-5 rounded-[var(--puk-radius-control)] border border-puk-border px-4 py-2 text-sm font-semibold text-puk-text transition hover:bg-puk-surface-raised"
+            @click="ui.showExplanation(outcome.explanationId)"
+          >
+            Open model explanation
+          </button>
+        </aside>
+      </section>
+
+      <section v-if="decisiveSeats.length" class="puk-screen-panel p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="puk-screen-kicker">Decisive places</p>
+            <h2 class="mt-1 text-xl font-bold text-puk-text">Seats that shaped the night</h2>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-2 md:grid-cols-2">
+          <p
+            v-for="seat in decisiveSeats"
+            :key="`${seat.regionId}:${seat.seatIndex}`"
+            class="rounded-[var(--puk-radius-card)] border border-puk-border-subtle bg-puk-map-backdrop/60 px-3 py-2 text-sm text-puk-text-muted"
+          >
+            <span class="font-semibold text-puk-text">{{ seat.seatName }}</span>
+            {{ partyShortName(seat.previousParty) }} to {{ partyShortName(seat.winnerParty) }}
+          </p>
+        </div>
+      </section>
+
+      <footer class="flex flex-wrap justify-end gap-3 pb-2">
+        <button
+          type="button"
+          class="rounded-[var(--puk-radius-control)] border border-puk-player-focus/60 bg-puk-player-focus/15 px-5 py-3 text-sm font-bold text-puk-text transition hover:bg-puk-player-focus/25"
+          @click="continuePlaying"
         >
-          <span class="font-medium text-zinc-100">{{ seat.seatName }}</span>
-          {{ partyShortName(seat.previousParty) }} to {{ partyShortName(seat.winnerParty) }}
-        </p>
-      </div>
-    </div>
+          Continue playing
+        </button>
+        <button
+          type="button"
+          class="rounded-[var(--puk-radius-control)] border border-puk-border px-5 py-3 text-sm font-bold text-puk-text-muted transition hover:bg-puk-surface-raised hover:text-puk-text"
+          @click="backToMainMenu"
+        >
+          Main menu
+        </button>
+      </footer>
 
-    <p class="max-w-2xl text-center text-sm text-zinc-500">
-      {{ outcome?.provenance ?? 'Projection applied from live campaign state.' }}
-    </p>
-
-    <button
-      v-if="outcome?.explanationId"
-      type="button"
-      class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
-      @click="ui.showExplanation(outcome.explanationId)"
-    >
-      Why?
-    </button>
-
-    <div class="flex gap-3">
-      <button
-        type="button"
-        class="rounded-xl border border-zinc-700 bg-zinc-800 px-6 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-700"
-        @click="continuePlaying"
-      >
-        Continue playing
-      </button>
-      <button
-        type="button"
-        class="rounded-xl border border-zinc-700 px-6 py-2 text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
-        @click="backToMainMenu"
-      >
-        Main menu
-      </button>
-    </div>
-    <ExplanationDetails />
+      <ExplanationDetails />
+    </section>
   </main>
 </template>

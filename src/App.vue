@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onMounted, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useSaveStore } from '@/stores/save'
 import TitleScreen from '@/screens/TitleScreen.vue'
@@ -27,6 +27,16 @@ const screens = {
 } as const
 
 const currentScreen = computed(() => screens[ui.screen])
+
+function resetScreenScroll() {
+  nextTick(() => {
+    document.getElementById('app')?.scrollTo({ top: 0, left: 0 })
+    window.scrollTo({ top: 0, left: 0 })
+  })
+}
+
+watch(() => ui.screen, resetScreenScroll)
+onMounted(resetScreenScroll)
 </script>
 
 <template>

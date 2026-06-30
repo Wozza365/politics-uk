@@ -1,12 +1,9 @@
 <script setup lang="ts">
-// Load-game browser (P3.2 step 2/5): lists every save — the rolling autosave and manual slots
-// alike — newest first, and hands off to `RestoreScreen` to do the actual read/hydrate. Renaming/
-// deleting/exporting a manual slot stays the in-game Saves panel's job (`SaveManagementPanel.vue`)
-// — this screen's only job is picking one to load.
 import { computed, onMounted } from 'vue'
 import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import { useScenarioStore } from '@/stores/scenario'
+import { CURRENT_SAVE_FORMAT_VERSION } from '@/types'
 
 const save = useSaveStore()
 const ui = useUiStore()
@@ -23,52 +20,138 @@ const saves = computed(() =>
 )
 
 function partyLabel(partyId: string | null) {
-  if (!partyId) return '—'
+  if (!partyId) return 'No party selected'
   return scenario.party(partyId)?.shortName ?? partyId
 }
 
-function formatDate(iso: string) {
+function partyName(partyId: string | null) {
+  if (!partyId) return 'Campaign'
+  return scenario.party(partyId)?.name ?? partyId
+}
+
+function partyColour(partyId: string | null) {
+  return partyId ? scenario.party(partyId)?.colours.primary ?? 'var(--puk-color-data-neutral)' : 'var(--puk-color-data-neutral)'
+}
+
+function partyOnColour(partyId: string | null) {
+  return partyId ? scenario.party(partyId)?.colours.onPrimary ?? '#101114' : '#101114'
+}
+
+function slotLabel(kind: string, label: string | undefined, id: string) {
+  if (kind === 'autosave') return 'Autosave'
+  return label || `Manual slot ${id.slice(0, 8)}`
+}
+
+function formatGameDate(date: string) {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-function loadSave(id: string) {
+function isCompatible(formatVersion: number) {
+  return formatVersion === CURRENT_SAVE_FORMAT_VERSION
+}
+
+function loadSave(id: string, formatVersion: number) {
+  if (!isCompatible(formatVersion)) return
   ui.goToRestoring(id)
 }
 </script>
 
 <template>
-  <main class="flex h-screen w-screen flex-col items-center gap-6 overflow-y-auto bg-zinc-900 p-8 text-zinc-100">
-    <div class="flex w-full max-w-2xl items-center justify-start">
-      <button type="button" class="text-sm text-zinc-400 hover:text-zinc-100" @click="ui.goToTitle">
-        ← Back
-      </button>
-    </div>
-
-    <h1 class="text-3xl font-semibold">Load game</h1>
-
-    <div class="w-full max-w-2xl space-y-2">
-      <div
-        v-for="entry in saves"
-        :key="entry.id"
-        class="flex items-center justify-between gap-3 rounded-lg border border-zinc-800/80 px-4 py-3"
-      >
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-zinc-100">
-            {{ entry.kind === 'autosave' ? 'Autosave' : entry.label || entry.id }}
-          </p>
-          <p class="text-xs text-zinc-400">{{ entry.summary || partyLabel(entry.selectedPartyId) }}</p>
-          <p class="text-xs text-zinc-500">Updated {{ formatDate(entry.updatedAt) }}</p>
-        </div>
+  <main class="puk-screen-shell overflow-y-auto">
+    <section class="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-5 py-6 sm:px-8">
+      <header class="flex flex-wrap items-center justify-between gap-4">
         <button
           type="button"
-          class="shrink-0 rounded-md bg-zinc-100 px-3 py-1.5 text-sm font-semibold text-zinc-900"
-          @click="loadSave(entry.id)"
+          class="rounded-[var(--puk-radius-control)] border border-puk-border px-3 py-2 text-sm font-semibold text-puk-text-muted transition hover:bg-puk-surface-raised hover:text-puk-text"
+          @click="ui.goToTitle"
         >
-          Load
+          <- Back
         </button>
-      </div>
+        <div class="text-right">
+          <p class="puk-screen-kicker">Campaign archive</p>
+          <h1 class="mt-1 text-2xl font-bold text-puk-text sm:text-3xl">Load campaign</h1>
+        </div>
+      </header>
 
-      <p v-if="!saves.length" class="text-center text-sm text-zinc-500">No saves yet.</p>
-    </div>
+      <section class="puk-screen-panel overflow-hidden">
+        <div class="border-b border-puk-border-subtle p-5">
+          <p class="text-sm leading-6 text-puk-text-muted">
+            Compatible saves for {{ scenario.scenario.label }}.
+          </p>
+        </div>
+
+        <div v-if="saves.length" class="divide-y divide-puk-border-subtle">
+          <article
+            v-for="entry in saves"
+            :key="entry.id"
+            class="grid gap-4 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:p-5"
+          >
+            <div
+              class="puk-save-thumbnail"
+              :style="{ '--party-accent': partyColour(entry.selectedPartyId), '--party-on-accent': partyOnColour(entry.selectedPartyId) }"
+              aria-hidden="true"
+            >
+              <span
+                class="relative z-10 rounded-[var(--puk-radius-card)] px-2 py-1 text-xs font-black"
+                :style="{ backgroundColor: partyColour(entry.selectedPartyId), color: partyOnColour(entry.selectedPartyId) }"
+              >
+                {{ partyLabel(entry.selectedPartyId) }}
+              </span>
+            </div>
+
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="truncate text-base font-bold text-puk-text">
+                  {{ slotLabel(entry.kind, entry.label, entry.id) }}
+                </h2>
+                <span
+                  class="puk-status-pill"
+                  :class="isCompatible(entry.formatVersion) ? 'puk-status-pill--selected' : ''"
+                >
+                  <span aria-hidden="true">{{ isCompatible(entry.formatVersion) ? 'OK' : '!' }}</span>
+                  <span>{{ isCompatible(entry.formatVersion) ? 'Compatible' : 'Unsupported' }}</span>
+                </span>
+              </div>
+              <p class="mt-2 truncate text-sm text-puk-text">
+                {{ partyName(entry.selectedPartyId) }} - {{ formatGameDate(entry.date) }}
+              </p>
+              <p class="mt-1 text-xs leading-5 text-puk-text-muted">
+                {{ entry.summary || partyLabel(entry.selectedPartyId) }} / Updated {{ formatDateTime(entry.updatedAt) }} / Save v{{ entry.formatVersion }}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="rounded-[var(--puk-radius-control)] border border-puk-player-focus/60 bg-puk-player-focus/15 px-4 py-2 text-sm font-bold text-puk-text transition hover:bg-puk-player-focus/25 disabled:cursor-not-allowed disabled:border-puk-border disabled:bg-puk-surface disabled:text-puk-text-disabled"
+              :disabled="!isCompatible(entry.formatVersion)"
+              @click="loadSave(entry.id, entry.formatVersion)"
+            >
+              Load
+            </button>
+          </article>
+        </div>
+
+        <div v-else class="grid min-h-72 place-items-center p-6 text-center">
+          <div class="max-w-sm">
+            <p class="puk-screen-kicker">No save slots</p>
+            <h2 class="mt-2 text-xl font-bold text-puk-text">No campaigns saved yet</h2>
+            <p class="mt-3 text-sm leading-6 text-puk-text-muted">
+              Start a new campaign to create the rolling autosave slot, then return here to restore it.
+            </p>
+            <button
+              type="button"
+              class="mt-5 rounded-[var(--puk-radius-control)] border border-puk-border px-4 py-2 text-sm font-semibold text-puk-text transition hover:bg-puk-surface-raised"
+              @click="ui.goToNewGame"
+            >
+              New campaign
+            </button>
+          </div>
+        </div>
+      </section>
+    </section>
   </main>
 </template>

@@ -16,6 +16,25 @@ Completed on 2026-06-27.
   [`phase4/screenshots/p4-0/`](./phase4/screenshots/p4-0/), with QA exceptions listed for map hover
   and result screen follow-up.
 
+### P4.1 - Premium title, setup, loading, and result screens
+
+Completed on 2026-06-30.
+
+- Rebuilt the outer game loop screens around the P4.0 civic command-room tokens:
+  [`TitleScreen.vue`](../src/screens/TitleScreen.vue),
+  [`NewGameScreen.vue`](../src/screens/NewGameScreen.vue),
+  [`LoadGameScreen.vue`](../src/screens/LoadGameScreen.vue),
+  [`LoadingScreen.vue`](../src/screens/LoadingScreen.vue),
+  [`RestoreScreen.vue`](../src/screens/RestoreScreen.vue), and
+  [`ResultScreen.vue`](../src/screens/ResultScreen.vue).
+- Reworked [`PartyCard.vue`](../src/components/PartyCard.vue) with an accent rail, party mark,
+  dense stat tiles, and non-colour selected state.
+- Added screen-flow scroll reset in [`App.vue`](../src/App.vue) so narrow screen transitions start
+  at the top of the new view.
+- Captured P4.1 screenshots and verification notes in
+  [`phase4/P4.1-QA.md`](./phase4/P4.1-QA.md) and
+  [`phase4/screenshots/p4-1/`](./phase4/screenshots/p4-1/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made
