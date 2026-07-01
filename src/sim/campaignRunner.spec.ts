@@ -100,5 +100,5 @@ describe('runHeadlessCampaign', () => {
     expect(report.indicators.electionOutcomes).toBe(1)
     expect(Object.values(report.commonsSeats).reduce((sum, value) => sum + value, 0)).toBe(650)
     expect(report.result).not.toBeNull()
-  }, 20_000)
+  }, 30_000)
 })

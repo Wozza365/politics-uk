@@ -8,6 +8,7 @@ import VChart from 'vue-echarts'
 import { useGameStore } from '@/stores/game'
 import { useScenarioStore } from '@/stores/scenario'
 import { DATA_VIZ_THEME, formatPercent, trendDelta } from './dataVizTheme'
+import PartyMark from './PartyMark.vue'
 
 use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
@@ -73,6 +74,7 @@ const latestPollingSummary = computed(() => {
   return chartedPartyIds.value
     .map((partyId) => ({
       id: partyId,
+      party: scenario.party(partyId),
       name: scenario.party(partyId)?.shortName ?? partyId,
       value: latest.polling[partyId] ?? 0,
       colour: scenario.party(partyId)?.colours.primary ?? '#8fa3ad',
@@ -101,7 +103,7 @@ const chartSummary = computed(() => {
         class="data-viz-row"
         :style="{ '--series-colour': party.colour }"
       >
-        <span class="data-viz-mark" aria-hidden="true">{{ party.name.slice(0, 2) }}</span>
+        <PartyMark :party="party.party" :label="party.name" size="xs" decorative />
         <span class="truncate font-semibold text-puk-text">{{ party.name }}</span>
         <span class="tabular-nums text-puk-text">{{ formatPercent(party.value) }}%</span>
         <span class="data-viz-delta" :data-direction="party.trend.direction">{{ party.trend.label }}</span>

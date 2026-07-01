@@ -221,6 +221,14 @@ textarea {
   color: var(--puk-color-text-disabled);
 }
 
+.puk-command-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  color: currentColor;
+  stroke-width: 2.2;
+}
+
 .puk-stat-tile {
   border: var(--puk-border-width) solid var(--puk-color-border-subtle);
   border-radius: var(--puk-radius-card);
@@ -290,7 +298,8 @@ textarea {
     var(--puk-shadow-panel);
 }
 
-.puk-party-mark {
+.puk-party-mark,
+.party-identity-mark {
   display: inline-flex;
   min-height: 2.75rem;
   min-width: 2.75rem;
@@ -303,6 +312,131 @@ textarea {
   font-weight: 800;
   line-height: var(--puk-line-tight);
   text-align: center;
+}
+
+.party-identity-mark {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--party-accent) 72%, var(--puk-color-border));
+  box-shadow:
+    inset 0 -0.5rem 1rem color-mix(in srgb, #000 16%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--party-on-accent) 18%, transparent);
+}
+
+.party-identity-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--party-on-accent) 18%, transparent), transparent 42%),
+    repeating-linear-gradient(90deg, transparent 0 0.45rem, color-mix(in srgb, var(--party-on-accent) 16%, transparent) 0.45rem 0.52rem);
+  opacity: 0.64;
+}
+
+.party-identity-mark__text {
+  max-width: 4ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.party-identity-mark--xs {
+  min-height: 1.35rem;
+  min-width: 1.8rem;
+  border-radius: 4px;
+  font-size: var(--puk-type-micro);
+}
+
+.party-identity-mark--sm {
+  min-height: 2rem;
+  min-width: 2rem;
+  font-size: var(--puk-type-micro);
+}
+
+.party-identity-mark--lg {
+  min-height: 3rem;
+  min-width: 3rem;
+  font-size: 0.78rem;
+}
+
+.leader-portrait {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: var(--puk-border-width) solid color-mix(in srgb, var(--party-accent) 58%, var(--puk-color-border));
+  border-radius: var(--puk-radius-card);
+  background:
+    radial-gradient(circle at 50% 24%, color-mix(in srgb, var(--party-accent) 32%, #f4f1e8) 0 22%, transparent 23%),
+    linear-gradient(180deg, color-mix(in srgb, var(--party-accent) 26%, var(--puk-color-surface-raised)), var(--puk-color-map-backdrop));
+  color: var(--puk-color-text);
+  box-shadow: inset 0 -0.5rem 1rem rgb(0 0 0 / 0.18);
+}
+
+.leader-portrait--sm {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.leader-portrait--md {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.leader-portrait__silhouette,
+.leader-portrait__head,
+.leader-portrait__shoulders {
+  position: absolute;
+  display: block;
+}
+
+.leader-portrait__head {
+  left: 50%;
+  top: 22%;
+  width: 32%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--party-on-accent) 78%, #f4f1e8);
+  transform: translateX(-50%);
+  opacity: 0.82;
+}
+
+.leader-portrait__shoulders {
+  left: 50%;
+  bottom: 10%;
+  width: 66%;
+  height: 34%;
+  border-radius: 999px 999px 0 0;
+  background: color-mix(in srgb, var(--party-on-accent) 64%, #f4f1e8);
+  transform: translateX(-50%);
+  opacity: 0.58;
+}
+
+.leader-portrait__initials {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  margin-bottom: 0.2rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--puk-color-surface) 78%, transparent);
+  padding: 0.05rem 0.25rem;
+  color: var(--puk-color-text);
+  font-size: var(--puk-type-micro);
+  font-weight: 850;
+  line-height: var(--puk-line-tight);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--puk-color-border) 75%, transparent);
+}
+
+.leader-portrait__caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .puk-status-pill {

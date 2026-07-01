@@ -4,6 +4,7 @@ import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import { useScenarioStore } from '@/stores/scenario'
 import { CURRENT_SAVE_FORMAT_VERSION } from '@/types'
+import { ArrowRight, FilePlus2, FolderOpen, Settings } from '@lucide/vue'
 
 const save = useSaveStore()
 const ui = useUiStore()
@@ -100,7 +101,7 @@ function continueGame() {
                 {{ continueSummary }} - {{ formatIsoDate(autosave.date) }}
               </span>
             </span>
-            <span class="text-lg" aria-hidden="true">-></span>
+            <ArrowRight class="puk-command-icon" aria-hidden="true" />
           </button>
 
           <button
@@ -112,7 +113,7 @@ function continueGame() {
               <span class="block text-sm font-bold">New campaign</span>
               <span class="mt-1 block text-xs text-puk-text-muted">Briefing, party, timeline</span>
             </span>
-            <span aria-hidden="true">+</span>
+            <FilePlus2 class="puk-command-icon" aria-hidden="true" />
           </button>
 
           <button
@@ -124,7 +125,7 @@ function continueGame() {
               <span class="block text-sm font-bold">Load campaign</span>
               <span class="mt-1 block text-xs text-puk-text-muted">Autosave and manual slots</span>
             </span>
-            <span aria-hidden="true">#</span>
+            <FolderOpen class="puk-command-icon" aria-hidden="true" />
           </button>
 
           <button
@@ -137,7 +138,7 @@ function continueGame() {
               <span class="block text-sm font-bold">Settings</span>
               <span class="mt-1 block text-xs">Not available in this build</span>
             </span>
-            <span aria-hidden="true">-</span>
+            <Settings class="puk-command-icon" aria-hidden="true" />
           </button>
         </nav>
 

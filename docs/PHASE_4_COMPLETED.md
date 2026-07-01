@@ -103,6 +103,23 @@ Completed on 2026-07-01.
   [`phase4/P4.5-QA.md`](./phase4/P4.5-QA.md) and
   [`phase4/screenshots/p4-5/`](./phase4/screenshots/p4-5/).
 
+### P4.6 - Iconography, party identity, imagery, and app assets
+
+Completed on 2026-07-01.
+
+- Added shared party and leader identity components:
+  [`PartyMark.vue`](../src/components/PartyMark.vue) and
+  [`LeaderPortrait.vue`](../src/components/LeaderPortrait.vue).
+- Replaced title/setup/load text glyph controls with lucide icons and reused party marks in
+  polling, save, and setup surfaces.
+- Replaced the starter favicon with project-owned ballot-shield assets in
+  [`public/favicon.svg`](../public/favicon.svg), [`public/app-icon.svg`](../public/app-icon.svg),
+  and [`public/manifest.webmanifest`](../public/manifest.webmanifest).
+- Documented asset source and replacement rules in
+  [`phase4/P4.6-asset-notes.md`](./phase4/P4.6-asset-notes.md), with QA screenshots in
+  [`phase4/P4.6-QA.md`](./phase4/P4.6-QA.md) and
+  [`phase4/screenshots/p4-6/`](./phase4/screenshots/p4-6/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

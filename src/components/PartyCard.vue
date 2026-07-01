@@ -5,6 +5,8 @@ import { useScenarioStore } from '@/stores/scenario'
 import { computeDifficulty } from '@/sim/difficulty'
 import CompassView from './CompassView.vue'
 import DifficultyBadge from './DifficultyBadge.vue'
+import LeaderPortrait from './LeaderPortrait.vue'
+import PartyMark from './PartyMark.vue'
 
 const props = defineProps<{
   party: Party
@@ -42,8 +44,6 @@ const compassItems = computed(() => {
   ]
 })
 
-const partyMark = computed(() => props.party.shortName.replace(/\s+/g, '').slice(0, 4))
-
 function formatPct(value: number) {
   return Number.isInteger(value) ? `${value}%` : `${value.toFixed(1)}%`
 }
@@ -61,7 +61,7 @@ function formatPct(value: number) {
   >
     <span class="relative z-10 flex items-start justify-between gap-3">
       <span class="flex min-w-0 items-center gap-3">
-        <span class="puk-party-mark shrink-0">{{ partyMark }}</span>
+        <PartyMark :party="party" size="lg" />
         <span class="min-w-0">
           <span class="block truncate text-lg font-black leading-tight text-puk-text">{{ party.name }}</span>
           <span class="mt-1 block truncate text-sm font-medium text-puk-text-muted">
@@ -69,6 +69,7 @@ function formatPct(value: number) {
           </span>
         </span>
       </span>
+      <LeaderPortrait :party="party" :officer="leader" size="sm" />
       <span class="puk-status-pill shrink-0" :class="selected ? 'puk-status-pill--selected' : ''">
         <span aria-hidden="true">{{ selected ? '✓' : '+' }}</span>
         <span>{{ selected ? 'Selected' : 'Pick' }}</span>

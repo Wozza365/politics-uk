@@ -5,7 +5,10 @@ import { useGameStore } from '@/stores/game'
 import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import PartyCard from '@/components/PartyCard.vue'
+import LeaderPortrait from '@/components/LeaderPortrait.vue'
+import PartyMark from '@/components/PartyMark.vue'
 import { computeDifficulty, DIFFICULTY_LABELS } from '@/sim/difficulty'
+import { ArrowLeft, Play } from '@lucide/vue'
 
 interface TimelineStop {
   scenarioId: string
@@ -50,6 +53,7 @@ const selectedPartyStats = computed(() => {
   const leader = selectedParty.value.leadership.find((officer) => officer.role === 'leader')
   const band = computeDifficulty(selectedParty.value, scenario.scenario)
   return {
+    leaderOfficer: leader,
     leader: leader?.personName ?? 'Leader TBC',
     seats: commonsSeatsFor(selectedParty.value.id),
     polling: scenario.scenario.polling[selectedParty.value.id] ?? 0,
@@ -89,7 +93,8 @@ async function startGame() {
           class="rounded-[var(--puk-radius-control)] border border-puk-border px-3 py-2 text-sm font-semibold text-puk-text-muted transition hover:bg-puk-surface-raised hover:text-puk-text"
           @click="ui.goToTitle"
         >
-          <- Back
+          <ArrowLeft class="mr-2 inline h-4 w-4" aria-hidden="true" />
+          Back
         </button>
         <div class="text-right">
           <p class="puk-screen-kicker">Campaign setup</p>
@@ -182,15 +187,15 @@ async function startGame() {
           <div class="border-t border-puk-border-subtle pt-4">
             <p class="puk-stat-label">Selected party</p>
             <div v-if="selectedParty && selectedPartyStats" class="mt-3 flex gap-3">
-              <span
-                class="puk-party-mark shrink-0"
-                :style="{ '--party-accent': selectedParty.colours.primary, '--party-on-accent': selectedParty.colours.onPrimary }"
-              >
-                {{ selectedParty.shortName }}
-              </span>
+              <PartyMark :party="selectedParty" size="md" />
               <div class="min-w-0 text-sm">
-                <p class="truncate font-semibold text-puk-text">{{ selectedParty.name }}</p>
-                <p class="truncate text-xs text-puk-text-muted">{{ selectedPartyStats.leader }}</p>
+                <div class="flex min-w-0 items-center gap-2">
+                  <div class="min-w-0">
+                    <p class="truncate font-semibold text-puk-text">{{ selectedParty.name }}</p>
+                    <p class="truncate text-xs text-puk-text-muted">{{ selectedPartyStats.leader }}</p>
+                  </div>
+                  <LeaderPortrait :party="selectedParty" :officer="selectedPartyStats.leaderOfficer" size="sm" />
+                </div>
                 <p class="mt-1 text-xs text-puk-text-muted">
                   {{ selectedPartyStats.seats }} seats / {{ selectedPartyStats.polling }}% polling / {{ selectedPartyStats.difficulty }}
                 </p>
@@ -213,6 +218,7 @@ async function startGame() {
             :disabled="!selectedPartyId"
             @click="startGame"
           >
+            <Play class="mr-2 inline h-4 w-4" aria-hidden="true" />
             Start campaign
           </button>
         </div>

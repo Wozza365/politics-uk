@@ -54,7 +54,7 @@ See [`phase4/P4.4-data-visualisation-polish.md`](./phase4/P4.4-data-visualisatio
 
 See [`phase4/P4.5-motion-feedback.md`](./phase4/P4.5-motion-feedback.md).
 
-### P4.6 - Iconography, party identity, imagery, and app assets `TODO`
+### P4.6 - Iconography, party identity, imagery, and app assets `DONE`
 
 See [`phase4/P4.6-iconography-assets.md`](./phase4/P4.6-iconography-assets.md).
 

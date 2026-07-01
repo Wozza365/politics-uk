@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Politics UK app icon</title>
+  <desc id="desc">A ballot shield over a dark campaign-room field with gold Westminster benches.</desc>
+  <rect width="512" height="512" rx="96" fill="#141713"/>
+  <path d="M72 96h368v200c0 83-56 143-184 196C128 439 72 379 72 296V96z" fill="#f4f1e8"/>
+  <path d="M116 136h280v150c0 62-42 109-140 152-98-43-140-90-140-152V136z" fill="#1f3d36"/>
+  <path d="M178 218h156" stroke="#d9b45f" stroke-width="34" stroke-linecap="round"/>
+  <path d="M178 286h156" stroke="#d9b45f" stroke-width="34" stroke-linecap="round"/>
+  <path d="M256 168v216" stroke="#f4f1e8" stroke-width="24" stroke-linecap="round"/>
+  <path d="M154 370c29 27 63 46 102 63 39-17 73-36 102-63" fill="none" stroke="#d9b45f" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -4,6 +4,8 @@ import { useSaveStore } from '@/stores/save'
 import { useUiStore } from '@/stores/ui'
 import { useScenarioStore } from '@/stores/scenario'
 import { CURRENT_SAVE_FORMAT_VERSION } from '@/types'
+import PartyMark from '@/components/PartyMark.vue'
+import { ArrowLeft, FilePlus2 } from '@lucide/vue'
 
 const save = useSaveStore()
 const ui = useUiStore()
@@ -35,6 +37,10 @@ function partyColour(partyId: string | null) {
 
 function partyOnColour(partyId: string | null) {
   return partyId ? scenario.party(partyId)?.colours.onPrimary ?? '#101114' : '#101114'
+}
+
+function partyFor(partyId: string | null) {
+  return partyId ? scenario.party(partyId) : undefined
 }
 
 function slotLabel(kind: string, label: string | undefined, id: string) {
@@ -69,7 +75,8 @@ function loadSave(id: string, formatVersion: number) {
           class="rounded-[var(--puk-radius-control)] border border-puk-border px-3 py-2 text-sm font-semibold text-puk-text-muted transition hover:bg-puk-surface-raised hover:text-puk-text"
           @click="ui.goToTitle"
         >
-          <- Back
+          <ArrowLeft class="mr-2 inline h-4 w-4" aria-hidden="true" />
+          Back
         </button>
         <div class="text-right">
           <p class="puk-screen-kicker">Campaign archive</p>
@@ -95,12 +102,12 @@ function loadSave(id: string, formatVersion: number) {
               :style="{ '--party-accent': partyColour(entry.selectedPartyId), '--party-on-accent': partyOnColour(entry.selectedPartyId) }"
               aria-hidden="true"
             >
-              <span
-                class="relative z-10 rounded-[var(--puk-radius-card)] px-2 py-1 text-xs font-black"
-                :style="{ backgroundColor: partyColour(entry.selectedPartyId), color: partyOnColour(entry.selectedPartyId) }"
-              >
-                {{ partyLabel(entry.selectedPartyId) }}
-              </span>
+              <PartyMark
+                class="relative z-10"
+                :party="partyFor(entry.selectedPartyId)"
+                :label="partyLabel(entry.selectedPartyId)"
+                size="sm"
+              />
             </div>
 
             <div class="min-w-0">
@@ -147,6 +154,7 @@ function loadSave(id: string, formatVersion: number) {
               class="mt-5 rounded-[var(--puk-radius-control)] border border-puk-border px-4 py-2 text-sm font-semibold text-puk-text transition hover:bg-puk-surface-raised"
               @click="ui.goToNewGame"
             >
+              <FilePlus2 class="mr-2 inline h-4 w-4" aria-hidden="true" />
               New campaign
             </button>
           </div>

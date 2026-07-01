@@ -1,0 +1,16 @@
+{
+  "name": "Politics UK",
+  "short_name": "Politics UK",
+  "description": "A Westminster campaign operations desk.",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#141713",
+  "background_color": "#141713",
+  "display": "standalone"
+}
