@@ -287,7 +287,7 @@ function partyInitials(name: string, shortName: string) {
     >
       <span class="flex min-w-0 items-center gap-2">
         <Landmark class="h-4 w-4 text-puk-premium-accent" aria-hidden="true" />
-        <span class="truncate text-sm font-semibold tracking-wide text-puk-text">Party makeup</span>
+        <span class="min-w-0 truncate text-xs font-semibold tracking-wide text-puk-text sm:text-sm">Seats</span>
       </span>
       <span class="flex items-center gap-3 text-xs text-puk-text-muted">
         <span v-if="largestParty">

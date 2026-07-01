@@ -151,6 +151,18 @@ Completed on 2026-07-01.
   with QA screenshots in [`phase4/P4.8-QA.md`](./phase4/P4.8-QA.md) and
   [`phase4/screenshots/p4-8/`](./phase4/screenshots/p4-8/).
 
+### P4.9 - Visual QA, performance budgets, and release packaging
+
+Completed on 2026-07-01.
+
+- Ran a production visual QA matrix across desktop, laptop, tablet, narrow, 320px, 200% text, and
+  forced-colors states, with screenshots in [`phase4/screenshots/p4-9/`](./phase4/screenshots/p4-9/).
+- Recorded release performance timings in
+  [`performance-baseline.json`](./phase4/screenshots/p4-9/performance-baseline.json).
+- Fixed the only automated 320px overflow finding by shortening the compact hemicycle label in
+  [`HemicycleView.vue`](../src/components/HemicycleView.vue).
+- Closed Phase 4 with [`phase4/P4.9-release-qa.md`](./phase4/P4.9-release-qa.md).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

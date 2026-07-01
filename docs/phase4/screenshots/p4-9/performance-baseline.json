@@ -1,0 +1,11 @@
+{
+  "device": "Windows desktop via Playwright Chromium 1223, production static server mounted at /politics-uk/, localhost",
+  "measuredAt": "2026-07-01T06:12:04.201Z",
+  "metrics": {
+    "titleRenderMs": 1252,
+    "setupRenderMs": 197,
+    "gameHudRenderMs": 5247,
+    "panelOpenMs": 382,
+    "viewSwitchMs": 322
+  }
+}

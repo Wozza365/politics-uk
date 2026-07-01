@@ -66,7 +66,7 @@ See [`phase4/P4.7-event-presentation-microcopy.md`](./phase4/P4.7-event-presenta
 
 See [`phase4/P4.8-audio-ambience-settings.md`](./phase4/P4.8-audio-ambience-settings.md).
 
-### P4.9 - Visual QA, performance budgets, and release packaging `TODO`
+### P4.9 - Visual QA, performance budgets, and release packaging `DONE`
 
 See [`phase4/P4.9-visual-qa-release.md`](./phase4/P4.9-visual-qa-release.md).
 
