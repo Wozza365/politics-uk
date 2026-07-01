@@ -58,7 +58,7 @@ See [`phase4/P4.5-motion-feedback.md`](./phase4/P4.5-motion-feedback.md).
 
 See [`phase4/P4.6-iconography-assets.md`](./phase4/P4.6-iconography-assets.md).
 
-### P4.7 - Event presentation, microcopy, and narrative tone `TODO`
+### P4.7 - Event presentation, microcopy, and narrative tone `DONE`
 
 See [`phase4/P4.7-event-presentation-microcopy.md`](./phase4/P4.7-event-presentation-microcopy.md).
 

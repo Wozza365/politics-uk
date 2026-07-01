@@ -12,11 +12,12 @@ const panel = ref<HTMLElement | null>(null)
 useFocusTrap(panel, () => ui.closeHelpPanel(), computed(() => ui.helpPanelOpen))
 
 const entries = [
-  ['Polling vs projection', 'Polling is the current vote share snapshot. Projection converts polling into Commons seats.'],
-  ['National vs local impact', 'National effects move the whole field. Local influence matters in named seats and contests.'],
-  ['Resource and cooldown', 'Money is spent, staff and leadership can be held, and cooldowns stop repeated use.'],
+  ['Polling vs projection', 'Polling is the vote-share snapshot. Projection translates it into Commons seats.'],
+  ['National vs local impact', 'National effects move the field. Local influence matters in named seats and live contests.'],
+  ['Resource and cooldown', 'Money is spent, capacity can be held, and cooldowns prevent repeated use.'],
   ['Contested election', 'A pending contest can be actioned from the elections panel before it resolves.'],
-  ['Scenario assumption', 'Starting data is a scenario baseline; live play records only the campaign changes made after it.'],
+  ['Scenario baseline', 'Starting data is a scenario snapshot. Live play records only simulated campaign changes.'],
+  ['Model language', 'Feed and result text describes this simulation, not real-world reporting or predictions.'],
 ]
 </script>
 

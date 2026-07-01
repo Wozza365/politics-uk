@@ -104,6 +104,9 @@ export interface FeedEntry {
   id: string
   date: ISODate
   headline: string
+  body?: string
+  scope?: EventScope
+  severity?: EventSeverity
   /** 'unactioned' renders choice buttons; 'actioned' renders the choice made + its effect. */
   status: 'actioned' | 'unactioned'
   /** Set once resolved: the action taken (often an action's `label`) and its effect. */

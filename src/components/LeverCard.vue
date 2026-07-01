@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { CheckCircle2, Clock3, Lock, Zap } from '@lucide/vue'
 
 const props = defineProps<{
   label: string
@@ -29,24 +30,37 @@ function onClick() {
 function buttonLabel() {
   if (props.cooldownDays > 0) return `Ready in ${props.cooldownDays}d`
   if (!props.allowed) return props.disabledReason ?? 'Unavailable'
-  if (awaitingConfirmation.value) return 'Confirm?'
+  if (awaitingConfirmation.value) return 'Confirm action'
   return props.label
 }
 </script>
 
 <template>
-  <div class="w-full rounded-xl border border-zinc-800/80 bg-zinc-900/60 px-3 py-2 text-left">
-    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-300">{{ label }}</p>
-    <p class="mt-1 text-xs text-zinc-500">{{ description }}</p>
-    <p v-if="forecastSummary" class="mt-1 text-xs text-zinc-600">{{ forecastSummary }}</p>
+  <div class="action-choice-card">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <p class="action-choice-kicker">National action</p>
+        <p class="truncate text-sm font-semibold text-puk-text">{{ label }}</p>
+      </div>
+      <span class="action-choice-chip" :data-state="allowed ? 'ready' : 'blocked'">
+        <CheckCircle2 v-if="allowed && cooldownDays === 0" class="h-3.5 w-3.5" aria-hidden="true" />
+        <Clock3 v-else-if="cooldownDays > 0" class="h-3.5 w-3.5" aria-hidden="true" />
+        <Lock v-else class="h-3.5 w-3.5" aria-hidden="true" />
+        {{ cooldownDays > 0 ? `${cooldownDays}d` : allowed ? 'Ready' : 'Held' }}
+      </span>
+    </div>
+    <p class="mt-2 text-xs leading-5 text-puk-text-muted">{{ description }}</p>
+    <p v-if="forecastSummary" class="mt-2 action-choice-forecast">{{ forecastSummary }}</p>
     <button
       type="button"
-      class="mt-2 w-full rounded-lg border border-zinc-700/80 bg-zinc-800/80 px-2 py-1.5 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-700/80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-zinc-800/80"
+      class="hud-action-button mt-3 w-full"
+      :class="awaitingConfirmation ? 'hud-action-button--danger' : 'hud-action-button--primary'"
       :disabled="!allowed"
       :title="!allowed ? disabledReason : undefined"
       @click="onClick"
       @blur="awaitingConfirmation = false"
     >
+      <Zap class="h-4 w-4" aria-hidden="true" />
       {{ buttonLabel() }}
     </button>
   </div>

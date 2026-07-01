@@ -120,6 +120,21 @@ Completed on 2026-07-01.
   [`phase4/P4.6-QA.md`](./phase4/P4.6-QA.md) and
   [`phase4/screenshots/p4-6/`](./phase4/screenshots/p4-6/).
 
+### P4.7 - Event presentation, microcopy, and narrative tone
+
+Completed on 2026-07-01.
+
+- Added feed scope/severity metadata for generated events, contests, elections, player levers,
+  targeted campaigns, and commitment resolution in [`game.ts`](../src/stores/game.ts).
+- Reworked [`EventFeed.vue`](../src/components/EventFeed.vue) into metadata-led event cards with
+  clear decision, recorded, action-taken, effect, and explanation states.
+- Polished action comparison surfaces in [`LeverCard.vue`](../src/components/LeverCard.vue) and
+  [`TargetOptionRow.vue`](../src/components/TargetOptionRow.vue), then tightened tutorial,
+  glossary, and explanation audit copy.
+- Documented the tone guide in [`phase4/P4.7-tone-guide.md`](./phase4/P4.7-tone-guide.md), with
+  QA screenshots in [`phase4/P4.7-QA.md`](./phase4/P4.7-QA.md) and
+  [`phase4/screenshots/p4-7/`](./phase4/screenshots/p4-7/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

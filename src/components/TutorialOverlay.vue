@@ -7,32 +7,32 @@ const game = useGameStore()
 
 const COPY: Record<TutorialMilestoneId, { title: string; body: string }> = {
   'campaign-start': {
-    title: 'Start from the objective',
-    body: 'Your live objective, next election timing, unresolved decision, and pause reason are shown across the top of the campaign.',
+    title: 'Briefing live',
+    body: 'The goal strip tracks your route to the next election: objective, time remaining, and any decision holding the clock.',
   },
   'first-player-lever': {
-    title: 'Campaign action recorded',
-    body: 'Actions spend resources now or reserve staff until they resolve. Their polling effect appears at the next published poll.',
+    title: 'Action logged',
+    body: 'Campaign actions spend resources now or reserve capacity until they resolve. Polling effects land at the next published poll.',
   },
   'first-paused-action-event': {
-    title: 'Decision needed',
-    body: 'The clock pauses when an event needs a choice. Save and menu controls remain available while you decide.',
+    title: 'Decision on the desk',
+    body: 'The clock pauses for unresolved choices. Pick a response, then the record will show the action and its effect.',
   },
   'first-contest': {
     title: 'Contest called',
-    body: 'By-elections and local contests sit in the elections panel. Resolved contests record a short cause summary.',
+    body: 'By-elections and local contests sit in the elections panel. Resolved contests leave a concise public record.',
   },
   'first-targeted-commitment': {
-    title: 'Local campaign committed',
-    body: 'Targeted commitments build temporary local influence, visible on the map and considered by contests and elections.',
+    title: 'Local pressure applied',
+    body: 'Targeted campaigns build temporary local influence. The map records where pressure is active.',
   },
   'first-poll-release': {
-    title: 'Poll released',
-    body: 'Poll movements combine recorded events, campaign actions, policy alignment, and bounded variance.',
+    title: 'Poll published',
+    body: 'Poll movement combines recorded choices, campaign action, policy fit, and bounded model variance.',
   },
   'first-election-result': {
     title: 'Election resolved',
-    body: 'The result ledger shows the model, decisive seats, and local-commitment contributions.',
+    body: 'The result ledger separates seat projection, decisive seats, and local campaign contributions.',
   },
 }
 

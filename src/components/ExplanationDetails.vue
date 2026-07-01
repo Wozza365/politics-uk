@@ -19,7 +19,7 @@ useFocusTrap(dialog, () => ui.closeExplanation(), computed(() => !!explanation.v
   <Transition name="puk-modal">
     <ModalSurface v-if="explanation" aria-label="Explanation details">
       <div ref="dialog" class="contents">
-      <PanelHeader :title="explanation.title" :subtitle="explanation.summary">
+      <PanelHeader :title="explanation.title" :subtitle="`Model audit - ${explanation.summary}`">
         <template #actions>
           <IconButton label="Close explanation" size="sm" @click="ui.closeExplanation()">
             <X class="h-4 w-4" aria-hidden="true" />
@@ -29,11 +29,19 @@ useFocusTrap(dialog, () => ui.closeExplanation(), computed(() => !!explanation.v
 
       <div class="hud-panel-body space-y-3">
         <article v-for="group in explanation.groups" :key="group.id" class="hud-record p-3">
-          <p class="font-semibold text-puk-text">{{ group.title }}</p>
+          <div class="flex items-start justify-between gap-3">
+            <p class="font-semibold text-puk-text">{{ group.title }}</p>
+            <span class="event-feed-chip">Audit trail</span>
+          </div>
           <p class="mt-1 text-xs leading-5 text-puk-text-muted">{{ group.summary }}</p>
-          <ul v-if="group.contributors.length" class="mt-2 space-y-1 text-xs text-puk-text-muted">
-            <li v-for="contributor in group.contributors" :key="`${group.id}:${contributor.label}:${contributor.sourceId ?? ''}`">
-              <span class="font-semibold text-puk-text">{{ contributor.label }}:</span> {{ contributor.detail }}
+          <ul v-if="group.contributors.length" class="mt-3 space-y-1.5 text-xs text-puk-text-muted">
+            <li
+              v-for="contributor in group.contributors"
+              :key="`${group.id}:${contributor.label}:${contributor.sourceId ?? ''}`"
+              class="explanation-contributor"
+            >
+              <span class="font-semibold text-puk-text">{{ contributor.label }}</span>
+              <span>{{ contributor.detail }}</span>
             </li>
           </ul>
         </article>

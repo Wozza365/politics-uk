@@ -613,6 +613,9 @@ export const useGameStore = defineStore('game', {
             id: rolled.id,
             date: this.date,
             headline: rolled.headline,
+            body: rolled.body,
+            scope: rolled.scope,
+            severity: rolled.severity,
             status: 'unactioned',
             actions: rolled.actions.map((action) => ({ id: action.id, label: action.label })),
           })
@@ -630,6 +633,9 @@ export const useGameStore = defineStore('game', {
             id: rolled.id,
             date: this.date,
             headline: rolled.headline,
+            body: rolled.body,
+            scope: rolled.scope,
+            severity: rolled.severity,
             status: 'actioned',
             effect: [rolled.effects?.summary, ...summary].filter(Boolean).join(' ') || undefined,
             explanationId,
@@ -679,12 +685,14 @@ export const useGameStore = defineStore('game', {
 
       const partyName = this.selectedPartyId ? scenario.party(this.selectedPartyId)?.shortName ?? this.selectedPartyId : 'Player party'
       const playerSeats = this.selectedPartyId ? applied.countsByParty[this.selectedPartyId] ?? 0 : 0
-      this.recordFeedEntry({
-        id: `${applied.id}:applied`,
-        date: this.date,
-        headline: `General election resolved: ${partyName} wins ${playerSeats} Commons seats.`,
-        status: 'actioned',
-        effect: applied.provenance,
+        this.recordFeedEntry({
+          id: `${applied.id}:applied`,
+          date: this.date,
+          headline: `General election resolved: ${partyName} wins ${playerSeats} Commons seats.`,
+          scope: 'national',
+          severity: 'major',
+          status: 'actioned',
+          effect: applied.provenance,
         explanationId: applied.explanationId,
       })
       this.evaluateCampaignProgress()
@@ -716,6 +724,8 @@ export const useGameStore = defineStore('game', {
           id: contest.id,
           date: this.date,
           headline: `By-election called: ${contest.seatName} (${partyName} hold).`,
+          scope: 'local',
+          severity: 'moderate',
           status: 'unactioned',
           actions: [],
         })
@@ -732,7 +742,7 @@ export const useGameStore = defineStore('game', {
         if (existing) {
           existing.headline = headline
         } else {
-          this.recordFeedEntry({ id: weekEntryId, date: this.date, headline, status: 'unactioned', actions: [] })
+          this.recordFeedEntry({ id: weekEntryId, date: this.date, headline, scope: 'local', severity: 'minor', status: 'unactioned', actions: [] })
         }
       }
     },
@@ -883,6 +893,8 @@ export const useGameStore = defineStore('game', {
           id: `lever:${leverId}:${this.date}`,
           date: this.date,
           headline: `${partyName} begins: ${def.label.toLowerCase()}.`,
+          scope: 'national',
+          severity: 'minor',
           status: 'actioned',
         })
         this.evaluateCampaignProgress()
@@ -895,6 +907,8 @@ export const useGameStore = defineStore('game', {
         id: `lever:${leverId}:${this.date}`,
         date: this.date,
         headline: `${partyName} ${outcome.resultLabel}`,
+        scope: 'national',
+        severity: 'minor',
         status: 'actioned',
       })
       this.evaluateCampaignProgress()
@@ -935,6 +949,8 @@ export const useGameStore = defineStore('game', {
         id: `${actionId}:${this.date}`,
         date: this.date,
         headline: rationale ? `${partyName}: ${rationale}` : `${partyName} launches a targeted campaign in ${scope.label}.`,
+        scope: scope.kind === 'national' ? 'national' : 'local',
+        severity: partyId === this.selectedPartyId ? 'moderate' : 'minor',
         status: 'actioned',
       })
       if (partyId === this.selectedPartyId) this.completeTutorialMilestone('first-targeted-commitment')
@@ -978,6 +994,8 @@ export const useGameStore = defineStore('game', {
         id: `${commitment.id}:cancelled`,
         date: this.date,
         headline: `${partyName} abandons: ${label.toLowerCase()}.`,
+        scope: commitment.targetScope?.kind === 'national' ? 'national' : commitment.targetScope ? 'local' : 'national',
+        severity: 'minor',
         status: 'actioned',
       })
     },
@@ -1012,6 +1030,8 @@ export const useGameStore = defineStore('game', {
           id: `${commitment.id}:resolved`,
           date: this.date,
           headline: `${partyName} ${commitment.resultLabel}`,
+          scope: commitment.targetScope?.kind === 'national' ? 'national' : commitment.targetScope ? 'local' : 'national',
+          severity: 'minor',
           status: 'actioned',
         })
       }
