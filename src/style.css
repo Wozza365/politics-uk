@@ -691,6 +691,70 @@ textarea {
   padding-top: 0.4rem;
 }
 
+.presentation-settings-group {
+  border: var(--puk-border-width) solid var(--puk-color-border-subtle);
+  border-radius: var(--puk-radius-card);
+  background: color-mix(in srgb, var(--puk-color-map-backdrop) 70%, transparent);
+  padding: 0.85rem;
+}
+
+.presentation-toggle,
+.presentation-slider,
+.presentation-motion-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--puk-color-text-muted);
+  font-size: var(--puk-type-dense);
+  font-weight: 700;
+}
+
+.presentation-toggle {
+  width: fit-content;
+  border: var(--puk-border-width) solid var(--puk-color-border-subtle);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--puk-color-surface-raised) 72%, transparent);
+  padding: 0.35rem 0.6rem;
+}
+
+.presentation-toggle--wide {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.presentation-toggle input,
+.presentation-motion-options input {
+  accent-color: var(--puk-color-player-focus);
+}
+
+.presentation-slider {
+  margin-top: 0.8rem;
+  justify-content: space-between;
+}
+
+.presentation-slider input {
+  width: min(12rem, 45%);
+  accent-color: var(--puk-color-player-focus);
+}
+
+.presentation-slider input:disabled {
+  opacity: 0.45;
+}
+
+.presentation-motion-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.presentation-motion-options label {
+  justify-content: center;
+  border: var(--puk-border-width) solid var(--puk-color-border-subtle);
+  border-radius: var(--puk-radius-control);
+  background: color-mix(in srgb, var(--puk-color-surface-raised) 64%, transparent);
+  padding: 0.45rem 0.5rem;
+}
+
 .hud-icon-button {
   display: inline-flex;
   align-items: center;
@@ -1518,6 +1582,21 @@ textarea {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+:root[data-puk-motion="reduced"] *,
+:root[data-puk-motion="reduced"] *::before,
+:root[data-puk-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+:root[data-puk-motion="reduced"] .puk-command-action:not(:disabled):hover,
+:root[data-puk-motion="reduced"] .puk-party-card:hover,
+:root[data-puk-motion="reduced"] .event-choice-button:hover {
+  transform: none;
 }
 
 @media (max-width: 48rem) {

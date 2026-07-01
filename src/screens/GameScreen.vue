@@ -11,6 +11,7 @@ import GameClock from '@/components/GameClock.vue'
 import ByElectionsPanel from '@/components/ByElectionsPanel.vue'
 import SaveManagementPanel from '@/components/SaveManagementPanel.vue'
 import GameMenuPanel from '@/components/GameMenuPanel.vue'
+import PresentationSettingsPanel from '@/components/PresentationSettingsPanel.vue'
 import TargetingPanel from '@/components/TargetingPanel.vue'
 import CampaignJournal from '@/components/CampaignJournal.vue'
 import ViewSwitcher from '@/components/ViewSwitcher.vue'
@@ -55,6 +56,7 @@ watch(
     <CampaignJournal />
     <SaveManagementPanel />
     <GameMenuPanel />
+    <PresentationSettingsPanel />
     <GoalStatusStrip />
     <HelpPanel />
     <TutorialOverlay />

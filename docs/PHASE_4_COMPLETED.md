@@ -135,6 +135,22 @@ Completed on 2026-07-01.
   QA screenshots in [`phase4/P4.7-QA.md`](./phase4/P4.7-QA.md) and
   [`phase4/screenshots/p4-7/`](./phase4/screenshots/p4-7/).
 
+### P4.8 - Audio, ambience, and player presentation settings
+
+Completed on 2026-07-01.
+
+- Added local presentation preferences in [`ui.ts`](../src/stores/ui.ts) with localStorage
+  persistence for sound, effects volume, ambience volume, reduced sensory mode, and motion
+  preference.
+- Added [`PresentationSettingsPanel.vue`](../src/components/PresentationSettingsPanel.vue) and
+  enabled the game-menu Settings entry.
+- Added generated WebAudio cues in
+  [`usePresentationAudio.ts`](../src/composables/usePresentationAudio.ts), with no bundled
+  third-party audio assets.
+- Documented policy and asset status in [`phase4/P4.8-audio-policy.md`](./phase4/P4.8-audio-policy.md),
+  with QA screenshots in [`phase4/P4.8-QA.md`](./phase4/P4.8-QA.md) and
+  [`phase4/screenshots/p4-8/`](./phase4/screenshots/p4-8/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

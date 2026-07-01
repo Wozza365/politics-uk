@@ -4,7 +4,19 @@ import { useUiStore } from './ui'
 
 describe('useUiStore — P3.2 screen lifecycle', () => {
   beforeEach(() => {
+    const storage = new Map<string, string>()
+    globalThis.localStorage = {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+      clear: () => storage.clear(),
+      key: (index: number) => Array.from(storage.keys())[index] ?? null,
+      get length() {
+        return storage.size
+      },
+    }
     setActivePinia(createPinia())
+    localStorage.clear()
   })
 
   it('starts on the title screen', () => {
@@ -89,5 +101,27 @@ describe('useUiStore — P3.2 screen lifecycle', () => {
     expect(ui.openMenus).toBe(0)
     expect(ui.confirmModal).toBeNull()
     expect(ui.activeView).toBe('regional')
+  })
+
+  it('persists presentation preferences locally without adding them to save state', () => {
+    const ui = useUiStore()
+
+    ui.setSoundEnabled(true)
+    ui.setSoundEffectsVolume(1.5)
+    ui.setAmbienceVolume(0.4)
+    ui.setMotionPreference('reduced')
+
+    expect(ui.presentation.soundEnabled).toBe(true)
+    expect(ui.presentation.soundEffectsVolume).toBe(1)
+    expect(ui.presentation.ambienceVolume).toBe(0.4)
+    expect(ui.presentation.motionPreference).toBe('reduced')
+    expect(ui.toSaveState()).not.toHaveProperty('presentation')
+
+    const restored = useUiStore()
+    restored.presentation.soundEnabled = false
+    restored.loadPresentationPreferences()
+
+    expect(restored.presentation.soundEnabled).toBe(true)
+    expect(restored.presentation.motionPreference).toBe('reduced')
   })
 })

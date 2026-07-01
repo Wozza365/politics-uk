@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, watch } from 'vue'
 import { useUiStore } from '@/stores/ui'
 import { useSaveStore } from '@/stores/save'
+import { usePresentationAudio } from '@/composables/usePresentationAudio'
 import TitleScreen from '@/screens/TitleScreen.vue'
 import NewGameScreen from '@/screens/NewGameScreen.vue'
 import LoadGameScreen from '@/screens/LoadGameScreen.vue'
@@ -15,6 +16,7 @@ const ui = useUiStore()
 // Wired once for the app's lifetime (P3.1) — startAutosave() is idempotent, so this is safe
 // even though App.vue itself never unmounts/remounts.
 useSaveStore().startAutosave()
+usePresentationAudio()
 
 const screens = {
   title: TitleScreen,
@@ -36,7 +38,18 @@ function resetScreenScroll() {
 }
 
 watch(() => ui.screen, resetScreenScroll)
-onMounted(resetScreenScroll)
+watch(
+  () => [ui.presentation.motionPreference, ui.presentation.reducedSensory] as const,
+  ([motionPreference, reducedSensory]) => {
+    document.documentElement.dataset.pukMotion = reducedSensory || motionPreference === 'reduced' ? 'reduced' : motionPreference
+    document.documentElement.dataset.pukSensory = reducedSensory ? 'reduced' : 'standard'
+  },
+  { immediate: true },
+)
+onMounted(() => {
+  ui.loadPresentationPreferences()
+  resetScreenScroll()
+})
 </script>
 
 <template>

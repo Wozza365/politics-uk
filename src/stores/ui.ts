@@ -14,6 +14,30 @@ const GAME_VIEWS: GameView[] = ['westminster', 'regional', 'councils']
 const MAP_RENDERER_CHOICES: MapRendererChoice[] = ['geographic', 'hex']
 
 export type MapOverlayKey = 'commitments' | 'contests' | 'opponentActivity'
+export type MotionPreference = 'system' | 'reduced' | 'standard'
+
+export interface PresentationPreferences {
+  soundEnabled: boolean
+  soundEffectsVolume: number
+  ambienceVolume: number
+  reducedSensory: boolean
+  motionPreference: MotionPreference
+}
+
+const PRESENTATION_STORAGE_KEY = 'politics-uk:presentation-preferences:v1'
+const MOTION_PREFERENCES: MotionPreference[] = ['system', 'reduced', 'standard']
+
+const defaultPresentationPreferences = (): PresentationPreferences => ({
+  soundEnabled: false,
+  soundEffectsVolume: 0.35,
+  ambienceVolume: 0,
+  reducedSensory: false,
+  motionPreference: 'system',
+})
+
+function clampUnit(value: number) {
+  return Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0))
+}
 
 /** External request for `MapView.vue` to focus a region — the only seam other components use to
  * drive the map (spec/CLAUDE.md: "never reach into SVG/DOM from game logic"). `MapView` alone
@@ -53,12 +77,14 @@ export const useUiStore = defineStore('ui', {
     saveManagementPanelOpen: false,
     targetingPanelOpen: false,
     gameMenuOpen: false,
+    presentationSettingsOpen: false,
     helpPanelOpen: false,
     activeExplanationId: null as string | null,
     mapFocusRequest: null as MapFocusRequest | null,
     // P3.4 map overlay toggles — transient display preferences for `MapView.vue`'s targeting
     // tinting pass, never persisted (see `hydrateFromSaveState`, which always resets to defaults).
     mapOverlays: { commitments: true, contests: true, opponentActivity: true } as Record<MapOverlayKey, boolean>,
+    presentation: defaultPresentationPreferences(),
     // Transient — `resolve` is a callback, never persisted (see `hydrateFromSaveState`, which
     // always clears this like every other open-panel flag). Only one prompt is ever pending at a
     // time, matching the UI: a screen-level transition is never queued behind another one.
@@ -97,6 +123,12 @@ export const useUiStore = defineStore('ui', {
     },
     closeGameMenu() {
       this.gameMenuOpen = false
+    },
+    openPresentationSettings() {
+      this.presentationSettingsOpen = true
+    },
+    closePresentationSettings() {
+      this.presentationSettingsOpen = false
     },
     toggleHelpPanel() {
       this.helpPanelOpen = !this.helpPanelOpen
@@ -160,6 +192,53 @@ export const useUiStore = defineStore('ui', {
     setWestminsterRenderer(renderer: MapRendererChoice) {
       this.westminsterRenderer = renderer
     },
+    loadPresentationPreferences() {
+      if (typeof localStorage === 'undefined') return
+      try {
+        const raw = localStorage.getItem(PRESENTATION_STORAGE_KEY)
+        if (!raw) return
+        const parsed = JSON.parse(raw) as Partial<PresentationPreferences>
+        this.presentation = {
+          soundEnabled: parsed.soundEnabled === true,
+          soundEffectsVolume: clampUnit(Number(parsed.soundEffectsVolume ?? 0.35)),
+          ambienceVolume: clampUnit(Number(parsed.ambienceVolume ?? 0)),
+          reducedSensory: parsed.reducedSensory === true,
+          motionPreference: MOTION_PREFERENCES.includes(parsed.motionPreference as MotionPreference)
+            ? (parsed.motionPreference as MotionPreference)
+            : 'system',
+        }
+      } catch {
+        this.presentation = defaultPresentationPreferences()
+      }
+    },
+    persistPresentationPreferences() {
+      if (typeof localStorage === 'undefined') return
+      localStorage.setItem(PRESENTATION_STORAGE_KEY, JSON.stringify(this.presentation))
+    },
+    setSoundEnabled(enabled: boolean) {
+      this.presentation.soundEnabled = enabled
+      this.persistPresentationPreferences()
+    },
+    setSoundEffectsVolume(volume: number) {
+      this.presentation.soundEffectsVolume = clampUnit(volume)
+      this.persistPresentationPreferences()
+    },
+    setAmbienceVolume(volume: number) {
+      this.presentation.ambienceVolume = clampUnit(volume)
+      this.persistPresentationPreferences()
+    },
+    setReducedSensory(enabled: boolean) {
+      this.presentation.reducedSensory = enabled
+      if (enabled) {
+        this.presentation.soundEnabled = false
+        this.presentation.ambienceVolume = 0
+      }
+      this.persistPresentationPreferences()
+    },
+    setMotionPreference(preference: MotionPreference) {
+      this.presentation.motionPreference = MOTION_PREFERENCES.includes(preference) ? preference : 'system'
+      this.persistPresentationPreferences()
+    },
     /** The only `ui` fields worth persisting (P3.0) — display preferences, never an open
      * panel/modal or a running timer. */
     toSaveState(): UiSaveStateV1 {
@@ -186,6 +265,7 @@ export const useUiStore = defineStore('ui', {
       this.saveManagementPanelOpen = false
       this.targetingPanelOpen = false
       this.gameMenuOpen = false
+      this.presentationSettingsOpen = false
       this.helpPanelOpen = false
       this.activeExplanationId = null
       this.mapFocusRequest = null

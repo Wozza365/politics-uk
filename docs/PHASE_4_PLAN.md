@@ -62,7 +62,7 @@ See [`phase4/P4.6-iconography-assets.md`](./phase4/P4.6-iconography-assets.md).
 
 See [`phase4/P4.7-event-presentation-microcopy.md`](./phase4/P4.7-event-presentation-microcopy.md).
 
-### P4.8 - Audio, ambience, and player presentation settings `TODO`
+### P4.8 - Audio, ambience, and player presentation settings `DONE`
 
 See [`phase4/P4.8-audio-ambience-settings.md`](./phase4/P4.8-audio-ambience-settings.md).
 

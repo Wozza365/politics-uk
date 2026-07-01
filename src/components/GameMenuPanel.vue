@@ -25,6 +25,11 @@ function manageSaves() {
   ui.toggleSaveManagementPanel()
 }
 
+function openSettings() {
+  ui.closeGameMenu()
+  ui.openPresentationSettings()
+}
+
 async function returnToMainMenu() {
   const confirmed = await ui.requestConfirm({
     title: 'Return to main menu?',
@@ -73,7 +78,7 @@ async function restart() {
           <SaveIcon class="h-4 w-4" aria-hidden="true" />
           Manage saves
         </button>
-        <button type="button" class="hud-action-button justify-start" disabled aria-disabled="true">
+        <button type="button" class="hud-action-button justify-start" @click="openSettings">
           <Settings class="h-4 w-4" aria-hidden="true" />
           Settings
         </button>
