@@ -52,19 +52,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <aside
-    v-if="active && copy"
-    class="hud-tutorial absolute bottom-40 left-[22rem] z-40 w-[min(24rem,calc(100vw-24rem))] rounded-lg border border-sky-500/40 bg-zinc-950/95 p-4 text-sm text-zinc-200 shadow-2xl"
-    aria-live="polite"
-  >
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <p class="font-semibold text-sky-100">{{ copy.title }}</p>
-        <p class="mt-1 text-xs leading-5 text-zinc-400">{{ copy.body }}</p>
+  <Transition name="puk-popover">
+    <aside
+      v-if="active && copy"
+      class="hud-tutorial hud-record absolute bottom-40 left-[22rem] z-40 w-[min(24rem,calc(100vw-24rem))] p-4 text-sm"
+      aria-live="polite"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="font-semibold text-puk-text">{{ copy.title }}</p>
+          <p class="mt-1 text-xs leading-5 text-puk-text-muted">{{ copy.body }}</p>
+        </div>
+        <button type="button" class="hud-action-button shrink-0" @click="dismiss">
+          Skip
+        </button>
       </div>
-      <button type="button" class="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-800" @click="dismiss">
-        Skip
-      </button>
-    </div>
-  </aside>
+    </aside>
+  </Transition>
 </template>

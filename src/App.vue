@@ -40,14 +40,18 @@ onMounted(resetScreenScroll)
 </script>
 
 <template>
-  <component :is="currentScreen" />
-  <ConfirmDialog
-    v-if="ui.confirmModal"
-    :title="ui.confirmModal.request.title"
-    :message="ui.confirmModal.request.message"
-    :confirm-label="ui.confirmModal.request.confirmLabel"
-    :cancel-label="ui.confirmModal.request.cancelLabel"
-    @confirm="ui.resolveConfirm(true)"
-    @cancel="ui.resolveConfirm(false)"
-  />
+  <Transition name="puk-screen" mode="out-in">
+    <component :is="currentScreen" :key="ui.screen" />
+  </Transition>
+  <Transition name="puk-modal">
+    <ConfirmDialog
+      v-if="ui.confirmModal"
+      :title="ui.confirmModal.request.title"
+      :message="ui.confirmModal.request.message"
+      :confirm-label="ui.confirmModal.request.confirmLabel"
+      :cancel-label="ui.confirmModal.request.cancelLabel"
+      @confirm="ui.resolveConfirm(true)"
+      @cancel="ui.resolveConfirm(false)"
+    />
+  </Transition>
 </template>

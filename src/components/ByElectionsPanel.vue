@@ -23,15 +23,16 @@ function formatWeek(week: ISODate) {
 </script>
 
 <template>
-  <HudPanel
-    v-if="ui.byElectionsPanelOpen"
-    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
-    aria-label="By-elections panel"
-  >
-    <PanelHeader
-      title="By-elections & minor elections"
-      :subtitle="`${commonsContests.filter((contest) => contest.status === 'pending').length} parliamentary contest(s) pending`"
-    />
+  <Transition name="puk-panel">
+    <HudPanel
+      v-if="ui.byElectionsPanelOpen"
+      class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
+      aria-label="By-elections panel"
+    >
+      <PanelHeader
+        title="By-elections & minor elections"
+        :subtitle="`${commonsContests.filter((contest) => contest.status === 'pending').length} parliamentary contest(s) pending`"
+      />
 
     <div class="hud-panel-body space-y-4">
       <div v-if="commonsContests.length">
@@ -84,6 +85,7 @@ function formatWeek(week: ISODate) {
       <p v-if="!commonsContests.length && !councilContestsByWeek.length" class="text-sm text-puk-text-disabled">
         No by-elections called yet.
       </p>
-    </div>
-  </HudPanel>
+      </div>
+    </HudPanel>
+  </Transition>
 </template>

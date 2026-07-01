@@ -87,6 +87,22 @@ Completed on 2026-06-30.
   [`phase4/P4.4-QA.md`](./phase4/P4.4-QA.md) and
   [`phase4/screenshots/p4-4/`](./phase4/screenshots/p4-4/).
 
+### P4.5 - Motion, transitions, feedback states, and tactile feel
+
+Completed on 2026-07-01.
+
+- Added shared motion timings and transition classes for screen changes, HUD panels, popovers,
+  modal surfaces, event-feed arrivals, and save-status feedback in [`src/style.css`](../src/style.css).
+- Wrapped the title/setup/game screen outlet, save/help/targeting/by-election/menu panels,
+  tutorial popover, explanation dialog, confirmation dialog, and event feed in deterministic Vue
+  transitions.
+- Added explicit save-status states in
+  [`SaveStatusIndicator.vue`](../src/components/SaveStatusIndicator.vue) and reduced-motion
+  substitutions for all new transition families.
+- Captured P4.5 screenshots and verification notes in
+  [`phase4/P4.5-QA.md`](./phase4/P4.5-QA.md) and
+  [`phase4/screenshots/p4-5/`](./phase4/screenshots/p4-5/).
+
 ## Carry-forward notes
 
 - Keep screenshots, visual QA notes, and any asset-rights decisions close to the task that made

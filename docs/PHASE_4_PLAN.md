@@ -50,7 +50,7 @@ See [`phase4/P4.3-map-geography-polish.md`](./phase4/P4.3-map-geography-polish.m
 
 See [`phase4/P4.4-data-visualisation-polish.md`](./phase4/P4.4-data-visualisation-polish.md).
 
-### P4.5 - Motion, transitions, feedback states, and tactile feel `TODO`
+### P4.5 - Motion, transitions, feedback states, and tactile feel `DONE`
 
 See [`phase4/P4.5-motion-feedback.md`](./phase4/P4.5-motion-feedback.md).
 

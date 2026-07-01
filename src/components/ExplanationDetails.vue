@@ -16,8 +16,9 @@ useFocusTrap(dialog, () => ui.closeExplanation(), computed(() => !!explanation.v
 </script>
 
 <template>
-  <ModalSurface v-if="explanation" aria-label="Explanation details">
-    <div ref="dialog" class="contents">
+  <Transition name="puk-modal">
+    <ModalSurface v-if="explanation" aria-label="Explanation details">
+      <div ref="dialog" class="contents">
       <PanelHeader :title="explanation.title" :subtitle="explanation.summary">
         <template #actions>
           <IconButton label="Close explanation" size="sm" @click="ui.closeExplanation()">
@@ -37,6 +38,7 @@ useFocusTrap(dialog, () => ui.closeExplanation(), computed(() => !!explanation.v
           </ul>
         </article>
       </div>
-    </div>
-  </ModalSurface>
+      </div>
+    </ModalSurface>
+  </Transition>
 </template>

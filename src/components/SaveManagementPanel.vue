@@ -97,13 +97,14 @@ function formatDate(iso: string) {
 </script>
 
 <template>
-  <HudPanel
-    v-if="ui.saveManagementPanelOpen"
-    class="absolute left-1/2 top-24 z-30 max-h-[calc(100vh-7rem)] w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto"
-    role="dialog"
-    aria-modal="false"
-    aria-label="Save management panel"
-  >
+  <Transition name="puk-panel">
+    <HudPanel
+      v-if="ui.saveManagementPanelOpen"
+      class="absolute left-1/2 top-24 z-30 max-h-[calc(100vh-7rem)] w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto"
+      role="dialog"
+      aria-modal="false"
+      aria-label="Save management panel"
+    >
     <div ref="panel" class="contents">
       <PanelHeader title="Saved games" subtitle="Manual slots only">
         <template #actions>
@@ -205,5 +206,6 @@ function formatDate(iso: string) {
       @confirm="confirmImportOverwrite"
       @cancel="cancelImportOverwrite"
     />
-  </HudPanel>
+    </HudPanel>
+  </Transition>
 </template>

@@ -55,12 +55,13 @@ async function restart() {
 </script>
 
 <template>
-  <HudPanel
-    v-if="ui.gameMenuOpen"
-    class="absolute left-1/2 top-24 z-30 w-[min(20rem,calc(100vw-2rem))] -translate-x-1/2"
-    aria-label="Game menu"
-  >
-    <div ref="panel" class="contents">
+  <Transition name="puk-panel">
+    <HudPanel
+      v-if="ui.gameMenuOpen"
+      class="absolute left-1/2 top-24 z-30 w-[min(20rem,calc(100vw-2rem))] -translate-x-1/2"
+      aria-label="Game menu"
+    >
+      <div ref="panel" class="contents">
       <PanelHeader title="Menu" />
 
       <nav class="flex flex-col gap-1 p-2" aria-label="Game menu actions">
@@ -85,6 +86,7 @@ async function restart() {
           Restart campaign
         </button>
       </nav>
-    </div>
-  </HudPanel>
+      </div>
+    </HudPanel>
+  </Transition>
 </template>

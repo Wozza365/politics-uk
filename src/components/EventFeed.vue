@@ -15,7 +15,8 @@ watch(
   () => game.feed.length,
   async () => {
     await nextTick()
-    scrollEl.value?.scrollTo({ top: scrollEl.value.scrollHeight, behavior: 'smooth' })
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    scrollEl.value?.scrollTo({ top: scrollEl.value.scrollHeight, behavior: reducedMotion ? 'auto' : 'smooth' })
   },
 )
 
@@ -34,36 +35,38 @@ function formatDate(date: ISODate) {
       Awaiting the first tick. Events will appear here as they happen.
     </p>
 
-    <article v-for="entry in game.feed" :key="entry.id" class="hud-record p-3">
-      <p class="font-bold text-puk-text">{{ entry.headline }}</p>
+    <TransitionGroup name="puk-feed" tag="div" class="contents">
+      <article v-for="entry in game.feed" :key="entry.id" class="hud-record p-3">
+        <p class="font-bold text-puk-text">{{ entry.headline }}</p>
 
-      <template v-if="entry.status === 'actioned'">
-        <p v-if="entry.actionTaken" class="mt-1 text-puk-text-muted">{{ entry.actionTaken }}</p>
-        <p v-if="entry.effect" class="mt-0.5 text-xs text-puk-text-disabled">{{ entry.effect }}</p>
-        <button
-          v-if="entry.explanationId"
-          type="button"
-          class="hud-action-button mt-2"
-          @click="ui.showExplanation(entry.explanationId)"
-        >
-          <HelpCircle class="h-4 w-4" aria-hidden="true" />
-          Why?
-        </button>
-      </template>
+        <template v-if="entry.status === 'actioned'">
+          <p v-if="entry.actionTaken" class="mt-1 text-puk-text-muted">{{ entry.actionTaken }}</p>
+          <p v-if="entry.effect" class="mt-0.5 text-xs text-puk-text-disabled">{{ entry.effect }}</p>
+          <button
+            v-if="entry.explanationId"
+            type="button"
+            class="hud-action-button mt-2"
+            @click="ui.showExplanation(entry.explanationId)"
+          >
+            <HelpCircle class="h-4 w-4" aria-hidden="true" />
+            Why?
+          </button>
+        </template>
 
-      <div v-else class="mt-2 flex flex-wrap gap-2">
-        <button
-          v-for="action in entry.actions"
-          :key="action.id"
-          type="button"
-          class="hud-action-button hud-action-button--primary"
-          @click="game.resolveFeedAction(entry.id, action.id)"
-        >
-          {{ action.label }}
-        </button>
-      </div>
+        <div v-else class="mt-2 flex flex-wrap gap-2">
+          <button
+            v-for="action in entry.actions"
+            :key="action.id"
+            type="button"
+            class="hud-action-button hud-action-button--primary"
+            @click="game.resolveFeedAction(entry.id, action.id)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
 
-      <p class="mt-2 text-xs text-puk-text-disabled">{{ formatDate(entry.date) }}</p>
-    </article>
+        <p class="mt-2 text-xs text-puk-text-disabled">{{ formatDate(entry.date) }}</p>
+      </article>
+    </TransitionGroup>
   </div>
 </template>

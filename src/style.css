@@ -58,6 +58,8 @@
   --puk-shadow-modal: 0 32px 96px rgb(0 0 0 / 0.58);
 
   --puk-duration-control: 120ms;
+  --puk-duration-instant: 80ms;
+  --puk-duration-fast: 140ms;
   --puk-duration-panel: 180ms;
   --puk-duration-map-snap: 320ms;
   --puk-duration-result: 520ms;
@@ -635,6 +637,92 @@ textarea {
   transform: translateY(0);
 }
 
+.puk-screen-enter-active,
+.puk-screen-leave-active {
+  transition:
+    opacity var(--puk-duration-panel) var(--puk-ease-standard),
+    transform var(--puk-duration-panel) var(--puk-ease-standard);
+}
+
+.puk-screen-enter-from {
+  opacity: 0;
+  transform: translateY(0.5rem);
+}
+
+.puk-screen-leave-to {
+  opacity: 0;
+  transform: translateY(-0.35rem);
+}
+
+.puk-panel-enter-active,
+.puk-panel-leave-active,
+.puk-popover-enter-active,
+.puk-popover-leave-active,
+.puk-modal-enter-active,
+.puk-modal-leave-active {
+  transition:
+    opacity var(--puk-duration-panel) var(--puk-ease-standard),
+    transform var(--puk-duration-panel) var(--puk-ease-standard),
+    filter var(--puk-duration-panel) var(--puk-ease-standard);
+}
+
+.puk-panel-enter-from,
+.puk-panel-leave-to {
+  opacity: 0;
+  transform: translateY(-0.4rem) scale(0.985);
+  filter: blur(2px);
+}
+
+.puk-popover-enter-from,
+.puk-popover-leave-to {
+  opacity: 0;
+  transform: translateY(0.4rem);
+}
+
+.puk-modal-enter-from,
+.puk-modal-leave-to {
+  opacity: 0;
+  transform: scale(0.985);
+}
+
+.puk-feed-enter-active,
+.puk-feed-leave-active {
+  transition:
+    opacity var(--puk-duration-panel) var(--puk-ease-standard),
+    transform var(--puk-duration-panel) var(--puk-ease-standard),
+    border-color var(--puk-duration-panel) var(--puk-ease-standard);
+}
+
+.puk-feed-enter-from,
+.puk-feed-leave-to {
+  opacity: 0;
+  transform: translateY(0.35rem);
+}
+
+.puk-feed-enter-active {
+  border-color: color-mix(in srgb, var(--puk-color-player-focus) 48%, var(--puk-color-border));
+}
+
+.save-status {
+  color: var(--puk-color-text-disabled);
+  transition:
+    color var(--puk-duration-fast) var(--puk-ease-standard),
+    text-shadow var(--puk-duration-fast) var(--puk-ease-standard);
+}
+
+.save-status[data-state="saving"] {
+  color: var(--puk-color-warning);
+}
+
+.save-status[data-state="saved"] {
+  color: var(--puk-color-success);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--puk-color-success) 36%, transparent);
+}
+
+.save-status[data-state="error"] {
+  color: var(--puk-color-danger);
+}
+
 .puk-map-room {
   isolation: isolate;
   border-radius: var(--puk-radius-panel);
@@ -1041,6 +1129,33 @@ textarea {
   .puk-command-action:not(:disabled):hover,
   .puk-party-card:hover {
     transform: none;
+  }
+
+  .puk-screen-enter-active,
+  .puk-screen-leave-active,
+  .puk-panel-enter-active,
+  .puk-panel-leave-active,
+  .puk-popover-enter-active,
+  .puk-popover-leave-active,
+  .puk-modal-enter-active,
+  .puk-modal-leave-active,
+  .puk-feed-enter-active,
+  .puk-feed-leave-active {
+    transition-property: opacity, border-color, color, background-color;
+  }
+
+  .puk-screen-enter-from,
+  .puk-screen-leave-to,
+  .puk-panel-enter-from,
+  .puk-panel-leave-to,
+  .puk-popover-enter-from,
+  .puk-popover-leave-to,
+  .puk-modal-enter-from,
+  .puk-modal-leave-to,
+  .puk-feed-enter-from,
+  .puk-feed-leave-to {
+    transform: none;
+    filter: none;
   }
 
   .puk-loading-map::after {

@@ -12,13 +12,20 @@ const statusLabel = computed(() => {
   if (save.lastSavedAt) return 'Saved'
   return ''
 })
+
+const statusState = computed(() => {
+  if (save.lastWriteError) return 'error'
+  if (save.saving) return 'saving'
+  if (save.lastSavedAt) return 'saved'
+  return 'idle'
+})
 </script>
 
 <template>
   <p
     aria-live="polite"
-    class="text-xs"
-    :class="save.lastWriteError ? 'text-red-400' : 'text-zinc-500'"
+    class="save-status text-xs"
+    :data-state="statusState"
   >
     {{ statusLabel }}
   </p>

@@ -25,14 +25,15 @@ useFocusTrap(panel, close, computed(() => ui.targetingPanelOpen))
 </script>
 
 <template>
-  <HudPanel
-    v-if="ui.targetingPanelOpen"
-    class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
-    role="dialog"
-    aria-modal="false"
-    aria-label="Targeted campaigning panel"
-  >
-    <div ref="panel" class="contents">
+  <Transition name="puk-panel">
+    <HudPanel
+      v-if="ui.targetingPanelOpen"
+      class="hud-side-panel absolute bottom-44 right-4 top-[23rem] z-30 w-[min(28rem,calc(100vw-2rem))] overflow-y-auto"
+      role="dialog"
+      aria-modal="false"
+      aria-label="Targeted campaigning panel"
+    >
+      <div ref="panel" class="contents">
       <PanelHeader title="Targeted campaigning" subtitle="Commit staff and money to a specific place for two weeks.">
         <template #actions>
           <IconButton label="Close targeted campaigning panel" size="sm" @click="close">
@@ -57,6 +58,7 @@ useFocusTrap(panel, close, computed(() => ui.targetingPanelOpen))
           @focus="option.focusGeometryRef && focusOnMap(option.focusGeometryRef)"
         />
       </div>
-    </div>
-  </HudPanel>
+      </div>
+    </HudPanel>
+  </Transition>
 </template>

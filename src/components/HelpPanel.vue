@@ -21,14 +21,15 @@ const entries = [
 </script>
 
 <template>
-  <HudPanel
-    v-if="ui.helpPanelOpen"
-    class="absolute left-1/2 top-20 z-40 max-h-[calc(100vh-7rem)] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto text-sm"
-    role="dialog"
-    aria-modal="false"
-    aria-label="Glossary"
-  >
-    <div ref="panel" class="contents">
+  <Transition name="puk-panel">
+    <HudPanel
+      v-if="ui.helpPanelOpen"
+      class="absolute left-1/2 top-20 z-40 max-h-[calc(100vh-7rem)] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto text-sm"
+      role="dialog"
+      aria-modal="false"
+      aria-label="Glossary"
+    >
+      <div ref="panel" class="contents">
       <PanelHeader title="Glossary">
         <template #actions>
           <IconButton label="Close glossary" size="sm" @click="ui.closeHelpPanel()">
@@ -42,6 +43,7 @@ const entries = [
           <dd class="mt-1 text-xs leading-5 text-puk-text-muted">{{ definition }}</dd>
         </div>
       </dl>
-    </div>
-  </HudPanel>
+      </div>
+    </HudPanel>
+  </Transition>
 </template>
